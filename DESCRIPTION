@@ -1,0 +1,22 @@
+Package: lolog
+Maintainer: Ian Fellows <ian@fellstat.com>
+License: LGPL-2.1
+Title: Exponential-Family Random Network Models
+LinkingTo: Rcpp, BH
+Type: Package
+LazyLoad: yes
+Author: Ian Fellows
+Description: Estimation of Latent Order LOGistic (LOLOG) graph models.
+Version: 1.0
+Date: 2018-03-15
+Depends:
+    methods,
+    Rcpp (>= 0.9.4)
+Imports:
+    trust,
+    moments
+Suggests:
+    testthat,
+    network,
+    inline
+RcppModules: ernm

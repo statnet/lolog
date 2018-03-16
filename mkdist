@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ -n $R]; then
+	R="/usr/local/bin/R"
+else
+	R="R"
+fi
+
+mkdir tmp
+cp -r lolog tmp/lolog
+rm -rf tmp/lolog/Debug
+rm -rf tmp/lolog/.cproject
+rm -rf tmp/lolog/.project
+rm -rf tmp/lolog/mkdist
+cp -rf tmp/lolog/src/*.h tmp/lolog/inst/include
+cp -rf tmp/lolog/src/tests/* tmp/lolog/src
+rm -rf tmp/lolog/src/tests
+$R CMD build tmp/lolog
+rm -rf tmp
+$R CMD INSTALL lolog_1.0.tar.gz

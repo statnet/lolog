@@ -1,0 +1,6 @@
+import(methods)
+import(Rcpp)
+import(trust)
+import(moments)
+useDynLib(lolog)
+exportPattern("^[^\\.]")

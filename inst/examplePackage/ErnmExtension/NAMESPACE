@@ -1,0 +1,3 @@
+useDynLib(ErnmExtension)
+import(lolog)
+exportPattern("^[[:alpha:]]+")
