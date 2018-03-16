@@ -1,2 +1,3 @@
-# ernm
-Estimation of fully/partially observed Exponential-Family Random     Network Models (ERNM). ERNMs are a generalization of ERGM (see the ergm     package) and Gibbs Fields, encompassing both as special cases
+# Latent Order LOGistic (LOLOG) Graph Models
+
+LOLOG is a general framework for generative statistical modeling of graph datasets.  

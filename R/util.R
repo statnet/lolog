@@ -1,35 +1,9 @@
 
-#' MCMC standard error by batch
-#' @param x a statistic vector
-#' @param expon batch size control
-mcmcse <- function(x, expon=.5){
-	
-	n <- length(x)
-	b <- floor(n^expon)
-	a <- floor(n/b)
-	m <- mean(x)
-	err <- rep(NA,a)
-	for(i in 1:a){
-		err[i] <- ( m - mean(x[((i-1)*b+1):(i*b)]) )^2
-	}
-	sqrt( (b/(a-1))*sum(err) ) / sqrt(n)
-}
-
-
-#' MCMC effective sample size
-#' @param x a statistic vector
-mcmcEss <- function(x){
-	rho <- acf(x,plot=FALSE)$acf[2]
-	length(x) * (1-rho) / (1+rho)
-}
-
-
-
 #' create a skeleton for a package extending lolog
 #' @param path where to create the package
 lologPackageSkeleton <- function( path = "."){
 	pkgPath <- find.package("lolog")
-	p <- file.path(pkgPath,"examplePackage","ErnmExtension")
+	p <- file.path(pkgPath,"examplePackage","LologExtension")
 	file.copy(p,path,recursive=TRUE)
 }
 

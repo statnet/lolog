@@ -30,7 +30,7 @@ createLatentOrderLikelihood <- function(formula, theta=NULL){
 
 
 #' Fits a latent ordered network model using maximum likelihood
-elogVariationalFit <- function(formula, order=NULL, nReplicates=5L, downsampleRate=NULL, targetFrameSize=500000){
+lologVariationalFit <- function(formula, order=NULL, nReplicates=5L, downsampleRate=NULL, targetFrameSize=500000){
   
   lolik <- createLatentOrderLikelihood(formula)
   
@@ -62,17 +62,17 @@ elogVariationalFit <- function(formula, order=NULL, nReplicates=5L, downsampleRa
                  lolik=lolik,
                  outcome=outcome,
                  predictors=predictors)
-  class(result) <- c("elogVariationalFit","list")
+  class(result) <- c("lologVariationalFit","list")
   result
 }
 
-print.elogVariationalFit <- function(x, ...){
+print.lologVariationalFit <- function(x, ...){
   print(x$theta)
 }
 
 
 
-elogFit <- function(formula, theta, nsamp=1000, hotellingTTol= .1, nHalfSteps=10, maxIter=100, minIter=4,
+lologFit <- function(formula, theta, nsamp=1000, hotellingTTol= .1, nHalfSteps=10, maxIter=100, minIter=4,
 		startingStepSize=maxStepSize, maxStepSize=.5, order=NULL){
 	
 	lolik <- createLatentOrderLikelihood(formula, theta=theta)
@@ -154,11 +154,11 @@ elogFit <- function(formula, theta, nsamp=1000, hotellingTTol= .1, nHalfSteps=10
 			grad=grad, 
 			vcov=vcov, 
 			likelihoodModel=lolik)
-	class(result) <- c("elog","list")
+	class(result) <- c("lolog","list")
 	result
 }
 
-summary.elog <- function(x, ...){
+summary.lolog <- function(x, ...){
 	theta <- x$theta
 	se <- sqrt(diag(x$vcov))
 	pvalue <- 2 * pnorm(abs(theta / se),lower.tail = FALSE)
@@ -169,7 +169,7 @@ summary.elog <- function(x, ...){
 }
 
 
-elogGmmFit <- function(formula, auxFormula, theta, nsamp=1000, weights="diagonal", hotellingTTol= .1, nHalfSteps=10, maxIter=100, minIter=4,
+lologGmmFit <- function(formula, auxFormula, theta, nsamp=1000, weights="diagonal", hotellingTTol= .1, nHalfSteps=10, maxIter=100, minIter=4,
 		startingStepSize=.1, maxStepSize=.5, order=NULL, cluster=NULL){
 	
 	lolik <- createLatentOrderLikelihood(formula, theta=theta)

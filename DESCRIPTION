@@ -20,3 +20,4 @@ Suggests:
     network,
     inline
 RcppModules: ernm
+RoxygenNote: 5.0.1

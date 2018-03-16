@@ -1,9 +1,9 @@
-* This is the skeleton for an ernm extension package.
+* This is the skeleton for an lolog extension package.
 
 * MinDegree.h and MinDegree.cpp illustrate how to extend ernm to
   include a custom statistic.
 
-* ernm_hello_world.h and ernm_hello_world.cpp show a simple example 
+* lolog_hello_world.h and ernm_hello_world.cpp show a simple example 
   C++ function using both Rcpp and ernm.
 
 * If code in source is edited run 
