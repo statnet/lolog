@@ -1,9 +1,3 @@
-/*
- * tests.cpp
- *
- *  Created on: Oct 22, 2012
- *      Author: ianfellows
- */
 #include "tests.h"
 #include "BinaryNetTests.h"
 #include "StatTests.h"
@@ -17,13 +11,17 @@ namespace tests{
 std::string testContext;
 
 
-RcppExport void runErnmTests(){
+RcppExport void runLologTests(){
+#ifdef INSIDE
 	Rcpp::Rcout << "\n\t";
+#endif
 	testBinaryNet();
 	testStats();
 	testConstraints();
 	testLatent();
+#ifdef INSIDE
 	Rcpp::Rcout << "All C++ Tests Complete\n";
+#endif
 }
 
 

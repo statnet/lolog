@@ -1,10 +1,3 @@
-/*
- * VarAttrib.cpp
- *
- *  Created on: Jun 9, 2011
- *      Author: ianfellows
- */
-
 #include "VarAttrib.h"
 #include <Rcpp.h>
 
@@ -15,9 +8,7 @@ VarAttrib::VarAttrib() {
 	name = "";
 }
 
-VarAttrib::~VarAttrib() {
-	// TODO Auto-generated destructor stub
-}
+VarAttrib::~VarAttrib() {}
 
 bool VarAttrib::isDouble(){
 	return type==VarAttrib::DOUBLE;
@@ -45,9 +36,7 @@ DiscreteAttrib::DiscreteAttrib() {
 	name="";
 }
 
-DiscreteAttrib::~DiscreteAttrib() {
-	// TODO Auto-generated destructor stub
-}
+DiscreteAttrib::~DiscreteAttrib() {}
 void DiscreteAttrib::setLabels(std::vector<std::string> l){
 	labs = l;
 }
@@ -106,9 +95,7 @@ ContinAttrib::ContinAttrib() {
 	name="";
 }
 
-ContinAttrib::~ContinAttrib() {
-	// TODO Auto-generated destructor stub
-}
+ContinAttrib::~ContinAttrib() {}
 
 bool ContinAttrib::hasLowerBound(){
 	return hasLb;

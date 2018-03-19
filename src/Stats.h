@@ -1,10 +1,3 @@
-/*
- * Stats.h
- *
- *  Created on: Jan 9, 2014
- *      Author: ianfellows
- */
-
 #ifndef STATS_H_
 #define STATS_H_
 

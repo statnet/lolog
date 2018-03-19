@@ -1,10 +1,3 @@
-/*
- * Stat.h
- *
- *  Created on: Jun 11, 2011
- *      Author: ianfellows
- */
-
 #ifndef STATH_
 #define STATH_
 

@@ -7,17 +7,17 @@ lologPackageSkeleton <- function( path = "."){
 	file.copy(p,path,recursive=TRUE)
 }
 
-#' Used to indicate a required parameter
+# Used to indicate a required parameter
 .required <- function(){
 	r <- NA
 	class(r) <- ".requiredParam"
 	r
 }
 
-#' Parses evaulated parameters as if in a function call.
-#' using names and positional matching
-#' @param lis a list of parameter values
-#' @param params a named list of default parameters
+# Parses evaulated parameters as if in a function call.
+# using names and positional matching
+# @param lis a list of parameter values
+# @param params a named list of default parameters
 .matchParams <- function(lis,params){
   n <- length(lis)
   nm <- names(lis)

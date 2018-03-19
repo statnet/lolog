@@ -12,12 +12,11 @@ Date: 2018-03-15
 Depends:
     methods,
     Rcpp (>= 0.9.4)
-Imports:
-    trust,
-    moments
+Imports: 
+    network, 
+    parallel
 Suggests:
     testthat,
-    network,
     inline
-RcppModules: ernm
+RcppModules: lolog
 RoxygenNote: 5.0.1

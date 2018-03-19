@@ -1,11 +1,3 @@
-/*
- * ContraintTests.cpp
- *
- *  Created on: Jan 9, 2014
- *      Author: ianfellows
- */
-
-
 #include <Rcpp.h>
 #ifdef INSIDE
 #include "../BinaryNet.h"

@@ -1,11 +1,3 @@
-/*
- * Constraints.h
- *
- *  Created on: Jan 9, 2014
- *      Author: ianfellows
- */
-
-
 #ifndef CONSTRAINTS_H_
 #define CONSTRAINTS_H_
 

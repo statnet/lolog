@@ -132,7 +132,7 @@ RCPP_MODULE(lolog){
 		.method("generateNetwork",&LatentOrderLikelihood<Directed>::generateNetwork)
 		;
 
-	function("initErnmStatistics",&initStats);
+	function("initLologStatistics",&initStats);
 
 	function("registerDirectedStatistic",&registerDirectedStatistic);
 	function("registerUndirectedStatistic",&registerUndirectedStatistic);

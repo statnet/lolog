@@ -1,9 +1,3 @@
-/*
- * BinaryNetTests.cpp
- *
- *  Created on: Oct 22, 2012
- *      Author: ianfellows
- */
 #include <Rcpp.h>
 #ifdef INSIDE
 #include "../BinaryNet.h"

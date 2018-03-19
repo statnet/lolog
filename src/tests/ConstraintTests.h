@@ -1,10 +1,3 @@
-/*
- * ContraintTests.h
- *
- *  Created on: Jan 9, 2014
- *      Author: ianfellows
- */
-
 #ifndef CONTRAINTTESTS_H_
 #define CONTRAINTTESTS_H_
 

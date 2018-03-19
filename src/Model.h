@@ -1,10 +1,3 @@
-/*
- * Model.h
- *
- *  Created on: Jun 27, 2011
- *      Author: ianfellows
- */
-
 #ifndef MODELH_
 #define MODELH_
 

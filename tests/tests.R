@@ -3,4 +3,4 @@
 library(testthat)
 library(lolog)
 
-test_package("lolog")
+test_check("lolog")

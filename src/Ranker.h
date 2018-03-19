@@ -1,5 +1,3 @@
-
-
 #ifndef RANKER_H_
 #define RANKER_H_
 

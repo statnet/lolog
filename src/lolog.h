@@ -1,17 +1,16 @@
-/*
- * lolog.h
- *
- *  Created on: Nov 4, 2012
- *      Author: ianfellows
- */
 
-#ifndef ERNM_H_
-#define ERNM_H_
+
+#ifndef LOLOG_H_
+#define LOLOG_H_
 
 #include "BinaryNet.h"
+#include "Constraint.h"
 #include "DirectedVertex.h"
+#include "LatentOrderLikelihood.h"
 #include "Model.h"
 #include "Offset.h"
+#include "Ranker.h"
+#include "ShallowCopyable.h"
 #include "Stat.h"
 #include "StatController.h"
 #include "UndirectedVertex.h"
@@ -22,4 +21,4 @@
 
 
 
-#endif /* ERNM_H_ */
+#endif /* LOLOG_H_ */

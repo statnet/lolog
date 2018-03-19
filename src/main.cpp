@@ -1,9 +1,3 @@
-/*
- * main.cpp
- *
- *  Created on: Sep 5, 2011
- *      Author: ianfellows
- */
 //#define INSIDE
 #ifdef INSIDE
 

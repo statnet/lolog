@@ -1,10 +1,3 @@
-/*
- * Constraint.h
- *
- *  Created on: Mar 21, 2012
- *      Author: ianfellows
- */
-
 #ifndef CONSTRAINTH_
 #define CONSTRAINTH_
 #include <vector>

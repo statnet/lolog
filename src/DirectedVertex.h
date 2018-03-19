@@ -1,10 +1,3 @@
-/*
- * Vertex.h
- *
- *  Created on: Jun 7, 2011
- *      Author: ianfellows
- */
-
 #ifndef DVERTEXH_
 #define DVERTEXH_
 #include "Rcpp.h"

@@ -1,6 +1,3 @@
-
-
-
 #ifndef STATCONTROLLERH_
 #define STATCONTROLLERH_
 

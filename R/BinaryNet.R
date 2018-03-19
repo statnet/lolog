@@ -128,12 +128,6 @@ setMethod("[", c("Rcpp_DirectedNet"),
 #' indexing
 #' @name [
 #' @aliases [,Rcpp_UndirectedNet-method
-#' @param x object
-#' @param i indices
-#' @param j indices
-#' @param ... unused
-#' @param maskMissing should missing values be masked by NA
-#' @param drop unused
 #' @docType methods
 #' @rdname extract-methods
 setMethod("[", c("Rcpp_UndirectedNet"),
@@ -145,11 +139,6 @@ setMethod("[", c("Rcpp_UndirectedNet"),
 #' indexing
 #' @name [<-
 #' @aliases [<-,Rcpp_DirectedNet-method
-#' @param x object
-#' @param i indices
-#' @param j indices
-#' @param ... unused
-#' @param maskMissing should missing values be masked by NA
 #' @param value values to assign
 #' @docType methods
 #' @rdname extract-methods
@@ -171,12 +160,6 @@ setMethod("[<-", c("Rcpp_DirectedNet"),
 #' indexing
 #' @name [<-
 #' @aliases [<-,Rcpp_UndirectedNet-method
-#' @param x object
-#' @param i indices
-#' @param j indices
-#' @param ... unused
-#' @param maskMissing should missing values be masked by NA
-#' @param value values to assign
 #' @docType methods
 #' @rdname extract-methods
 setMethod("[<-", c("Rcpp_UndirectedNet"),

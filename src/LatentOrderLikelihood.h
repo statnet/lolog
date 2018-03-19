@@ -1,10 +1,3 @@
-/*
- * LatentOrderLikelihood.h
- *
- *  Created on: Jun 22, 2015
- *      Author: goodfellow
- */
-
 #ifndef LATENTORDERLIKELIHOOD_H_
 #define LATENTORDERLIKELIHOOD_H_
 
@@ -219,7 +212,7 @@ public:
 		for(int i=0; i < n; i++){
 			int vertex = workingVertOrder[i];
 			this->shuffle(workingVertOrder,i);
-			std::cout <<"(" << i << ")\n";
+			//std::cout <<"(" << i << ")\n";
 			for(int j=0; j < i; j++){
 				int alter = workingVertOrder[j];
 				sample = Rf_runif(0.0,1.0) < downsampleRate;

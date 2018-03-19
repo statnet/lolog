@@ -4,10 +4,10 @@
 
 #' creates a model
 #' @param formula the model formula
-#' @param ignoreMnar ignore missing not at random offsets
+#' @param cloneNet create a deep copy of the network within the model object
 #' @param theta the model parameters.
-#' @param modelClass The trailing name of the model class. For now, either Model or ReModel
-createCppModel <- function(formula,cloneNet=TRUE,theta=NULL, modelClass="Model"){
+createCppModel <- function(formula,cloneNet=TRUE,theta=NULL){
+  modelClass <- "Model"
 	form <- formula
 	env <- environment(form)
 	net <- as.BinaryNet(eval(form[[2]],envir=env))
@@ -73,7 +73,7 @@ createCppModel <- function(formula,cloneNet=TRUE,theta=NULL, modelClass="Model")
 	
 	clss <- class(net)
 	networkEngine <- substring(clss,6,nchar(clss)-3)
-	ModelType <- eval(parse(text=paste(networkEngine,modelClass,sep="")))
+	ModelType <- eval(parse(text=paste("lolog::",networkEngine,modelClass,sep="")))
 	
 	model <- new(ModelType)
 	model$setNetwork(net)
@@ -105,6 +105,6 @@ createCppModel <- function(formula,cloneNet=TRUE,theta=NULL, modelClass="Model")
 #'calculate model statistics from a formula
 #' @param formula An lolog formula
 calculateStatistics <- function(formula){
-	createCppModel(formula,clone=FALSE)$statistics()
+	createCppModel(formula,cloneNet=FALSE)$statistics()
 }
 

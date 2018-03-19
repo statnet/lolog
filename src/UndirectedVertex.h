@@ -1,10 +1,3 @@
-/*
- * UndirectedVertex.h
- *
- *  Created on: Jan 31, 2012
- *      Author: ianfellows
- */
-
 #ifndef UNDIRECTEDVERTEXH_
 #define UNDIRECTEDVERTEXH_
 #include "Rcpp.h"

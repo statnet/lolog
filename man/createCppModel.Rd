@@ -4,17 +4,14 @@
 \alias{createCppModel}
 \title{creates a model}
 \usage{
-createCppModel(formula, cloneNet = TRUE, theta = NULL,
-  modelClass = "Model")
+createCppModel(formula, cloneNet = TRUE, theta = NULL)
 }
 \arguments{
 \item{formula}{the model formula}
 
+\item{cloneNet}{create a deep copy of the network within the model object}
+
 \item{theta}{the model parameters.}
-
-\item{modelClass}{The trailing name of the model class. For now, either Model or ReModel}
-
-\item{ignoreMnar}{ignore missing not at random offsets}
 }
 \description{
 creates a model

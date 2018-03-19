@@ -1,10 +1,3 @@
-/*
- * Offset.h
- *
- *  Created on: Mar 10, 2012
- *      Author: ianfellows
- */
-
 #ifndef OFFSETH_
 #define OFFSETH_
 

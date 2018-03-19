@@ -1,15 +1,15 @@
 
 #' initialize model statistics
-#' @name initErnmStatistics
-#' @aliases initErnmStatistics
-#' @usage initErnmStatistics()
+#' @name initLologStatistics
+#' @aliases initLologStatistics
+#' @usage initLologStatistics()
 NULL
 
 
 #' The inline plug-in for lolog
-#' @name inlineErnmPlugin
-#' @aliases inlineErnmPlugin
-#' @usage inlineErnmPlugin
+#' @name inlineLologPlugin
+#' @aliases inlineLologPlugin
+#' @usage inlineLologPlugin
 NULL
 
 #' Register Statistics
@@ -21,7 +21,7 @@ NULL
 NULL
 
 #' Models
-#' @name ErnmModels
+#' @name LologModels
 #' @docType class
 #' @aliases DirectedModel UndirectedModel 
 #' Rcpp_DirectedModel-class Rcpp_UndirectedModel-class
@@ -32,3 +32,12 @@ NULL
 #' @docType class
 #' @aliases DirectedNet UndirectedNet Rcpp_DirectedNet-class Rcpp_UndirectedNet-class
 NULL
+
+#' LatentOrderLikelihood
+#' @name LatentOrderLikelihood
+#' @docType class
+#' @aliases DirectedLatentOrderLikelihood UndirectedLatentOrderLikelihood Rcpp_DirectedLatentOrderLikelihood-class Rcpp_UndirectedLatentOrderLikelihood-class
+NULL
+
+
+

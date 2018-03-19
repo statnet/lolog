@@ -1,10 +1,3 @@
-/*
- * BinaryNetTests.h
- *
- *  Created on: Oct 22, 2012
- *      Author: ianfellows
- */
-
 #ifndef BINARYNETTESTS_H_
 #define BINARYNETTESTS_H_
 

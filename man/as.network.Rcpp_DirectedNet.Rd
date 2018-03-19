@@ -4,7 +4,7 @@
 \alias{as.network.Rcpp_DirectedNet}
 \title{convert and DirectedNet to a network object}
 \usage{
-as.network.Rcpp_DirectedNet(x, ...)
+\method{as.network}{Rcpp_DirectedNet}(x, ...)
 }
 \arguments{
 \item{x}{the object}

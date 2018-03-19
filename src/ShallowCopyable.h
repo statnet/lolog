@@ -1,10 +1,3 @@
-/*
- * Clonable.h
- *
- *  Created on: Jan 16, 2016
- *      Author: ianfellows
- */
-
 #ifndef CLONABLE_H_
 #define CLONABLE_H_
 

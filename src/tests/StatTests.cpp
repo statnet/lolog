@@ -1,10 +1,3 @@
-/*
- * StatTests.cpp
- *
- *  Created on: Oct 23, 2012
- *      Author: ianfellows
- */
-
 #include <Rcpp.h>
 #ifdef INSIDE
 #include "../BinaryNet.h"

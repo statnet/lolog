@@ -6,6 +6,14 @@
 \usage{
 createLatentOrderLikelihood(formula, theta = NULL)
 }
+\arguments{
+\item{formula}{A LOLOG formula}
+
+\item{theta}{Parameter values.}
+}
+\value{
+An Rcpp object representing the likeilhood model
+}
 \description{
 Creates a probability model for a latent ordered network model
 }

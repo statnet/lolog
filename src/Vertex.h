@@ -1,10 +1,3 @@
-/*
- * Vertex.h
- *
- *  Created on: Jun 10, 2011
- *      Author: ianfellows
- */
-
 #ifndef VERTEXH_
 #define VERTEXH_
 

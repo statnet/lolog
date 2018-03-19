@@ -1,13 +1,17 @@
 
 
 #' Creates a probability model for a latent ordered network model
+#' @param formula A LOLOG formula
+#' @param theta Parameter values.
+#' @return 
+#' An Rcpp object representing the likeilhood model
 createLatentOrderLikelihood <- function(formula, theta=NULL){
 	env <- environment(formula)
 	net <- as.BinaryNet(eval(formula[[2]],envir=env))
 	model <- createCppModel(formula)
 	clss <- class(net)
 	networkEngine <- substring(clss,6,nchar(clss)-3)
-	LikType <- eval(parse(text=paste(networkEngine,"LatentOrderLikelihood",sep="")))
+	LikType <- eval(parse(text=paste("lolog::",networkEngine,"LatentOrderLikelihood",sep="")))
 	lik <- new(LikType, model)
 	if(!is.null(theta)){
 		lik$setThetas(theta)
@@ -15,12 +19,13 @@ createLatentOrderLikelihood <- function(formula, theta=NULL){
 	lik
 }
 
+
 .createLatentOrderLikelihoodFromTerms <- function(terms, net, theta=NULL){
   net <- as.BinaryNet(net)
   model <- .makeCppModelFromTerms(terms, net, theta)
   clss <- class(net)
   networkEngine <- substring(clss,6,nchar(clss)-3)
-  LikType <- eval(parse(text=paste(networkEngine,"LatentOrderLikelihood",sep="")))
+  LikType <- eval(parse(text=paste("lolog::",networkEngine,"LatentOrderLikelihood",sep="")))
   lik <- new(LikType, model)
   if(!is.null(theta)){
     lik$setThetas(theta)
@@ -30,9 +35,16 @@ createLatentOrderLikelihood <- function(formula, theta=NULL){
 
 
 #' Fits a latent ordered network model using maximum likelihood
-lologVariationalFit <- function(formula, order=NULL, nReplicates=5L, downsampleRate=NULL, targetFrameSize=500000){
+#' @param formula A lolog formula
+#' @param order An optional vector providing a (partial) order of the vertices inclusion.
+#' @param nReplicates An integer controling how many dyad ordering to perform.
+#' @param downsampleRate Controls what proportion of dyads in each ordering should be dropped.
+#' @param targetFrameSize Sets downsampleRate so that the model frame for the logistic regression will have on average this amount of observations.
+#' @return An object of class 'lologVariationalFit'.
+lologVariational <- function(formula, order=NULL, nReplicates=5L, downsampleRate=NULL, targetFrameSize=500000){
   
   lolik <- createLatentOrderLikelihood(formula)
+  nReplicates <- as.integer(nReplicates)
   
   if(!is.null(order)){
     lolik$setOrder(as.integer(rank(order, ties.method = "min")))
@@ -66,99 +78,109 @@ lologVariationalFit <- function(formula, order=NULL, nReplicates=5L, downsampleR
   result
 }
 
+
+#' Print of a lologVariationalFit object
+#' @param x the object
+#' @param ... additional parameters (unused)
+#' @method print lologVariationalFit
 print.lologVariationalFit <- function(x, ...){
   print(x$theta)
 }
 
 
 
-lologFit <- function(formula, theta, nsamp=1000, hotellingTTol= .1, nHalfSteps=10, maxIter=100, minIter=4,
-		startingStepSize=maxStepSize, maxStepSize=.5, order=NULL){
-	
-	lolik <- createLatentOrderLikelihood(formula, theta=theta)
-	if(!is.null(order)){
-		lolik$setOrder(as.integer(rank(order, ties.method = "min")))
-	}
-	obsStats <- lolik$getModel()$statistics()
-	stepSize <- startingStepSize
-	lastTheta <- NULL
-	hsCount <- 0
-	iter <- 0
-	while(iter < maxIter){
-		iter <- iter + 1
-		
-		#generate networks
-		lolik$setThetas(theta)
-		stats <- matrix(0,ncol=length(theta),nrow=nsamp)
-		estats <- matrix(0,ncol=length(theta),nrow=nsamp)
-		for(i in 1:nsamp){
-			cat(".")
-			samp <- lolik$generateNetwork()
-			stats[i,] <- samp$stats + samp$emptyNetworkStats
-			estats[i,] <- samp$expectedStats + samp$emptyNetworkStats
-		}
-		cat("\n")
-		
-		momentCondition <- obsStats - colMeans(stats)
-		
-		#calculate gradient of moment conditions
-		grad <- matrix(0,ncol=length(theta),nrow=length(theta))
-		for(i in 1:length(theta)){
-			for(j in 1:length(theta)){
-				#grad[i,j] <- -mean(stats[,i] * (stats[,j] - estats[,j]))
-				grad[i,j] <- -(cov(stats[,i], stats[,j]) - cov(stats[,i], estats[,j]))
-			}
-		}
-		
-		
-		cat("Moment Conditions:\n")
-		print(momentCondition)
-		
-		
-		#calculate inverse of gradient
-		invFailed <- inherits(try(gradInv <- solve(grad),silent = TRUE),"try-error")
-		#invFailed <- inherits(try(gradInv <- solve(-var(stats)),silent = TRUE),"try-error")
-		pairs(stats)
-		#browser()
-		if(hsCount < nHalfSteps && invFailed && !is.null(lastTheta)){
-			cat("Half step back\n")
-			theta <- (lastTheta + theta) / 2
-			hsCount <- hsCount + 1
-			stepSize <- stepSize / 2
-			next
-		}else{
-			stepSize <- min(maxStepSize, stepSize * 1.1)
-			hsCount <- 0
-		}
-		lastTheta <- theta
-		theta <- theta - stepSize * gradInv %*% momentCondition
-		
-		#Hotelling's T^2 test
-		hotT <- momentCondition %*% solve(var(stats)/nrow(stats)) %*% momentCondition
-		pvalue <- pchisq(hotT,df=length(theta), lower.tail = FALSE)
-		cat("Hotelling's T2 p-value: ",pvalue,"\n")
-		cat("Theta:\n")
-		print(theta)
-		if(pvalue > hotellingTTol && iter >= minIter){
-			break
-		}else if(iter < maxIter){
-			
-		}
-	}
-	vcov <- gradInv %*% var(stats) %*% t(gradInv)
-	
-	result <- list(theta=lastTheta,
-			stats=stats,
-			estats=estats, 
-			net=samp$network,
-			grad=grad, 
-			vcov=vcov, 
-			likelihoodModel=lolik)
-	class(result) <- c("lolog","list")
-	result
-}
+# lologFit <- function(formula, theta, nsamp=1000, hotellingTTol= .1, nHalfSteps=10, maxIter=100, minIter=4,
+# 		startingStepSize=maxStepSize, maxStepSize=.5, order=NULL){
+# 	
+# 	lolik <- createLatentOrderLikelihood(formula, theta=theta)
+# 	if(!is.null(order)){
+# 		lolik$setOrder(as.integer(rank(order, ties.method = "min")))
+# 	}
+# 	obsStats <- lolik$getModel()$statistics()
+# 	stepSize <- startingStepSize
+# 	lastTheta <- NULL
+# 	hsCount <- 0
+# 	iter <- 0
+# 	while(iter < maxIter){
+# 		iter <- iter + 1
+# 		
+# 		#generate networks
+# 		lolik$setThetas(theta)
+# 		stats <- matrix(0,ncol=length(theta),nrow=nsamp)
+# 		estats <- matrix(0,ncol=length(theta),nrow=nsamp)
+# 		for(i in 1:nsamp){
+# 			cat(".")
+# 			samp <- lolik$generateNetwork()
+# 			stats[i,] <- samp$stats + samp$emptyNetworkStats
+# 			estats[i,] <- samp$expectedStats + samp$emptyNetworkStats
+# 		}
+# 		cat("\n")
+# 		
+# 		momentCondition <- obsStats - colMeans(stats)
+# 		
+# 		#calculate gradient of moment conditions
+# 		grad <- matrix(0,ncol=length(theta),nrow=length(theta))
+# 		for(i in 1:length(theta)){
+# 			for(j in 1:length(theta)){
+# 				#grad[i,j] <- -mean(stats[,i] * (stats[,j] - estats[,j]))
+# 				grad[i,j] <- -(cov(stats[,i], stats[,j]) - cov(stats[,i], estats[,j]))
+# 			}
+# 		}
+# 		
+# 		
+# 		cat("Moment Conditions:\n")
+# 		print(momentCondition)
+# 		
+# 		
+# 		#calculate inverse of gradient
+# 		invFailed <- inherits(try(gradInv <- solve(grad),silent = TRUE),"try-error")
+# 		#invFailed <- inherits(try(gradInv <- solve(-var(stats)),silent = TRUE),"try-error")
+# 		pairs(stats)
+# 		#browser()
+# 		if(hsCount < nHalfSteps && invFailed && !is.null(lastTheta)){
+# 			cat("Half step back\n")
+# 			theta <- (lastTheta + theta) / 2
+# 			hsCount <- hsCount + 1
+# 			stepSize <- stepSize / 2
+# 			next
+# 		}else{
+# 			stepSize <- min(maxStepSize, stepSize * 1.1)
+# 			hsCount <- 0
+# 		}
+# 		lastTheta <- theta
+# 		theta <- theta - stepSize * gradInv %*% momentCondition
+# 		
+# 		#Hotelling's T^2 test
+# 		hotT <- momentCondition %*% solve(var(stats)/nrow(stats)) %*% momentCondition
+# 		pvalue <- pchisq(hotT,df=length(theta), lower.tail = FALSE)
+# 		cat("Hotelling's T2 p-value: ",pvalue,"\n")
+# 		cat("Theta:\n")
+# 		print(theta)
+# 		if(pvalue > hotellingTTol && iter >= minIter){
+# 			break
+# 		}else if(iter < maxIter){
+# 			
+# 		}
+# 	}
+# 	vcov <- gradInv %*% var(stats) %*% t(gradInv)
+# 	
+# 	result <- list(theta=lastTheta,
+# 			stats=stats,
+# 			estats=estats, 
+# 			net=samp$network,
+# 			grad=grad, 
+# 			vcov=vcov, 
+# 			likelihoodModel=lolik)
+# 	class(result) <- c("lolog","list")
+# 	result
+# }
 
-summary.lolog <- function(x, ...){
+#' Summary of a lolog object
+#' @param object the object
+#' @param ... additional parameters (unused)
+#' @method summary lolog
+summary.lolog <- function(object, ...){
+  x <- object
 	theta <- x$theta
 	se <- sqrt(diag(x$vcov))
 	pvalue <- 2 * pnorm(abs(theta / se),lower.tail = FALSE)
@@ -169,7 +191,22 @@ summary.lolog <- function(x, ...){
 }
 
 
-lologGmmFit <- function(formula, auxFormula, theta, nsamp=1000, weights="diagonal", hotellingTTol= .1, nHalfSteps=10, maxIter=100, minIter=4,
+#' Fits a LOLOG model via Generalized Method of Moments
+#' @param formula A lolog formula for the sufficient statistics
+#' @param auxFormula A lolog formula of statistics to use for moment matching
+#' @param theta Initial parameters values
+#' @param nsamp The number of sample neteworks to draw at each iteration
+#' @param weights The type of weights to use in the GMM objective. Either 'full' for the inverse of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.
+#' @param tol The Hotteling's T^2 p-value tolerance for convergance for the transformed moment conditions.
+#' @param nHalfSteps The maximum number of half steps to take when the objective is not improved in an interation.
+#' @param maxIter The maximum number of iterations.
+#' @param minIter The minimum number of iterations.
+#' @param startingStepSize The starting dampening of the parameter update.
+#' @param maxStepSize The largest allowed value for dampening.
+#' @param order An optional vector providing a (partial) order of the vertices inclusion.
+#' @param cluster A parallel cluster to use for graph simulation.
+#' @return An object of class 'lolog'
+lologGmm <- function(formula, auxFormula, theta, nsamp=1000, weights="full", tol= .1, nHalfSteps=10, maxIter=100, minIter=2,
 		startingStepSize=.1, maxStepSize=.5, order=NULL, cluster=NULL){
 	
 	lolik <- createLatentOrderLikelihood(formula, theta=theta)
@@ -231,11 +268,11 @@ lologGmmFit <- function(formula, auxFormula, theta, nsamp=1000, weights="diagona
 			worker <- function(i, theta){
 			  cat(i," ")
 			  network <- as.BinaryNet(network)
-			  lolik <- lolog:::.createLatentOrderLikelihoodFromTerms(terms, network, theta)
+			  lolik <- .createLatentOrderLikelihoodFromTerms(terms, network, theta)
 			  if(!is.null(ord)){
 			    lolik$setOrder(as.integer(rank(ord, ties.method = "min")))
 			  }
-			  auxModel <- lolog:::.makeCppModelFromTerms(auxTerms, network)
+			  auxModel <- .makeCppModelFromTerms(auxTerms, network)
 			  samp <- lolik$generateNetwork()
 			  auxModel$setNetwork(samp$network)
 			  auxModel$calculate()
@@ -304,7 +341,7 @@ lologGmmFit <- function(formula, auxFormula, theta, nsamp=1000, weights="diagona
 		cat("Hotelling's T2 p-value: ",pvalue,"\n")
 		cat("Theta:\n")
 		print(theta)
-		if(pvalue > hotellingTTol && iter >= minIter){
+		if(pvalue > tol && iter >= minIter){
 			break
 		}else if(iter < maxIter){
 			
@@ -330,6 +367,6 @@ lologGmmFit <- function(formula, auxFormula, theta, nsamp=1000, weights="diagona
 			grad=grad, 
 			vcov=vcov, 
 			likelihoodModel=lolik)
-	class(result) <- c("elog","list")
+	class(result) <- c("lolog","list")
 	result
 }

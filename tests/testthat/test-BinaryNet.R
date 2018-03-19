@@ -18,14 +18,15 @@ test_that("DirectedNet",{
 			el <- as.matrix(nw,matrix.type="edgelist")
 			nVerts <- 18
 			net <- as.BinaryNet(nw)
-			expect_true(all(el[order(el[,1]),]==net$edges()))
+			
+			expect_true(all(el[order(el[,1],el[,2]),]==net$edges()))
 			
 			expect_true(all(list.vertex.attributes(nw) %in% net$variableNames(TRUE)))
 			
 			net1 <- as.network(net)
 			expect_identical(network.vertex.names(nw),network.vertex.names(net1))
 			net2 <- new(DirectedNet,el,nVerts)
-			expect_true(all(as.matrix(net1,matrix.type="edgelist")==el[order(el[,1]),]))
+			expect_true(all(as.matrix(net1,matrix.type="edgelist")==el[order(el[,1],el[,2]),]))
 			
 			expect_true(all(nw[1:10,1:5]==net[1:10,1:5]))
 			
@@ -62,31 +63,15 @@ test_that("DirectedNet",{
 							0L, 0L, 0L))
 			
 			net[1,1:18] <- rep(NA,18)
-			expect_identical(net$edges(),structure(c(2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L, 3L, 4L, 4L, 4L, 4L, 
-				4L, 5L, 5L, 5L, 5L, 6L, 6L, 6L, 6L, 6L, 7L, 7L, 7L, 7L, 7L, 7L, 
-				8L, 8L, 8L, 8L, 9L, 9L, 9L, 9L, 9L, 9L, 10L, 10L, 10L, 10L, 10L, 
-				11L, 11L, 11L, 11L, 11L, 12L, 12L, 12L, 12L, 12L, 12L, 13L, 13L, 
-				13L, 13L, 13L, 14L, 14L, 14L, 14L, 14L, 15L, 15L, 15L, 16L, 16L, 
-				16L, 16L, 16L, 17L, 17L, 17L, 17L, 18L, 18L, 18L, 18L, 18L, 18L, 
-				1L, 3L, 9L, 15L, 1L, 2L, 7L, 8L, 14L, 1L, 2L, 3L, 5L, 9L, 1L, 
-				2L, 4L, 6L, 2L, 5L, 7L, 11L, 14L, 1L, 3L, 4L, 5L, 9L, 10L, 9L, 
-				10L, 11L, 13L, 2L, 7L, 8L, 10L, 11L, 16L, 8L, 9L, 11L, 12L, 13L, 
-				6L, 8L, 9L, 10L, 12L, 2L, 8L, 9L, 10L, 11L, 13L, 7L, 8L, 9L, 
-				10L, 14L, 8L, 9L, 10L, 12L, 13L, 2L, 13L, 18L, 9L, 10L, 15L, 
-				17L, 18L, 10L, 15L, 16L, 18L, 9L, 10L, 13L, 15L, 16L, 17L), .Dim = c(83L, 
-				2L))
-			)
 			expect_true(length(net$outNeighbors(c(1))[[1]])==0)
-			net[1:18,1] <- rep(NA,18)
-			expect_true(all(net$outNeighbors(c(2))[[1]]==c(3,9,15)))
-			expect_true(all(net$outDegree(c(1,2))==c(0,3)))
+			expect_true(net$outDegree(1)==0)
 			
 			a <- 1:nVerts
 			attr(a,"lowerBound") <- 1
 			attr(a,"upperBound") <- nVerts
 			net[["a"]] <- a
 			expect_true(attr(net[["a"]],"lowerBound")==1)
-			expect_true(attr(net[["a"]],"upperBound")==17)
+			expect_true(attr(net[["a"]],"upperBound")==18)
 		})
 		
 		
@@ -148,6 +133,6 @@ test_that("UndirectedNet",{
 			attr(a,"upperBound") <- nVerts
 			net[["a"]] <- a
 			expect_true(attr(net[["a"]],"lowerBound")==1)
-			expect_true(attr(net[["a"]],"upperBound")==17)
+			expect_true(attr(net[["a"]],"upperBound")==16)
 		})
 		
