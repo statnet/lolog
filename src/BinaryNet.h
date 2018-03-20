@@ -1629,8 +1629,10 @@ public:
 					result[i] = discreteVariableValue(index,i);
 				}
 			}
-			result.attr("levels")=labels;
-			result.attr("class")="factor";
+			if(labels.size() > 0){
+				result.attr("levels")=labels;
+				result.attr("class")="factor";
+			}
 			return result;
 		}
 		names = continVarNames();

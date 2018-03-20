@@ -182,8 +182,6 @@ void changeStatTest(std::string statName){
 
     vector<int> togVars(1,0);
     togVars.push_back(1);
-    model.setRandomVariables(togVars,false);
-    model.setRandomVariables(togVars,true);
 
     vector<int> order(30,1);
     for(int i=0;i<30;i++) order[i] = i;

@@ -6,8 +6,7 @@
 \usage{
 lologGmm(formula, auxFormula, theta, nsamp = 1000, weights = "full",
   tol = 0.1, nHalfSteps = 10, maxIter = 100, minIter = 2,
-  startingStepSize = 0.1, maxStepSize = 0.5, order = NULL,
-  cluster = NULL)
+  startingStepSize = 0.1, maxStepSize = 0.5, cluster = NULL)
 }
 \arguments{
 \item{formula}{A lolog formula for the sufficient statistics}
@@ -31,8 +30,6 @@ lologGmm(formula, auxFormula, theta, nsamp = 1000, weights = "full",
 \item{startingStepSize}{The starting dampening of the parameter update.}
 
 \item{maxStepSize}{The largest allowed value for dampening.}
-
-\item{order}{An optional vector providing a (partial) order of the vertices inclusion.}
 
 \item{cluster}{A parallel cluster to use for graph simulation.}
 }

@@ -17,4 +17,4 @@ cp -rf tmp/lolog/src/tests/* tmp/lolog/src
 rm -rf tmp/lolog/src/tests
 $R CMD build tmp/lolog
 rm -rf tmp
-$R CMD INSTALL lolog_1.0.tar.gz
+$R CMD INSTALL --no-multiarch lolog_1.0.tar.gz

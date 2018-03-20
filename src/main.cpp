@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         R.parseEvalQ(evalstr);          // eval the init string, ignoring any returns
     }*/
     //quasiTest(R);
-    tests::runErnmTests();
+    tests::runLologTests();
     //flatSetTest();
     //togglerTest( R);
     //changeStatTest(R);

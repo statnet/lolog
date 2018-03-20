@@ -41,7 +41,7 @@ protected:
 	/**
 	 * A vector giving the (partial) ordering for vertex inclusion
 	 */
-	VectorPtr order;
+	//VectorPtr order;
 
 	/**
 	 * Fisher-Yates shuffle of elements up to offset
@@ -57,7 +57,11 @@ protected:
 		}
 	}
 
-	void generateOrder(std::vector<int>& vertexOrder){
+	/**
+	 * Generates a vertex ordering 'vertexOrder' conditional upon a possibly
+	 * partial ordering 'order'.
+	 */
+	void generateOrder(std::vector<int>& vertexOrder,const VectorPtr order){
 		vertexOrder.resize(order->size());
 		std::vector<int> y(vertexOrder.size());
 		//get ranks. ties broken randomly
@@ -76,12 +80,6 @@ protected:
 
 
 	void removeEdges(ModelPtr mod){
-		/*boost::shared_ptr< std::vector<std::pair<int,int> > > edgelist = mod->network()->edgelist();
-		long n = edgelist->size();
-		for(int i=0;i<n;i++){
-			mod->network()->removeEdge(edgelist->at(i).first,edgelist->at(i).second);
-		}
-		mod->calculate();*/
 		mod->network()->emptyGraph();
 	}
 public:
@@ -93,6 +91,8 @@ public:
 		noTieModel = mod.clone();
 		noTieModel->setNetwork(mod.network()->clone());
 		removeEdges(noTieModel);
+		if(model->hasVertexOrder() && model->getVertexOrder()->size() != model->network()->size())
+			Rf_error("Vertex ordering does not have the same number of elements as there are vertices in the network 95.");
 	}
 
 	/*!
@@ -133,14 +133,6 @@ public:
 		noTieModel->setThetas(newThetas);
 	}
 
-	void setOrder(std::vector<int>& newOrder){
-		order = VectorPtr(new std::vector<int>(newOrder));
-	}
-
-	std::vector<int> getOrder(){
-		return *order;
-	}
-
 	ModelPtr getModel(){
 		return model;
 	}
@@ -159,9 +151,9 @@ public:
 		long n = model->network()->size();
 		for(int i=0; i<nOrders; i++){
 			std::vector<int> vertices(n);
-			if(order){
+			if(model->hasVertexOrder()){
 				//std::cout << order->size() << "generating network from order" << order->size() << "\n" ;
-				this->generateOrder(vertices);
+				this->generateOrder(vertices, model->getVertexOrder());
 			}else{
 				for(int i=0; i<n;i++){
 					vertices[i] = i;
@@ -214,12 +206,14 @@ public:
 			this->shuffle(workingVertOrder,i);
 			//std::cout <<"(" << i << ")\n";
 			for(int j=0; j < i; j++){
+				//std::cout << "nedges: " << runningModel->network()->nEdges()<<"\n";
 				int alter = workingVertOrder[j];
 				sample = Rf_runif(0.0,1.0) < downsampleRate;
 				//std::cout <<"(" << vertex << ", " << alter << ")\n";
-				if(runningModel->network()->hasEdge(vertex,alter)){
-					Rf_error("Logic error: edge found where there should be none.\n");
-				}
+				//if(runningModel->network()->hasEdge(vertex, alter)){
+				//	Rf_error("Logic error: edge found where there should be none 213.\n");
+				//}
+				assert(!runningModel->network()->hasEdge(vertex, alter));
 				bool hasEdge = model->network()->hasEdge(vertex, alter);
 				if(sample){
 					//std::cout <<"sample: (" << vertex << ", " << alter << ")\n";
@@ -278,155 +272,13 @@ public:
 		return result;
 	}
 
-/*	List conditionalLogLik(double downsampleRate, std::vector<int> vert_order){
-		//std::cout << "enter conditionalLogLik\n";
-		GetRNGstate();
-		long n = model->network()->size();
-		long nStats = model->thetas().size();
-		std::vector<long> vertices(n);
-		std::vector<std::pair<long, long> > dyad_order;
-		for(int i=0; i<n;i++){
-			//long ind = floor(Rf_runif(0.0,1.0)*n);
-			vertices[i] = i;
-			for(int j=i+1;j<n;j++){
-				dyad_order.push_back(std::make_pair(i,j));
-			}
-		}
-		this->shuffle(dyad_order,dyad_order.size());
-		//this->shuffle(vertices, n);
-
-		ModelPtr runningModel = noTieModel->clone();
-		runningModel->setNetwork(noTieModel->network()->clone());
-		runningModel->calculate();
-		//std::cout << "n2 edges: " << noTieModel->network()->nEdges();
-		List samples;
-		double llik = runningModel->logLik();
-		double llikChange, ldenom, probTie;
-		std::vector<double> terms = runningModel->statistics();
-		std::vector<double>  newTerms = runningModel->statistics();
-		std::vector<double> deriv(nStats, 0.0);
-		NumericMatrix hessian(nStats, nStats);
-		for(int k=0; k < nStats; k++){
-			for(int l=0; l < nStats; l++){
-				hessian(k,l) = 0.0;
-			}
-		}
-		bool sample;
-		double lpartition = 0.0;
-		for(int i=0; i < n; i++){
-			int vertex = vert_order[i];
-			this->shuffle(vert_order,i);
-
-			for(int j=0; j < i; j++){
-				int alter = vert_order[j];
-				sample = Rf_runif(0.0,1.0) < downsampleRate;
-				runningModel->statistics(terms);
-				//std::cout <<"(" << vertex << ", " << alter << ")\n";
-				if(runningModel->network()->hasEdge(vertex,alter)){
-					Rf_error("Logic error: edge found where there should be none.\n");
-				}
-				llik = runningModel->logLik();
-				//Calculate likelihood for vertex --> alter
-				runningModel->dyadUpdate(vertex, alter, vert_order, i);
-				runningModel->network()->toggle(vertex, alter);
-				llikChange = runningModel->logLik() - llik;
-				//std::cout << llikChange;
-				ldenom = R::log1pexp(llikChange);//log(1.0 + exp(llikChange));
-				lpartition += ldenom;
-				probTie = exp(llikChange - ldenom);
-				runningModel->statistics(newTerms);
-				bool hasEdge = model->network()->hasEdge(vertex, alter);
-				for(int k=0; k < nStats; k++){
-					double changeK = newTerms[k] - terms[k];
-					deriv[k] += changeK * (hasEdge - probTie);  //(hasEdge ? changeK : 0.0) - probTie * changeK;
-					for(int l=0; l < nStats; l++){
-						double changeL = newTerms[l] - terms[l];
-						hessian(k,l) -= changeK * changeL * probTie * (1.0 - probTie);
-					}
-				}
-
-				if(hasEdge){
-					llik += llikChange;
-				}else{
-					runningModel->dyadUpdate(vertex, alter, vert_order, i);
-					runningModel->network()->toggle(vertex, alter);
-				}
-
-				if(sample){
-					for(int k=0; k<terms.size(); k++){
-						terms[k] = newTerms[k] - terms[k];
-					}
-					List s;
-					s["hasEdge"] = wrap(model->network()->hasEdge(vertex, alter));
-					s["changeStats"] = wrap(terms);
-					samples.push_back(s);
-				}
-
-				if(runningModel->network()->isDirected()){
-					//Calculate likelihood for alter --> vertex
-					sample = Rf_runif(0.0,1.0) < downsampleRate;
-					runningModel->statistics(terms);
-
-					runningModel->dyadUpdate(alter, vertex, vert_order, i);
-					runningModel->network()->toggle(alter, vertex);
-					llikChange = runningModel->logLik() - llik;
-					ldenom = R::log1pexp(llikChange);//log(1.0 + exp(llikChange));
-					lpartition += ldenom;
-					probTie = exp(llikChange - ldenom);
-					runningModel->statistics(newTerms);
-					bool hasEdge = model->network()->hasEdge(alter, vertex);
-					for(int k=0; k < nStats; k++){
-						double changeK = newTerms[k] - terms[k];
-						deriv[k] += (hasEdge ? changeK : 0.0) - probTie * changeK;
-						for(int l=0; l < nStats; l++){
-							double changeL = newTerms[l] - terms[l];
-							hessian(k,l) -= changeK * changeL * probTie * (1.0 - probTie);
-						}
-					}
-					if(hasEdge){
-						llik += llikChange;
-					}else{
-						runningModel->dyadUpdate(alter, vertex, vert_order, i);
-						runningModel->network()->toggle(alter, vertex);
-					}
-
-					if(sample){
-						for(int k=0; k<terms.size(); k++){
-							terms[k] = newTerms[k] - terms[k];
-						}
-						List s;
-						s["hasEdge"] = wrap(model->network()->hasEdge(alter, vertex));
-						s["changeStats"] = wrap(terms);
-						samples.push_back(s);
-					}
-				}
-
-
-			}
-		}
-		//runningModel->calculate();
-		//newTerms = runningModel->statistics();
-		//for(int k=0; k < nStats; k++){
-		//	deriv[k] = newTerms[k] - deriv[k];
-		//}
-		//std::cout << "db:" << newTerms[0];
-		PutRNGstate();
-		List result;
-		result["logLik"] = llik;
-		result["logPartition"] = lpartition;
-		result["derivative"] = wrap(deriv);
-		result["hessian"] = hessian;
-		result["samples"] = samples;
-		return result;
-	}*/
-
 	SEXP generateNetwork(){
 		GetRNGstate();
 		long n = model->network()->size();
 		std::vector<int> vertices(n);
-		if(order){
+		if(model->hasVertexOrder()){
 			//std::cout << order->size() << "generating network from order" << order->size() << "\n" ;
-			this->generateOrder(vertices);
+			this->generateOrder(vertices, model->getVertexOrder());
 		}else{
 			for(int i=0; i<n;i++){
 				vertices[i] = i;
@@ -501,8 +353,9 @@ public:
 
 				//std::cout <<"(" << vertex << ", " << alter << ")\n";
 				//if(runningModel->network()->hasEdge(vertex,alter)){
-				//	Rf_error("Logic error: edge found where there should be none.\n");
+				//	Rf_error("Logic error: edge found where there should be none 354.\n");
 				//}
+				assert(!runningModel->network()->hasEdge(vertex, alter));
 				llik = runningModel->logLik();
 				//runningModel->statistics(terms);
 				runningModel->dyadUpdate(vertex, alter, vert_order, i);
@@ -553,10 +406,11 @@ public:
 						}
 					}
 					*/
-
-					if(runningModel->network()->hasEdge(alter, vertex)){
-						Rf_error("Logic error: edge found where there should be none.\n");
-					}
+					//std::cout <<"(" << alter << ", " << vertex << ")\n";
+					//if(runningModel->network()->hasEdge(alter, vertex)){
+					//	Rf_error("Logic error: edge found where there should be none 408.\n");
+					//}
+					assert(!runningModel->network()->hasEdge(alter, vertex));
 					llik = runningModel->logLik();
 					//runningModel->statistics(terms);
 					runningModel->dyadUpdate(alter, vertex, vert_order, i);

@@ -105,27 +105,42 @@ void lt(){
     hom.push_back(false);
     stat = boost::shared_ptr< Stat<Engine, Triangles<Engine> > >(
             		new Stat<Engine, Triangles<Engine> >());
+
     //create model
     Model<Engine> model(net);
     model.addStatPtr(ed);
     model.addStatPtr(stat);
     //model.addOffsetPtr(off);
+
     model.calculate();
+
     double llik = model.logLik();
     //Language call2("print",wrap(model.terms()));
     //call2.eval();
     //cout << "\nllik: " << llik << "\n";
     //cout << "\nnedges:" << net.nEdges()<<"\n";
 
-    LatentOrderLikelihood<Engine> lol = LatentOrderLikelihood<Engine>(model);
-    List result = lol.variationalModelFrame(1,.005);
-    /*
     std::vector<int> ord(30);
     for(int i=0;i<30;i++){
-    	ord[i] = i / 5;
+    		ord[i] = i / 5;
     }
-    lol.setOrder(ord);*/
+    model.setVertexOrderVector(ord);
+
+    LatentOrderLikelihood<Engine> lol = LatentOrderLikelihood<Engine>(model);
+
+    List result = lol.variationalModelFrame(1,.005);
+
+    EXPECT_TRUE(model.getVertexOrderVector().size() == 30);
     lol.generateNetwork();
+
+    model.setVertexOrderVector(std::vector<int>());
+    EXPECT_TRUE(model.getVertexOrderVector().size() == 0);
+
+
+
+	lol = LatentOrderLikelihood<Engine>(model);
+	lol.generateNetwork();
+
     //Language call("print",result);
     //call.eval();
     PutRNGstate();
@@ -161,6 +176,7 @@ void rnker(){
 void testLatent(){
 	testContext = "TestLatent";
 	RUN_TEST(lt<Undirected>());
+	RUN_TEST(lt<Directed>());
 	RUN_TEST(rnker());
 }
 

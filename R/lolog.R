@@ -20,8 +20,23 @@ createCppModel <- function(formula,cloneNet=TRUE,theta=NULL){
 
 
 .prepModelTerms <- function(formula){
+  form <- formula
 	env <- environment(formula)
-	tmp <- formula[[3]]
+	
+	# Parse out vertex ordering (if it exists)
+	vertexOrder <- integer();
+	if(!is.symbol(formula[[3]]) && as.character(formula[[3]][[1]])=="|"){
+	  tmp <- formula[[3]][[3]]
+	  vertexOrder <- eval(tmp,envir=env)
+	  if(any(is.na(vertexOrder)))
+	    stop("vertex order can not have any NA values")
+	  if(!is.numeric(vertexOrder))
+	    stop("vertex order must be numeric")
+	  form[[3]] <- formula[[3]][[2]]
+	}
+	
+	# parse out model terms
+	tmp <- form[[3]]
 	lastTerm <- FALSE
 	stats <- list()
 	offsets <- list()
@@ -64,7 +79,8 @@ createCppModel <- function(formula,cloneNet=TRUE,theta=NULL){
 		if(!lastTerm)
 			tmp <- tmp[[2]]
 	}
-	list(stats=stats,offsets=offsets)
+	
+	list(stats=stats,offsets=offsets,vertexOrder=vertexOrder)
 }
 
 
@@ -95,6 +111,7 @@ createCppModel <- function(formula,cloneNet=TRUE,theta=NULL){
 			model$addOffset(names(offsets)[i],offsets[[i]])
 	if(!is.null(theta))
 		model$setThetas(theta)
+	model$setVertexOrder(as.integer(rank(terms$vertexOrder, ties.method = "min")))
 	model
 	
 }

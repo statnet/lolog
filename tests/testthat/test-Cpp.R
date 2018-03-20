@@ -1,10 +1,7 @@
-# TODO: Add comment
-# 
-# Author: ianfellows
-###############################################################################
 
 
 library(lolog)
+library(testthat)
 
 context("C++ tests")
 

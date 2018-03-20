@@ -4,13 +4,11 @@
 \alias{lologVariational}
 \title{Fits a latent ordered network model using maximum likelihood}
 \usage{
-lologVariational(formula, order = NULL, nReplicates = 5L,
-  downsampleRate = NULL, targetFrameSize = 5e+05)
+lologVariational(formula, nReplicates = 5L, downsampleRate = NULL,
+  targetFrameSize = 5e+05)
 }
 \arguments{
 \item{formula}{A lolog formula}
-
-\item{order}{An optional vector providing a (partial) order of the vertices inclusion.}
 
 \item{nReplicates}{An integer controling how many dyad ordering to perform.}
 

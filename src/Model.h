@@ -26,34 +26,31 @@ protected:
 
 	typedef boost::shared_ptr< AbstractOffset<Engine > > OffsetPtr;
 	typedef std::vector< OffsetPtr >  OffsetVector;
+	
+	typedef boost::shared_ptr< std::vector<int> > VectorPtr;
 
 	StatVector stats;						//!statistics
 	OffsetVector offsets;
 	boost::shared_ptr< BinaryNet<Engine> > net;			//!the relevant network
 
-	//The domain
-	boost::shared_ptr< bool > randomGraph;
-	boost::shared_ptr< std::vector<int> > randomDiscreteVariables;
-	boost::shared_ptr< std::vector<int> > randomContinVariables;
+	/**
+	 * A vector giving the (partial) ordering for vertex inclusion
+	 */
+	VectorPtr vertexOrder;
+	
 public:
 	Model(){
 		//std::cout << "m1";
 		boost::shared_ptr< BinaryNet<Engine> > n(new BinaryNet<Engine>());
 		net=n;
-		randomGraph = boost::shared_ptr< bool >(new bool);
-		randomDiscreteVariables = boost::shared_ptr< std::vector<int> >(new std::vector<int>) ;
-		randomContinVariables = boost::shared_ptr< std::vector<int> >(new std::vector<int>) ;
-		*randomGraph = true;
+		vertexOrder = VectorPtr(new std::vector<int>());
 	}
 
 	Model(BinaryNet<Engine>& network){
 		//std::cout << "m2";
 		boost::shared_ptr< BinaryNet<Engine> > n(new BinaryNet<Engine>(network));
 		net = n;
-		randomGraph = boost::shared_ptr< bool >(new bool);
-		randomDiscreteVariables = boost::shared_ptr< std::vector<int> >(new std::vector<int>) ;
-		randomContinVariables = boost::shared_ptr< std::vector<int> >(new std::vector<int>) ;
-		*randomGraph = true;
+		vertexOrder = VectorPtr(new std::vector<int>());
 	}
 
 	Model(const Model& mod){
@@ -61,9 +58,7 @@ public:
 		stats = mod.stats;
 		offsets = mod.offsets;
 		net = mod.net;
-		randomGraph = mod.randomGraph;
-		randomDiscreteVariables = mod.randomDiscreteVariables;
-		randomContinVariables = mod.randomContinVariables;
+		vertexOrder = mod.vertexOrder;
 	}
 
 	/*!
@@ -74,20 +69,14 @@ public:
 		stats = mod.stats;
 		offsets = mod.offsets;
 		net = mod.net;
-		randomGraph = mod.randomGraph;
-		randomDiscreteVariables = mod.randomDiscreteVariables;
-		randomContinVariables = mod.randomContinVariables;
+		vertexOrder = mod.vertexOrder;
 		if(deep){
 			for(int i=0;i<stats.size();i++)
 				stats[i] = stats[i]->vClone();
 			for(int i=0;i<offsets.size();i++)
 				offsets[i] = offsets[i]->vClone();
-			randomGraph = boost::shared_ptr< bool >(new bool);
-			randomDiscreteVariables = boost::shared_ptr< std::vector<int> >(new std::vector<int>) ;
-			randomContinVariables = boost::shared_ptr< std::vector<int> >(new std::vector<int>) ;
-			*randomGraph = *mod.randomGraph;
-			*randomDiscreteVariables = *mod.randomDiscreteVariables;
-			*randomContinVariables = *mod.randomContinVariables;
+			vertexOrder = boost::shared_ptr< std::vector<int> >(new std::vector<int>);
+			*vertexOrder = *mod.vertexOrder;
 		}
 	}
 
@@ -103,9 +92,7 @@ public:
 		stats = xp->stats;
 		offsets = xp->offsets;
 		net = xp->net;
-		randomGraph = xp->randomGraph;
-		randomDiscreteVariables = xp->randomDiscreteVariables;
-		randomContinVariables = xp->randomContinVariables;
+		vertexOrder = xp->vertexOrder;
 	}
 
 	virtual ShallowCopyable* vShallowCopyUnsafe() const{
@@ -135,9 +122,7 @@ public:
 		stats = mod.stats;
 		offsets = mod.offsets;
 		net = mod.net;
-		randomGraph = mod.randomGraph;
-		randomDiscreteVariables = mod.randomDiscreteVariables;
-		randomContinVariables = mod.randomContinVariables;
+		vertexOrder = mod.vertexOrder;
 	}
 
 	void copy(Model<Engine>& mod,bool deep){
@@ -149,85 +134,14 @@ public:
 				stats[i] = mod.stats[i]->vClone();
 			for(int i=0;i<offsets->vSize();i++)
 				offsets[i] = mod.offsets[i]->vClone();
-			*randomGraph = *mod.randomGraph;
-			*randomDiscreteVariables = *mod.randomDiscreteVariables;
-			*randomContinVariables = *mod.randomContinVariables;
+			vertexOrder = boost::shared_ptr< std::vector<int> >(new std::vector<int>);
+			*vertexOrder = *mod.vertexOrder;
 		}else{
 			stats = mod.stats;
 			offsets = mod.offsets;
-			randomGraph = mod.randomGraph;
-			randomDiscreteVariables = mod.randomDiscreteVariables;
-			randomContinVariables = mod.randomContinVariables;
+			vertexOrder = mod.vertexOrder;
 		}
 	}
-
-	/*!
-	 * Does the domain of the model include the graph
-	 */
-	bool hasRandomGraph() const{
-		return *randomGraph;
-	}
-
-	void setRandomGraph(bool random){
-		*randomGraph = random;
-	}
-
-	/*!
-	 * Which nodal variables are included in the domain of the model
-	 */
-	std::vector<int> randomVariables(bool discrete) const{
-		if(discrete)
-			return *randomDiscreteVariables;
-		else
-			return *randomContinVariables;
-	}
-
-	void setRandomVariables(std::vector<int> variables, bool discrete){
-		if(discrete)
-			*randomDiscreteVariables = variables;
-		else
-			*randomContinVariables = variables;
-	}
-
-	bool hasAnyRandomVariables() const{
-		return randomDiscreteVariables->size()>0 || randomContinVariables->size()>0;
-	}
-
-	void setRandomVariablesR(std::vector<std::string> vars){
-		std::vector<std::string> dv = net->discreteVarNames();
-		std::vector<std::string> cv = net->continVarNames();
-		std::vector<int> di,ci;
-		int ind;
-		for(int i=0;i<vars.size();i++){
-			ind = indexOf(vars[i],dv);
-			if(ind>=0){
-				di.push_back(ind);
-			}else{
-				ind = indexOf(vars[i],cv);
-				if(ind>=0)
-					ci.push_back(ind);
-				else
-					Rf_error("Model::setRandomVariables : Unknown variable");
-			}
-		}
-		*randomDiscreteVariables = di;
-		*randomContinVariables = ci;
-	}
-
-	std::vector<std::string> getRandomVariablesR() const{
-		std::vector<std::string> vars;
-		std::vector<std::string> dv = net->discreteVarNames();
-		std::vector<std::string> cv = net->continVarNames();
-		for(int i=0;i<randomDiscreteVariables->size();i++){
-			vars.push_back(dv.at(randomDiscreteVariables->at(i)));
-		}
-		for(int i=0;i<randomContinVariables->size();i++){
-			vars.push_back(cv.at(randomContinVariables->at(i)));
-		}
-		return vars;
-	}
-
-
 
 	/*!
 	 * the model terms
@@ -556,202 +470,36 @@ public:
 		net = network;
 	}
 
+	const VectorPtr& getVertexOrder() const {
+		return vertexOrder;
+	}
+
+	void setVertexOrder(const VectorPtr& vertexOrder) {
+		this->vertexOrder = vertexOrder;
+	}
+
+	std::vector<int> getVertexOrderVector() const {
+		if(!vertexOrder)
+			return std::vector<int>();
+		return *vertexOrder;
+	}
+
+	void setVertexOrderVector(std::vector<int> vertexOrder) {
+		if(net){
+			if(vertexOrder.size() != 0 && net->size() != vertexOrder.size())
+				Rf_error("Vertex ordering does not have the same number of elements as there are vertices in the network.");
+		}
+		if(!this->vertexOrder)
+			this->vertexOrder = boost::shared_ptr< std::vector<int> >(new std::vector<int>);
+		*this->vertexOrder = vertexOrder;
+	}
+
+	bool hasVertexOrder(){
+		return this->vertexOrder->size() != 0;
+	}
+
 };
 
-
-/**
- * Reduced entropy
- */
-template<class Engine>
-class ReModel : public Model<Engine>{
-protected:
-	typedef boost::shared_ptr< std::vector<double> > ParamPtr;
-	typedef boost::shared_ptr< bool > BoolPtr;
-	ParamPtr betas;		// coefficient for penalties
-	ParamPtr centers;	// The mean values to center the penalty on beta * (center - g(x))^2
-	BoolPtr isThetaDep;				// ( theta / beta)^2 if true, beta if false
-
-	int nModelTerms(){
-		int n = 0;
-		for(int i=0;i<this->stats.size();i++){
-			n += this->stats[i]->vStatistics().size();
-		}
-		return n;
-	}
-public:
-	ReModel() : Model<Engine>(){
-		//std::cout << "rm1";
-		betas = ParamPtr(new std::vector<double>());
-		centers = ParamPtr(new std::vector<double>());
-		isThetaDep = BoolPtr(new bool);
-		*isThetaDep = true;
-	}
-
-	ReModel(BinaryNet<Engine>& network) : Model<Engine>(network){
-		//std::cout << "rm2";
-		betas = ParamPtr(new std::vector<double>());
-		centers = ParamPtr(new std::vector<double>());
-		isThetaDep = BoolPtr(new bool);
-		*isThetaDep = true;
-
-		boost::shared_ptr< BinaryNet<Engine> > n(new BinaryNet<Engine>(network));
-		/*this->net = n;
-		this->randomGraph = boost::shared_ptr< bool >(new bool);
-		this->randomDiscreteVariables = boost::shared_ptr< std::vector<int> >(new std::vector<int>) ;
-		this->randomContinVariables = boost::shared_ptr< std::vector<int> >(new std::vector<int>) ;
-		*this->randomGraph = true;*/
-	}
-
-	ReModel(const ReModel<Engine>& mod) : Model<Engine>(mod){
-		//std::cout << "rm3";
-		betas = mod.betas;
-		centers = mod.centers;
-		isThetaDep = mod.isThetaDep;
-
-		/*this->stats = mod.stats;
-		this->offsets = mod.offsets;
-		this->net = mod.net;
-		this->randomGraph = mod.randomGraph;
-		this->randomDiscreteVariables = mod.randomDiscreteVariables;
-		this->randomContinVariables = mod.randomContinVariables;*/
-		/*if(const ReModel* m = dynamic_cast<const ReModel*>(&mod)){
-			betas = m->betas;
-			centers = m->centers;
-			isThetaDep = m->isThetaDep;
-		}*/
-
-	}
-
-	/*!
-	 * if deep, then the model statistics are de-aliased
-	 */
-	ReModel(const ReModel<Engine>& mod, bool deep)  : Model<Engine>(mod, deep){
-		//std::cout << "rm4";
-		betas = mod.betas;
-		centers = mod.centers;
-		isThetaDep = mod.isThetaDep;
-		if(deep){
-			betas = ParamPtr(new std::vector<double>());
-			centers = ParamPtr(new std::vector<double>());
-			isThetaDep = BoolPtr(new bool);
-
-			for(int i=0;i<mod.betas->size();i++)
-				betas->push_back(mod.betas->at(i));
-			for(int i=0;i<mod.centers->size();i++)
-				centers->push_back(mod.centers->at(i));
-			*isThetaDep = *mod.isThetaDep;
-		}
-		/*this->stats = mod.stats;
-		this->offsets = mod.offsets;
-		this->net = mod.net;
-		this->randomGraph = mod.randomGraph;
-		this->randomDiscreteVariables = mod.randomDiscreteVariables;
-		this->randomContinVariables = mod.randomContinVariables;
-		if(deep){
-			for(int i=0;i<this->stats.size();i++)
-				this->stats[i] = this->stats[i]->vClone();
-			for(int i=0;i<this->offsets.size();i++)
-				this->offsets[i] = this->offsets[i]->vClone();
-			this->randomGraph = boost::shared_ptr< bool >(new bool);
-			this->randomDiscreteVariables = boost::shared_ptr< std::vector<int> >(new std::vector<int>) ;
-			this->randomContinVariables = boost::shared_ptr< std::vector<int> >(new std::vector<int>) ;
-			*this->randomGraph = *mod.randomGraph;
-			*this->randomDiscreteVariables = *mod.randomDiscreteVariables;
-			*this->randomContinVariables = *mod.randomContinVariables;
-		}*/
-	}
-
-	virtual ~ReModel(){}
-
-	/*!
-	 * R constructor for RCPP
-	 *
-	 */
-	ReModel(SEXP sexp) : Model<Engine>(sexp){
-		//std::cout << "rm5";
-		boost::shared_ptr<ReModel> xp = unwrapRobject< ReModel<Engine> >(sexp);
-		betas = xp->betas;
-		centers = xp->centers;
-		isThetaDep = xp->isThetaDep;
-
-		/*this->stats = xp->stats;
-		this->offsets = xp->offsets;
-		this->net = xp->net;
-		this->randomGraph = xp->randomGraph;
-		this->randomDiscreteVariables = xp->randomDiscreteVariables;
-		this->randomContinVariables = xp->randomContinVariables;*/
-	}
-
-	/*!
-	 * coerce to R object. for RCPP
-	 */
-	operator SEXP() const{
-		//std::cout << "rmWrap";
-		return wrapInReferenceClass(*this,Engine::engineName() + "ReModel");
-	}
-
-	virtual ShallowCopyable* vShallowCopyUnsafe() const{
-		return new ReModel(*this);
-	}
-
-	virtual boost::shared_ptr< Model<Engine> > vClone() const{
-		return boost::shared_ptr< Model<Engine> >(new ReModel<Engine>(*this, true));
-	}
-
-	void  setBetas(std::vector<double> newBetas){
-		if(nModelTerms() != newBetas.size())
-			Rf_error("ReModel::setBetas : size mismatch");
-		betas = ParamPtr(new std::vector<double>(newBetas));
-	}
-
-	void thetaDependent(bool td){
-		isThetaDep = BoolPtr(new bool(td));
-	}
-
-	bool isThetaDependent(){
-		return *isThetaDep;
-	}
-
-	std::vector<double> betaParams(){
-		return *betas;
-	}
-
-	std::vector<double> centerParams(){
-		return *centers;
-	}
-
-	void  setCenters(std::vector<double> newCenters){
-		if(nModelTerms() != newCenters.size())
-			Rf_error("ReModel::setCenters : size mismatch");
-		centers = ParamPtr(new std::vector<double>(newCenters));
-		//*centers = newCenters;
-	}
-
-	virtual double vLogLik(){
-		double ll = 0.0;
-		double s, t, par;
-		int nStats = 0;
-		int index = 0;
-		for(int i=0;i<this->stats.size();i++){
-			nStats = this->stats[i]->vStatistics().size();
-			for(int j = 0; j < nStats; j++){
-				s = this->stats[i]->vStatistics()[j];
-				t = this->stats[i]->vTheta()[j];
-				if(*isThetaDep)
-					par = (t / betas->at(index)) * (t / betas->at(index));
-				else
-					par = betas->at(index);
-				ll += s * t - par * (centers->at(index) - s) * (centers->at(index) - s);
-				index++;
-			}
-
-		}
-		for(int i=0;i<this->offsets.size();i++){
-			ll += this->offsets[i]->vLogLik();
-		}
-		return ll;
-	}
-};
 
 #include <Rcpp.h>
 
