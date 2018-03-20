@@ -6,7 +6,7 @@ context("LOLOG Fit")
 
 test_that("lolog_fit",{
   data(sampson)
-  fit <- lologGmm(samplike ~ edges() + triangles(), 
+  fit <- lolog(samplike ~ edges() + triangles(), 
                   samplike ~ edges() + triangles(),
                   theta=c(-1.2304996,0),
                   nsamp=200,
@@ -19,7 +19,7 @@ test_that("lolog_fit",{
   vfit <- lologVariational(samplike ~ edges() + nodeMatch("group"))
   expect_true(all(round(efit$coef - vfit$theta,6) == 0))
   
-  gmmfit <- lologGmm(samplike ~ edges() + nodeMatch("group"),
+  gmmfit <- lolog(samplike ~ edges() + nodeMatch("group"),
                      theta=vfit$theta,nsamp=500,
                      verbose=FALSE)
   svar <- summary(vfit)
@@ -31,7 +31,7 @@ test_that("lolog_fit",{
   # order dependent
   data(flo)
   flomarriage <- network(flo,directed=FALSE)
-  fit <- lologGmm(flomarriage ~ edges() + preferentialAttachment(), 
+  fit <- lolog(flomarriage ~ edges() + preferentialAttachment(), 
                   flomarriage ~ star(2L),
                   theta=c(-1.54998018,0),
                   nsamp=400,
@@ -48,7 +48,7 @@ test_that("lolog_fit_parallel",{
   # order dependent
   data(flo)
   flomarriage <- network(flo,directed=FALSE)
-  fit <- lologGmm(flomarriage ~ edges() + preferentialAttachment(), 
+  fit <- lolog(flomarriage ~ edges() + preferentialAttachment(), 
                   flomarriage ~ star(2L),
                   theta=c(-1.54998018,0),
                   nsamp=400,
@@ -57,7 +57,7 @@ test_that("lolog_fit_parallel",{
   expect_true(all(fit$theta > c(-1.9,0)) & all(fit$theta < c(-1.1,.2))) 
   
   
-  fit <- lologGmm(flomarriage ~ edges() + star(2), 
+  fit <- lolog(flomarriage ~ edges() + star(2), 
                   theta=c(-1.54998018,0),
                   nsamp=200,
                   cluster=cluster,
