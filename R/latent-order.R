@@ -192,6 +192,7 @@ summary.lolog <- function(object, ...){
 #' @param auxFormula A lolog formula of statistics to use for moment matching
 #' @param theta Initial parameters values
 #' @param nsamp The number of sample neteworks to draw at each iteration
+#' @param includeOrderIndependent If true, all order independent terms in formula are used for moment matching.
 #' @param weights The type of weights to use in the GMM objective. Either 'full' for the inverse of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.
 #' @param tol The Hotteling's T^2 p-value tolerance for convergance for the transformed moment conditions.
 #' @param nHalfSteps The maximum number of half steps to take when the objective is not improved in an interation.
@@ -200,23 +201,28 @@ summary.lolog <- function(object, ...){
 #' @param startingStepSize The starting dampening of the parameter update.
 #' @param maxStepSize The largest allowed value for dampening.
 #' @param cluster A parallel cluster to use for graph simulation.
+#' @param verbose Level of verbosity 0-2
 #' @return An object of class 'lolog'
-lologGmm <- function(formula, auxFormula, theta, nsamp=1000, weights="full", tol= .1, nHalfSteps=10, maxIter=100, minIter=2,
-                     startingStepSize=.1, maxStepSize=.5, cluster=NULL){
+lologGmm <- function(formula, auxFormula=NULL, theta=NULL, nsamp=1000, includeOrderIndependent=TRUE, 
+                     weights="full", tol= .1, nHalfSteps=10, maxIter=100, minIter=2,
+                     startingStepSize=.1, maxStepSize=.5, cluster=NULL,verbose=TRUE){
   
   lolik <- createLatentOrderLikelihood(formula, theta=theta)
-  #if(!is.null(order)){
-  #	lolik$setOrder(as.integer(rank(order, ties.method = "min")))
-  #}
+  orderIndependent <- lolik$getModel()$isIndependent(FALSE,TRUE)
+  dyadIndependent <- lolik$getModel()$isIndependent(TRUE,TRUE)
   terms <- .prepModelTerms(formula)
   auxTerms <- .prepModelTerms(auxFormula)
-  auxModel <- createCppModel(auxFormula)
-  #browser()
   samp <- NULL
-  auxModel$setNetwork(lolik$getModel()$getNetwork())
-  auxModel$calculate()
-  obsStats <- auxModel$statistics()
-  #obsStats <- lolik$getModel()$statistics()
+  obsStats <- NULL
+  if(!is.null(auxFormula)){
+    auxModel <- createCppModel(auxFormula)
+    auxModel$setNetwork(lolik$getModel()$getNetwork())
+    auxModel$calculate()
+    obsStats <- auxModel$statistics()
+  }
+  if(includeOrderIndependent){
+    obsStats <- c(lolik$getModel()$statistics()[orderIndependent], obsStats)
+  }
   stepSize <- startingStepSize
   lastTheta <- NULL
   lastObjective <- Inf
@@ -233,11 +239,8 @@ lologGmm <- function(formula, auxFormula, theta, nsamp=1000, weights="full", tol
     clusterExport(cluster, "terms", envir = environment())
     clusterExport(cluster, "auxTerms", envir = environment())
     clusterExport(cluster, "network", envir = environment())
-    #if(!is.null(order))
-    #  ord <- as.integer(rank(order, ties.method = "min"))
-    #else
-    #  ord <- NULL
-    #clusterExport(cluster, "ord", envir = environment())
+    clusterExport(cluster, "orderIndependent", envir = environment())
+    clusterExport(cluster, "includeOrderIndependent", envir = environment())
   }
   while(iter < maxIter){
     iter <- iter + 1
@@ -246,39 +249,54 @@ lologGmm <- function(formula, auxFormula, theta, nsamp=1000, weights="full", tol
     lolik$setThetas(theta)
     stats <- matrix(0,ncol=length(theta),nrow=nsamp)
     estats <- matrix(0,ncol=length(theta),nrow=nsamp)
-    auxStats <- matrix(0,ncol=length(obsStats),nrow=nsamp)
+    if(includeOrderIndependent)
+      auxStats <- matrix(0,ncol=length(obsStats) - sum(orderIndependent),nrow=nsamp)
+    else
+      auxStats <- matrix(0,ncol=length(obsStats),nrow=nsamp)
     if(is.null(cluster)){
       for(i in 1:nsamp){
-        cat(".")
+        if(verbose) cat(".")
         samp <- lolik$generateNetwork()
-        auxModel$setNetwork(samp$network)
-        auxModel$calculate()
-        auxStats[i,] <-  auxModel$statistics()
+        if(!is.null(auxFormula)){
+          auxModel$setNetwork(samp$network)
+          auxModel$calculate()
+          auxStats[i,] <- auxModel$statistics()
+        }
         stats[i,] <- samp$stats + samp$emptyNetworkStats
         estats[i,] <- samp$expectedStats + samp$emptyNetworkStats
       }
-      cat("\n")
+      if(includeOrderIndependent)
+        auxStats <- cbind(stats[,orderIndependent], auxStats)
+      
+      if(verbose) cat("\n")
     }else{
       workingNetwork <- as.network(lolik$getModel()$getNetwork())
       worker <- function(i, theta){
         cat(i," ")
         network <- as.BinaryNet(network)
-        lolik <- .createLatentOrderLikelihoodFromTerms(terms, network, theta)
-        #if(!is.null(ord)){
-        #  lolik$setOrder(as.integer(rank(ord, ties.method = "min")))
-        #}
-        auxModel <- .makeCppModelFromTerms(auxTerms, network)
+        lolik <- lolog:::.createLatentOrderLikelihoodFromTerms(terms, network, theta)
         samp <- lolik$generateNetwork()
-        auxModel$setNetwork(samp$network)
-        auxModel$calculate()
+        if(!is.null(auxTerms)){
+          auxModel <- lolog:::.makeCppModelFromTerms(auxTerms, network)
+          auxModel$setNetwork(samp$network)
+          auxModel$calculate()
+          as <- auxModel$statistics()
+        }else{
+          as <- numeric()
+        }
         list(stats=samp$stats + samp$emptyNetworkStats,
              estats = samp$expectedStats + samp$emptyNetworkStats,
-             auxStats = auxModel$statistics())
+             auxStats = as)
       }
       results <- parallel::parLapply(cluster, 1:nsamp, worker, theta=theta)
       stats <- t(sapply(results, function(x) x$stats))
       estats <- t(sapply(results, function(x) x$estats))
-      auxStats <- t(sapply(results, function(x) x$auxStats))
+      if(!is.null(auxFormula))
+        auxStats <- t(sapply(results, function(x) x$auxStats))
+      else
+        auxStats <- NULL
+      if(includeOrderIndependent)
+        auxStats <- cbind(stats[,orderIndependent], drop(auxStats))
     }
     
     #calculate gradient of moment conditions
@@ -299,43 +317,43 @@ lologGmm <- function(formula, auxFormula, theta, nsamp=1000, weights="full", tol
     momentCondition <- colMeans(transformedDiffs)
     
     objective <- colMeans(diffs) %*% W %*% colMeans(diffs)
-    cat("Objective:\n")
-    print(objective)
+    if(verbose) cat("Objective:\n")
+    if(verbose) print(objective)
     objCrit <- max(-1000000, objective - lastObjective) / (lastObjective + 1)
     
-    cat("Moment Conditions:\n")
-    print(momentCondition)
+    if(verbose) cat("Moment Conditions:\n")
+    if(verbose) print(momentCondition)
     
     
     #calculate inverse of gradient
     invFailed <- inherits(try(gradInv <- solve(t(grad) %*% W %*% grad),silent = TRUE),"try-error")
-    pairs(stats)
+    if(verbose > 1) pairs(stats)
     if(hsCount < nHalfSteps && !is.null(lastTheta) && (invFailed || objCrit > .3)){
-      cat("Half step back\n")
+      if(verbose) cat("Half step back\n")
       theta <- (lastTheta + theta) / 2
       hsCount <- hsCount + 1
       stepSize <- stepSize / 2
-      cat("Theta:\n")
-      print(theta)
+      if(verbose) cat("Theta:\n")
+      if(verbose) print(theta)
       next
     }else{
       stepSize <- min(maxStepSize, stepSize * 1.25)
       hsCount <- 0
     }
-    print(stepSize)
+    if(verbose) print(stepSize)
     lastTheta <- theta
     theta <- theta - stepSize * gradInv %*% momentCondition
     lastObjective <- objective
     
-    print("auxStat Diffs:")
-    print(colMeans(diffs) / sqrt(diag(var(diffs))))
+    if(verbose) print("auxStat Diffs:")
+    if(verbose) print(colMeans(diffs) / sqrt(diag(var(diffs))))
     
     #Hotelling's T^2 test
     hotT <- momentCondition %*% solve(var(transformedDiffs)/nrow(transformedDiffs)) %*% momentCondition
     pvalue <- pchisq(hotT,df=length(theta), lower.tail = FALSE)
-    cat("Hotelling's T2 p-value: ",pvalue,"\n")
-    cat("Theta:\n")
-    print(theta)
+    if(verbose) cat("Hotelling's T2 p-value: ",pvalue,"\n")
+    if(verbose) cat("Theta:\n")
+    if(verbose) print(theta)
     if(pvalue > tol && iter >= minIter){
       break
     }else if(iter < maxIter){

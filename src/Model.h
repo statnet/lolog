@@ -260,6 +260,9 @@ public:
 		return res;
 	}
 
+
+
+
 	/*!
 	 * returns thetas with names for R
 	 */
@@ -496,6 +499,57 @@ public:
 
 	bool hasVertexOrder(){
 		return this->vertexOrder->size() != 0;
+	}
+
+	/*!
+	 * The independence type of each term
+	 *
+	 * \param dyad if true, dyad independence is evaluated, otherwise, order independence is evaluated
+	 * \param statistic. If true, independence is evaluated for each statistic, otherwise it is evaulated for each offset.
+	 *
+	 */
+	std::vector<bool> isIndependent(bool dyad, bool statistic){
+		bool di;
+		if(statistic){
+			int n=0;
+			for(int i=0;i<stats.size();i++){
+				n += stats.at(i)->vSize();
+			}
+			std::vector<bool> v(n,0.0);
+			int c=0;
+			for(int i=0;i<stats.size();i++){
+
+				if(dyad)
+					di = stats.at(i)->vIsDyadIndependent();
+				else
+					di = stats.at(i)->vIsOrderIndependent();
+				//std::vector<double> vals = stats.at(i)->vStatistics();
+				for(int j=0;j<stats.at(i)->vStatistics().size();j++){
+					v[c] = di;
+					c++;
+				}
+			}
+			return v;
+		}else{
+			int n=0;
+			for(int i=0;i<offsets.size();i++){
+				n += offsets.at(i)->vSize();
+			}
+			std::vector<bool> v(n,0.0);
+			int c=0;
+			for(int i=0;i<offsets.size();i++){
+				if(dyad)
+					di = offsets.at(i)->vIsDyadIndependent();
+				else
+					di = offsets.at(i)->vIsOrderIndependent();
+				//std::vector<double> vals = stats.at(i)->vStatistics();
+				for(int j=0;j<offsets.at(i)->vSize();j++){
+					v[c] = di;
+					c++;
+				}
+			}
+			return v;
+		}
 	}
 
 };

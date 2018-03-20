@@ -103,7 +103,13 @@ public:
 		BaseOffset<Engine>::update(net.hasEdge(from,to) ? -1.0 : 1.0, 0);
 	}
 
+	bool isOrderIndependent(){
+		return true;
+	}
 
+	bool isDyadIndependent(){
+		return true;
+	}
 };
 
 typedef Stat<Directed, Edges<Directed> > DirectedEdges;
@@ -226,6 +232,10 @@ public:
 		}
 	}
 
+	bool isOrderIndependent(){
+		return true;
+	}
+
 };
 
 typedef Stat<Directed, Star<Directed> > DirectedStar;
@@ -344,6 +354,9 @@ public:
 		//this->stats[0] = sumTri;//sumSqrtTri - sumSqrtExpected;
 	}
 
+	bool isOrderIndependent(){
+		return true;
+	}
 };
 
 typedef Stat<Directed, Triangles<Directed> > DirectedTriangles;
@@ -460,6 +473,10 @@ public:
 			this->stats[0] = 0.0;
 	}
 
+	bool isOrderIndependent(){
+		return true;
+	}
+
 };
 
 //typedef Stat<Directed, Clustering<Directed> > DirectedClustering;
@@ -564,6 +581,9 @@ public:
 		this->stats[0] =  (1.0 + triads) / (1.0 + nPosTriads);
 	}
 
+	bool isOrderIndependent(){
+		return true;
+	}
 };
 typedef Stat<Directed, Transitivity<Directed> > DirectedTransitivity;
 typedef Stat<Undirected, Transitivity<Undirected> > UndirectedTransitivity;
@@ -629,6 +649,10 @@ public:
 		else
 			change = 0.0;
 		BaseOffset<Engine>::update(change,0);
+	}
+
+	bool isOrderIndependent(){
+		return true;
 	}
 };
 
@@ -765,6 +789,14 @@ public:
 		}
 	}
 
+	bool isOrderIndependent(){
+		return true;
+	}
+
+	bool isDyadIndependent(){
+		return true;
+	}
+
 };
 
 typedef Stat<Directed, NodeMatch<Directed> > DirectedNodeMatch;
@@ -885,6 +917,13 @@ public:
 		Rf_error("NodeMix unimplemented");
 	}
 
+	bool isOrderIndependent(){
+		return true;
+	}
+
+	bool isDyadIndependent(){
+		return true;
+	}
 };
 
 typedef Stat<Directed, NodeMix<Directed> > DirectedNodeMix;
@@ -1036,6 +1075,10 @@ public:
 		}
 
 	}
+
+	bool isOrderIndependent(){
+		return true;
+	}
 };
 
 typedef Stat<Directed, Degree<Directed> > DirectedDegree;
@@ -1152,6 +1195,10 @@ public:
 			BaseOffset<Engine>::update(-this->stats[0],0);//this->stats[0] = 0;
 		else
 			BaseOffset<Engine>::update(crossProd / nEdges - this->stats[0], 0);//this->stats[0] = crossProd / nEdges;
+	}
+
+	bool isOrderIndependent(){
+		return true;
 	}
 
 };
@@ -1322,6 +1369,14 @@ public:
 				deg = net.degree(vert);
 			this->stats[0] += deg*(newValue - oldValue);
 		}
+	}
+
+	bool isOrderIndependent(){
+		return true;
+	}
+
+	bool isDyadIndependent(){
+		return true;
 	}
 
 };
@@ -1503,6 +1558,10 @@ public:
     	this->dyadUpdate(net, lastFrom, lastTo, std::vector<int>(), -1);
     	pnet->toggle(lastFrom, lastTo);
     }
+
+	bool isOrderIndependent(){
+		return true;
+	}
 };
 
 typedef Stat<Directed, Gwesp<Directed> > DirectedGwesp;
@@ -1615,6 +1674,10 @@ public:
  
         this->stats[0] += expalpha*(delta1 + delta2);
     }
+
+	bool isOrderIndependent(){
+		return true;
+	}
 };
 
 typedef Stat<Directed, GwDegree<Directed> > DirectedGwDegree;
@@ -1776,6 +1839,10 @@ public:
         this->stats[0] += (exp(alpha)*delta);
     }
     
+	bool isOrderIndependent(){
+		return true;
+	}
+
 };
 
 typedef Stat<Directed, Gwdsp<Directed> > DirectedGwdsp;
@@ -1938,6 +2005,10 @@ public:
         
     }
     
+	bool isOrderIndependent(){
+		return true;
+	}
+
 };
 
 typedef Stat<Directed, Esp<Directed> > DirectedEsp;
@@ -2070,6 +2141,14 @@ public:
 		}
 	}
 
+	bool isOrderIndependent(){
+		return true;
+	}
+
+	bool isDyadIndependent(){
+		return true;
+	}
+
 };
 
 typedef Stat<Directed, GeoDist<Directed> > DirectedGeoDist;
@@ -2168,6 +2247,14 @@ public:
 		BaseOffset<Engine>::resetLastStats();
 		double change = 2.0 * (!net.hasEdge(from,to) - 0.5);
 		this->stats[0] = this->stats[0] + change * dist(net, from,to);
+	}
+
+	bool isOrderIndependent(){
+		return true;
+	}
+
+	bool isDyadIndependent(){
+		return true;
 	}
 
 };
@@ -2463,6 +2550,14 @@ public:
         double val2 = getValue(net,to);
         double val = val1 > val2 ? val1 : val2;
         this->stats[0] += change * log(val);
+	}
+
+	bool isOrderIndependent(){
+		return true;
+	}
+
+	bool isDyadIndependent(){
+		return true;
 	}
 
 };

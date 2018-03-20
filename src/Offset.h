@@ -106,6 +106,16 @@ public:
 	 */
 	virtual void vRollback(const BinaryNet<Engine>& net) = 0;
 
+	/*!
+	 * Is this dyad independent. i.e. The change statistic depends only on the nodal attributes of the two incident nodes
+	 */
+	virtual bool vIsDyadIndependent() = 0;
+
+	/*!
+	 * Is this order independent. i.e. the value only depends on the graph, not the order in which edges are added.
+	 */
+	virtual bool vIsOrderIndependent() = 0;
+
 };
 
 
@@ -293,6 +303,21 @@ public:
 		return off.logLik();
 	}
 
+	virtual bool vIsDyadIndependent(){
+		return isDyadIndependent();
+	}
+
+	inline bool isDyadIndependent(){
+		return off.isDyadIndependent();
+	}
+
+	virtual bool vIsOrderIndependent(){
+		return isOrderIndependent();
+	}
+
+	inline bool isOrderIndependent(){
+		return off.isOrderIndependent();
+	}
 };
 
 
@@ -438,6 +463,14 @@ public:
 		for(int i=0;i<stats.size();i++)
 			ll += stats[i];
 		return ll;
+	}
+
+	bool isOrderIndependent(){
+		return false;
+	}
+
+	bool isDyadIndependent(){
+		return false;
 	}
 
 };

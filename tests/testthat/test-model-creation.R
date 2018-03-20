@@ -17,6 +17,12 @@ test_that("terms",{
   expect_identical(terms,structure(list(stats = structure(list(star = list(2:4), edges = list()), .Names = c("star", 
                                                                                                              "edges")), offsets = list(), vertexOrder = 1:18), .Names = c("stats", 
                                                                                                                                                                           "offsets", "vertexOrder")))
-  
+  data(flo)
+  flomarriage <- network(flo,directed=FALSE)
+  mod <- createCppModel(flomarriage ~ edges() + star(2:4) + preferentialAttachment())
+  expect_identical(mod$isIndependent(TRUE,TRUE),
+                   c(TRUE, FALSE, FALSE, FALSE, FALSE))
+  expect_identical(mod$isIndependent(FALSE,TRUE),
+                   c(TRUE, TRUE, TRUE, TRUE, FALSE))
   
 })

@@ -191,6 +191,14 @@ public:
 				int variable, double newValue, const  std::vector<int> &order, const  int &actorIndex){
 		Rf_error("BaseConstraint continVertexUpdate should not be called");
 	}
+
+	bool isOrderIndependent(){
+		return false;
+	}
+
+	bool isDyadIndependent(){
+		return false;
+	}
 };
 
 

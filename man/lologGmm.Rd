@@ -4,9 +4,10 @@
 \alias{lologGmm}
 \title{Fits a LOLOG model via Generalized Method of Moments}
 \usage{
-lologGmm(formula, auxFormula, theta, nsamp = 1000, weights = "full",
-  tol = 0.1, nHalfSteps = 10, maxIter = 100, minIter = 2,
-  startingStepSize = 0.1, maxStepSize = 0.5, cluster = NULL)
+lologGmm(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
+  includeOrderIndependent = TRUE, weights = "full", tol = 0.1,
+  nHalfSteps = 10, maxIter = 100, minIter = 2, startingStepSize = 0.1,
+  maxStepSize = 0.5, cluster = NULL, verbose = TRUE)
 }
 \arguments{
 \item{formula}{A lolog formula for the sufficient statistics}
@@ -16,6 +17,8 @@ lologGmm(formula, auxFormula, theta, nsamp = 1000, weights = "full",
 \item{theta}{Initial parameters values}
 
 \item{nsamp}{The number of sample neteworks to draw at each iteration}
+
+\item{includeOrderIndependent}{If true, all order independent terms in formula are used for moment matching.}
 
 \item{weights}{The type of weights to use in the GMM objective. Either 'full' for the inverse of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.}
 
@@ -32,6 +35,8 @@ lologGmm(formula, auxFormula, theta, nsamp = 1000, weights = "full",
 \item{maxStepSize}{The largest allowed value for dampening.}
 
 \item{cluster}{A parallel cluster to use for graph simulation.}
+
+\item{verbose}{Level of verbosity 0-2}
 }
 \value{
 An object of class 'lolog'

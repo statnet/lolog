@@ -133,13 +133,23 @@ public:
 	 */
 	virtual void vRollback(const BinaryNet<Engine>& net) = 0;
 
+	/*!
+	 * Is this dyad independent. i.e. The change statistic depends only on the nodal attributes of the two incident nodes
+	 */
+	virtual bool vIsDyadIndependent() = 0;
+
+	/*!
+	 * Is this order independent. i.e. the value only depends on the graph, not the order in which edges are added.
+	 */
+	virtual bool vIsOrderIndependent() = 0;
+
 };
 
 /*!
  * templated interface for model statistics.
  *
  * Allows for access via virtual functions or non-virtual functions,
- * which will be usefull if we ever want to do template meta programming.
+ * which will be useful if we ever want to do template meta programming.
  *
  * The StatEngine just needs to implement the non-virtual functions.
  *
@@ -387,6 +397,24 @@ public:
 
 	inline double logLik(){
 		return stat.logLik();
+	}
+
+
+	virtual bool vIsDyadIndependent(){
+		return isDyadIndependent();
+	}
+
+
+	inline bool isDyadIndependent(){
+		return stat.isDyadIndependent();
+	}
+
+	virtual bool vIsOrderIndependent(){
+		return isOrderIndependent();
+	}
+
+	inline bool isOrderIndependent(){
+		return stat.isOrderIndependent();
 	}
 
 };

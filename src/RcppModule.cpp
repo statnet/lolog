@@ -89,6 +89,7 @@ RCPP_MODULE(lolog){
 		.method("setThetas",&Model<Undirected>::setThetas)
 		.method("setVertexOrder",&Model<Undirected>::setVertexOrderVector)
 		.method("getVertexOrder",&Model<Undirected>::getVertexOrderVector)
+		.method("isIndependent",&Model<Undirected>::isIndependent)
 		;
 	class_<Model<Directed> >("DirectedModel")
 		.constructor()
@@ -105,6 +106,7 @@ RCPP_MODULE(lolog){
 		.method("setThetas",&Model<Directed>::setThetas)
 		.method("setVertexOrder",&Model<Directed>::setVertexOrderVector)
 		.method("getVertexOrder",&Model<Directed>::getVertexOrderVector)
+		.method("isIndependent",&Model<Directed>::isIndependent)
 		;
 
 

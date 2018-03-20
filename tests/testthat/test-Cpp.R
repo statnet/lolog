@@ -7,5 +7,5 @@ context("C++ tests")
 
 test_that("C++",{
 	.C("runLologTests")	
-	NULL
+  expect_true(TRUE)
 })

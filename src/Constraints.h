@@ -111,6 +111,10 @@ public:
 		return dist;
 	}
 
+	bool isOrderIndependent(){
+		return true;
+	}
+
 };
 
 typedef Constraint<Directed, BoundedDegree<Directed> > DirectedBoundedDegreeConstraint;

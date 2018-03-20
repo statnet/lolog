@@ -20,6 +20,8 @@ createCppModel <- function(formula,cloneNet=TRUE,theta=NULL){
 
 
 .prepModelTerms <- function(formula){
+  if(is.null(formula))
+    return(NULL)
   form <- formula
 	env <- environment(formula)
 	
