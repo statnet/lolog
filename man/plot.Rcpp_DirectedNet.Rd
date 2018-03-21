@@ -14,4 +14,3 @@
 \description{
 plot an DirectedNet object
 }
-

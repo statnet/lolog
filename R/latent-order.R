@@ -353,3 +353,125 @@ lolog <- function(formula, auxFormula=NULL, theta=NULL, nsamp=1000, includeOrder
   class(result) <- c("lologGmm","lolog","list")
   result
 }
+
+
+#' Generates BinaryNetworks from a fit lolog object
+#' @param object The lolog object
+#' @param nsim The number of simulated networks
+#' @param convert convert to a network object#' 
+#' @param ... unused
+#' @method simulate lolog
+simulate.lolog <- function(object, nsim=1, convert=FALSE,...){
+  l <- list()
+  for(i in 1:nsim){
+    l[[i]] <- object$likelihoodModel$generateNetwork()$network
+    if(convert)
+      l[[i]] <- as.network(l[[i]])
+  }
+  l
+}
+
+
+#' conduct goodness of fit diagnostics
+#' @param object the object to evaulate
+#' @param ... additional parameters
+#' @details 
+#' see ?gof.lolog
+gofit <- function(object, ...){
+  UseMethod("gofit")
+}
+
+
+#' Goodness of Fit Diagnostics for a LOLOG fit
+#' @param object the object to evaulate
+#' @param formula A formula specifying the statistics on which to evaluate the fit
+#' @param nsim The number of simulated statistics
+#' @param ... additional parameters
+#' @method gofit lolog
+gofit.lolog <- function(object, formula, nsim=100, ...){
+  model <- createCppModel(formula)
+  observedNetwork <- object$likelihoodModel$getModel()$getNetwork()
+  model$setNetwork(observedNetwork)
+  model$calculate()
+  ostats <- model$statistics()
+  ns <- length(ostats)
+  stats <- matrix(0,nrow=nsim, ncol=ns)
+  model$calculate
+  for(i in 1:nsim){
+    net <- object$likelihoodModel$generateNetwork()$network
+    model$setNetwork(net)
+    model$calculate()
+    stats[i,] <- model$statistics()
+  }
+  
+  mn <- apply(stats,2, min)
+  mx <- apply(stats,2, max)
+  pv <- apply(sweep(stats, 2, ostats), 2, function(a) {
+    if(sd(a) < .Machine$double.eps)
+      return(NA)
+    2 * pnorm(-abs(mean(a) / sd(a)))
+  })
+  d <- data.frame(obs=ostats,
+                  min=mn,
+                  mean=colMeans(stats),
+                  max=mx,
+                  pvalue=pv)
+  
+  result <- list(ostats=ostats,
+                 stats=stats,
+                 summary=d)
+  class(result) <- "gofit"
+  result
+}
+
+#' prints a gofit object
+#' @param x The object
+#' @param ... passed to print.data.frame
+#' @method print gofit
+print.gofit <- function(x, ...){
+  print(x$summary, ...)
+}
+
+#' Plots a gofit object
+#' @param x the gofit object
+#' @param y unused
+#' @param type type of plot, boxplot or lineplot
+#' @param normalize If true, netwrok statistics are normalized by subtracting off the observed statistics and scaling by the standard deviation.
+#' @param line.alpha The transparancy of the simulated statistics lines
+#' @param line.size The width of the lines
+#' @param ... passed to either boxplot or geom_line
+#' @method plot gofit
+plot.gofit <- function(x, y, type=c("line", "box"), normalize=FALSE, line.alpha=.02, line.size=1, ...){
+  type <- match.arg(type)
+  stats <- x$stats
+  ostats <- x$ostats
+  nms <- names(ostats)
+  colnames(stats) <- nms
+  ylab <- "Statistic"
+  if(normalize){
+    stats <- apply(sweep(stats, 2, ostats), 2, function(a) {
+      if(sd(a) < .Machine$double.eps)
+        return(rep(NA,length(a)))
+      a / sd(a)
+    })
+    ostats <- rep(0,length(ostats))
+    ylab <- "Normalized Statistic"
+  }
+  
+  if(type=="box"){
+    boxplot(stats,ylab=ylab, ...)
+    points(ostats,col="red",pch=16)
+    return(NULL)
+  }else{
+    Var2 <- value <- Var1 <- xx <- yy <- gg <- NULL #For R CMD check
+    mstats <- reshape2::melt(stats)
+    o <- data.frame(xx=nms, yy=ostats,gg="observed")
+    gg <- ggplot2::ggplot(data=mstats) + 
+      ggplot2::geom_line(ggplot2::aes(x=Var2,y=value,group=Var1),alpha=line.alpha,size=line.size,...) +
+      ggplot2::geom_line(ggplot2::aes(x=xx,y=yy,group=gg),data=o,color="red",size=line.size,...) + 
+      ggplot2::theme_bw() + ggplot2::ylab(ylab) + ggplot2::xlab("")
+    return(gg)
+  }
+}
+
+

@@ -44,4 +44,3 @@ An object of class 'lolog'
 \description{
 Fits a LOLOG model via Generalized Method of Moments
 }
-

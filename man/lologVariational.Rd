@@ -22,4 +22,3 @@ An object of class 'lologVariationalFit'.
 \description{
 Fits a latent ordered network model using maximum likelihood
 }
-

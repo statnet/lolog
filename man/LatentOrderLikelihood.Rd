@@ -2,13 +2,12 @@
 % Please edit documentation in R/roxygen.R
 \docType{class}
 \name{LatentOrderLikelihood}
-\alias{DirectedLatentOrderLikelihood}
 \alias{LatentOrderLikelihood}
+\alias{DirectedLatentOrderLikelihood}
+\alias{UndirectedLatentOrderLikelihood}
 \alias{Rcpp_DirectedLatentOrderLikelihood-class}
 \alias{Rcpp_UndirectedLatentOrderLikelihood-class}
-\alias{UndirectedLatentOrderLikelihood}
 \title{LatentOrderLikelihood}
 \description{
 LatentOrderLikelihood
 }
-

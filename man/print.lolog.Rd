@@ -14,4 +14,3 @@
 \description{
 Print of a lolog object
 }
-

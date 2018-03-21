@@ -12,4 +12,3 @@ lologPackageSkeleton(path = ".")
 \description{
 create a skeleton for a package extending lolog
 }
-

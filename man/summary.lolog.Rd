@@ -14,4 +14,3 @@
 \description{
 Summary of a lolog object
 }
-

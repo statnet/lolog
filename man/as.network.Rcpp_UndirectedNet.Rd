@@ -14,4 +14,3 @@
 \description{
 convert and UndirectedNet to a network object
 }
-

@@ -4,9 +4,11 @@
 \name{[}
 \alias{[}
 \alias{[,Rcpp_DirectedNet-method}
+\alias{[}
 \alias{[,Rcpp_UndirectedNet-method}
 \alias{[<-}
 \alias{[<-,Rcpp_DirectedNet-method}
+\alias{[<-}
 \alias{[<-,Rcpp_UndirectedNet-method}
 \title{indexing}
 \usage{
@@ -44,4 +46,3 @@ indexing
 
 indexing
 }
-

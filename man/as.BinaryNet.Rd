@@ -14,4 +14,3 @@ as.BinaryNet(x, ...)
 \description{
 convert and network to either an UndirectedNet or DirectedNet object
 }
-

@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ## Getting Started
 
-This Vingette is based on the vignette from the ergm package, and is designed to give a working introduction to LOLOG modeling.
+This vingette is based on the vignette from the ergm package, and is designed to give a working introduction to LOLOG modeling.
 
 This package will utilize the statnet suite of packages for data and network manipulation. To install these:
 
@@ -41,7 +41,7 @@ git clone https://github.com/fellstat/lolog.git
 sh lolog/mkdist
 ```
 
-# Statistical Network Modeling: The lolog Command and lolog Object
+## Statistical Network Modeling: The lolog Command and lolog Object
 
 Make sure the lolog pacakge is attached:
 
@@ -54,8 +54,8 @@ The ergm package contains several network data sets that you can use
 for practice examples.
 
 ```{r}
-library(ergm)
-data(package='ergm') # tells us the datasets in our packages
+suppressPackageStartupMessages(library(ergm))
+#data(package='ergm') # tells us the datasets in our packages
 data(florentine) # loads flomarriage and flobusiness data
 flomarriage # Let's look at the flomarriage data
 plot(flomarriage) # Let's view the flomarriage network
@@ -180,7 +180,7 @@ data(faux.mesa.high)
 mesa <- faux.mesa.high
 mesa
 plot(mesa, vertex.col='Grade')
-legend('bottomleft',fill=7:12,legend=paste('Grade',7:12),cex=0.75)
+#legend('bottomleft',fill=7:12,legend=paste('Grade',7:12),cex=0.75)
 mesa %v% "GradeCat" <- as.character(mesa %v% "Grade")
 fauxmodel.01 <- lolog(mesa ~edges + nodeMatch('GradeCat') + nodeMatch('Race'))
 summary(fauxmodel.01)
@@ -190,8 +190,8 @@ Now lets try adding in transitivity and 2-stars (a measure of degree spread)
 
 ```{r}
 # This may take a minute or two
-#fauxmodel.02 <- lolog(mesa ~edges + nodeMatch('GradeCat') + nodeMatch('Race') + triangles + star(2), verbose=FALSE)
-#summary(fauxmodel.02)
+fauxmodel.02 <- lolog(mesa ~edges + nodeMatch('GradeCat') + nodeMatch('Race') + triangles + star(2), verbose=FALSE)
+summary(fauxmodel.02)
 ```
 
 We see strong eidence of additional transitivity, but little evidence that the degrees have higher spread than expected given the other terms. With LOLOG models, we avoid some of the degeneracy problems present in ERGM models. Let's try the same model in ergm
@@ -201,8 +201,125 @@ fauxmodel.01.ergm <- ergm(mesa ~edges + nodematch('GradeCat') + nodematch('Race'
 ```
 Of course it is highly recommended that you take great care in selecting terms for use with ergm for precisly the reason that many can lead to model degeneracy. A much better choice here for the ergm model would have been to use gwesp and gwdegree in place of triangles and 2-stars.
 
+## Model Terms Available for LOLOG Estimation and Simulation
+
+Model terms are the expressions (e.g. triangle) used to represent predictors on the right-hand size of equations used
+in:
+- calls to lolog (to estimate an ergm model)
+- calls to simulate (to simulate networks from an lolog model
+fit)
+- calls to calculateStatistics (to obtain measurements of network statistics
+on a dataset)
+
+### Terms Provided with lolog
+
+For a list of available terms that can be used to specify an ERGM,
+type:
+```{r eval=FALSE}
+help('lolog-terms')
+```
 
 
+### Coding New Terms
 
+Full details on coding new terms is beyond the scope of this document. However, lolog provides facilities for extending the package to provide new terms. An example of this can be created via
+
+```{r, eval=FALSE}
+lologPackageSkeleton()
+```
+and then at the command prompt, run
+```{sh, eval=FALSE}
+R CMD build LologExtension
+R CMD INSTALL LologExtension_1.0.tar.gz
+```
+A new package will be installed implementing the minDegree (minimum degree) statistic.
+
+Alternatively, C++ extensions can be added directly from R without the need of any pacakge infustructure via the inlining features of the Rcpp package. lolog provides an inline plugin for this feature. For details, see
+```{r, eval=FALSE}
+help("inlineLologPlugin")
+```
+
+## Network Simulation and Computation
+
+Network Statistics can be calculated using the calculateStatistics function
+```{r}
+calculateStatistics(mesa ~ edges + triangles + degree(0:15))
+```
+
+Simulating from a fit lolog object with
+```{r}
+nets <- simulate(flomodel.03,nsim=10) #Generates a list of BinaryNet objects
+plot(nets[[1]])
+```
+
+Voila. Of course, yours will look somewhat different. Note that the objects created are BinaryNet objects unless the convert parameter is set to TRUE, in which case they are network objects.
+
+## Working with BinaryNet objects
+
+
+BinaryNets are network data structures native to the lolog package. They are special in a couple ways. First, they have a sparse representation of missingness, such that a directed network where halve of the nodes have been egocentrically sampled takes the same amount of space a a simple fully observed network. Secondly, they may be passed up and down easily from R to C++ and visa versa. Finally, they are extensible on the C++ level, so that their implementation may be replaced. For example, it might be useful to put in a file backed storage system for large problems.
+
+BinaryNets can be coerced to and from network objects.
+
+```{r}
+data(sampson)
+
+#coersion
+net <- as.BinaryNet(samplike)
+nw2 <- as.network(net)
+print(nw2)
+
+#dyad Extraction
+net[1:2,1:5]
+net$outNeighbors(c(1,2,3))
+
+#dyad assignment
+net[1,1:5] <- rep(NA,5)
+net[1:2,1:5]
+net[1:2,1:5,maskMissing=FALSE] #remove the mask over missing values and see nothing was really changed
+
+#node variables
+net$variableNames()
+net[["group"]]
+net[["rnorm"]] <- rnorm(18)
+net[["rnorm"]]
+
+#See available methods
+#print(DirectedNet)
+#print(UndirectedNet)
+```
+
+All user facing functions in the lolog package accept BinaryNets as arguments, and will convert network objects to BinaryNets automatically.
+
+## Order Dependent Terms
+
+LOLOG allows for network statistics tat depend not just on the network, but also the (unobserved) order in which syads were 'added' to the network. One model of this class is the Babarasi-Albert preferential attachment model, which is closely approximated by a lolog model with an edges and preferentialAttachment term.
+
+For each order dependent statistic, one or more order independent statistics must be specified as moment matching targets. In this case, w will use two-star
+
+```{r}
+flomodel.04 <- lolog(flomarriage ~ edges() + preferentialAttachment(), flomarriage ~ star(2), verbose=FALSE)
+summary(flomodel.04)
+```
+
+
+## Examining the Quality of Model Fit - GOF
+
+LOLOGs are generative models - that is, they represent the process that governs tie formation at a local level. These local processes in turn aggregate up to produce characteristic global network
+properties, even though these global properties are not explicit terms in the model. One test of whether a model "fits the data" is therefore how well it reproduces these global properties. We do this by choosing a network statistic that is not in the model, and comparing the value of this statistic observed in the original network to the distribution of values we get in simulated networks from our model. 
+
+We begin by comparing the degree structure of simulated nets compared to the observed (red) 
+```{r,  out.width="100%", dpi=340}
+gdeg <- gofit(flomodel.03, flomarriage ~ degree(0:10))
+gdeg
+plot(gdeg)
+```
+
+Next we can look at the edgewise shared partner distribution in simulated networks compared with the observed distribution(red)
+```{r}
+gesp <- gofit(flomodel.03, flomarriage ~ esp(0:5))
+gesp
+plot(gesp)
+```
 
 

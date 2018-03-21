@@ -14,12 +14,14 @@ Depends:
     Rcpp (>= 0.9.4)
 Imports:
     network, 
-    parallel
+    parallel,
+    ggplot2,
+    reshape2
 Suggests:
     testthat,
     inline,
     knitr,
     rmarkdown
 RcppModules: lolog
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 VignetteBuilder: knitr

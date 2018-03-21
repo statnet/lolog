@@ -4,11 +4,10 @@
 \name{BinaryNet}
 \alias{BinaryNet}
 \alias{DirectedNet}
+\alias{UndirectedNet}
 \alias{Rcpp_DirectedNet-class}
 \alias{Rcpp_UndirectedNet-class}
-\alias{UndirectedNet}
 \title{BinaryNet}
 \description{
 BinaryNet
 }
-

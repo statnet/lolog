@@ -9,4 +9,3 @@ initLologStatistics()
 \description{
 initialize model statistics
 }
-

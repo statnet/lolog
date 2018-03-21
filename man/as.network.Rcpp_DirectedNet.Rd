@@ -14,4 +14,3 @@
 \description{
 convert and DirectedNet to a network object
 }
-

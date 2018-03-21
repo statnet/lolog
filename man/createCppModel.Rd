@@ -16,4 +16,3 @@ createCppModel(formula, cloneNet = TRUE, theta = NULL)
 \description{
 creates a model
 }
-

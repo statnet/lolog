@@ -17,4 +17,3 @@ An Rcpp object representing the likeilhood model
 \description{
 Creates a probability model for a latent ordered network model
 }
-

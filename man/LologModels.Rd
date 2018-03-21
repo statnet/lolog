@@ -2,13 +2,12 @@
 % Please edit documentation in R/roxygen.R
 \docType{class}
 \name{LologModels}
-\alias{DirectedModel}
 \alias{LologModels}
+\alias{DirectedModel}
+\alias{UndirectedModel}
 \alias{Rcpp_DirectedModel-class}
 \alias{Rcpp_UndirectedModel-class}
-\alias{UndirectedModel}
 \title{Models}
 \description{
 Models
 }
-

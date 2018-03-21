@@ -12,4 +12,3 @@ calculateStatistics(formula)
 \description{
 calculate model statistics from a formula
 }
-
