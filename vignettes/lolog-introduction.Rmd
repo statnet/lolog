@@ -1,0 +1,208 @@
+---
+title: "An Introduction to Latent Order LOGistic (LOLOG) Network Models"
+author: "The Statnet Development Team"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{An Introduction to LOLOG Network Models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width="80%", 
+  dpi=120
+)
+```
+
+## Getting Started
+
+This Vingette is based on the vignette from the ergm package, and is designed to give a working introduction to LOLOG modeling.
+
+This package will utilize the statnet suite of packages for data and network manipulation. To install these:
+
+```{r, eval=FALSE}
+install.packages("statnet")
+```
+
+To install the latest version of the package from CRAN (not yet available):
+
+```{r, eval=FALSE}
+install.packages("lolog")
+```
+
+To install the latest development version from github run the following (you'll need a sh shell and git):
+
+```{sh, eval=FALSE}
+git clone https://github.com/fellstat/lolog.git
+sh lolog/mkdist
+```
+
+# Statistical Network Modeling: The lolog Command and lolog Object
+
+Make sure the lolog pacakge is attached:
+
+```{r}
+library(lolog)
+set.seed(1)
+```
+
+The ergm package contains several network data sets that you can use
+for practice examples.
+
+```{r}
+library(ergm)
+data(package='ergm') # tells us the datasets in our packages
+data(florentine) # loads flomarriage and flobusiness data
+flomarriage # Let's look at the flomarriage data
+plot(flomarriage) # Let's view the flomarriage network
+```
+
+Networks tend to evolve over time. This evolution can take the form of the addition or deletion of a tie from the network, or the addition or deletion of a vertex. LOLOGs are motivated by a growth process, where each edge variable is sequentially considered for edge creation, and edges are not deleted.
+
+Remember a LOLOG represents the probability of a tie, given the network grown up to a timepoint as
+$$
+\textrm{logit}\big(p(y_{s_t}=1 | \eta, y^{t-1}, s_{ \leq t})\big) = \theta \cdot c(y_{s_t}=1 | y^{t-1}, s_{ \leq t})
+$$
+where $s_{\leq t} is the growth order of the network up to time $t$, $y^{t-1}$ is the state of the graph at time $t-1$. $c(y_{s_t} | y^{t-1}, s_{ \leq t})$ is a vector representing the change in graph statistics from time $t-1$ to $t$ if an edge is present, and $\theta$ is a vector of parameters.
+
+### An Erdos-Renyi model
+
+We begin with the simplest possible model, the Bernoulli or Erdos-Renyi model, which contains only an edge term.
+
+```{r}
+flomodel.01 <- lolog(flomarriage~edges) # fit model
+flomodel.01 
+
+summary(flomodel.01) # look in more depth
+```
+
+How to interpret this model? The log-odds of any tie occurring is:
+$$
+ =-1.609\times\mbox{change in the number of ties} \\=-1.609\times1
+$$
+for all ties, since the addition of any tie to the network changes
+the number of ties by 1!
+
+Corresponding probability is:
+$$
+\exp(-1.609)/(1+\exp(-1.609)) = 0.1667
+$$
+which is what you would expect, since there are 20/120 ties.
+
+### A Triangle Model
+
+Let's add a term often thought to be a measure of clustering: the number of completed
+triangles.
+```{r}
+flomodel.02 <- lolog(flomarriage~edges()+triangles(), verbose=FALSE) 
+summary(flomodel.02)
+```
+
+```{r}
+coef1 = flomodel.02$theta[1]
+coef2 = flomodel.02$theta[2]
+logodds = coef1 + c(0,1,2) * coef2
+expit = function(x) 1/(1+exp(-x))
+ps = expit(logodds)
+coef1 = round(coef1, 3)
+coef2 = round(coef2, 3)
+logodds = round(logodds, 3)
+ps = round(ps, 3)
+```
+Again, how to interpret coefficients?
+
+Conditional log-odds of two actors forming a tie is:
+$$
+`r coef1` \times \mbox{change in the number of ties} + `r coef2` \times \mbox{change in number of triangles}
+$$
+
+
+- if the tie will not add any triangles to the network, its log-odds is: $`r coef1`$.
+- if it will add one triangle to the network, its log-odds is: $`r coef1`+`r coef2`=`r logodds[2]`$
+- if it will add two triangles to the network, its log-odds is: $`r coef1`+`r coef2`\times2=`r logodds[3]`$
+- the corresponding probabilities are `r ps[1]`, `r ps[2]`, and `r ps[3]`.
+
+Let's take a closer look at the ergm object itself:
+
+```{r}
+class(flomodel.02) # this has the class ergm
+
+names(flomodel.02) # let's look straight at the ERGM obj.
+```
+
+```{r}
+flomodel.02$theta 
+flomodel.02$formula 
+wealth <- flomarriage %v% 'wealth' # the %v% extracts vertex
+wealth # attributes from a network
+plot(flomarriage, vertex.cex=wealth/25) # network plot with vertex size 
+                                        # proportional to wealth
+```
+
+### The Effect of Wealth
+
+We can test whether edge probabilities are a function of wealth:
+
+```{r}
+flomodel.03 <- lolog(flomarriage~edges+nodeCov('wealth'))
+summary(flomodel.03)
+```
+
+Yes, there is a significant positive wealth effect on the probability
+of a tie.
+
+### Reciprocity
+
+Let's try a model or two on:
+
+Is there a statistically significant tendency for ties to be reciprocated ('mutuality')?
+
+
+```{r}
+data(samplk) 
+ls() # directed data: Sampson's Monks
+samplk3
+plot(samplk3)
+sampmodel.01 <- lolog(samplk3~edges+reciprocity, verbose=FALSE)
+summary(sampmodel.01)
+```
+
+## Modeling Larger Networks
+
+Let's try a larger network. First we will fit a dyad independent model.
+
+```{r}
+data(faux.mesa.high) 
+mesa <- faux.mesa.high
+mesa
+plot(mesa, vertex.col='Grade')
+legend('bottomleft',fill=7:12,legend=paste('Grade',7:12),cex=0.75)
+mesa %v% "GradeCat" <- as.character(mesa %v% "Grade")
+fauxmodel.01 <- lolog(mesa ~edges + nodeMatch('GradeCat') + nodeMatch('Race'))
+summary(fauxmodel.01)
+```
+
+Now lets try adding in transitivity and 2-stars (a measure of degree spread)
+
+```{r}
+# This may take a minute or two
+#fauxmodel.02 <- lolog(mesa ~edges + nodeMatch('GradeCat') + nodeMatch('Race') + triangles + star(2), verbose=FALSE)
+#summary(fauxmodel.02)
+```
+
+We see strong eidence of additional transitivity, but little evidence that the degrees have higher spread than expected given the other terms. With LOLOG models, we avoid some of the degeneracy problems present in ERGM models. Let's try the same model in ergm
+
+```{r, error=TRUE}
+fauxmodel.01.ergm <- ergm(mesa ~edges + nodematch('GradeCat') + nodematch('Race') + triangles + kstar(2))
+```
+Of course it is highly recommended that you take great care in selecting terms for use with ergm for precisly the reason that many can lead to model degeneracy. A much better choice here for the ergm model would have been to use gwesp and gwdegree in place of triangles and 2-stars.
+
+
+
+
+
+
