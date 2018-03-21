@@ -8,5 +8,6 @@ Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
 License: What Licence is it under ?
 Depends: Rcpp (>= 0.10.0), lolog
+Imports: BH
 Suggests: network
-LinkingTo: Rcpp, lolog
+LinkingTo: Rcpp, lolog, BH

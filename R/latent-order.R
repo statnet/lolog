@@ -100,7 +100,7 @@ print.lologVariationalFit <- function(x, ...){
 #' Print of a lolog object
 #' @param x the object
 #' @param ... additional parameters (unused)
-#' @method print lologVariationalFit
+#' @method print lolog
 print.lolog <- function(x, ...){
   cat(x$method, "Coefficients:\n")
   print(x$theta)
@@ -153,6 +153,7 @@ lolog <- function(formula, auxFormula=NULL, theta=NULL, nsamp=1000, includeOrder
       if(verbose) cat("Model is dyad independent. Returning maximum likelihood estimate.\n")
       return(varFit)
     }
+    theta <- varFit$theta
     if(verbose) cat("theta:\n")
     if(verbose) print(theta)
   }

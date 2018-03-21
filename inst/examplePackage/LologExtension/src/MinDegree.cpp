@@ -13,6 +13,6 @@
 */
 RcppExport void registerMinDegree(){
 	using namespace lolog;
-	Rcpp::XPtr< Stat<Undirected> > ps1(new MinDegree<Undirected>());
+	Rcpp::XPtr< AbstractStat<Undirected> > ps1(new UndirectedMinDegree());
 	REGISTER_UNDIRECTED_STATISTIC(ps1);
 }

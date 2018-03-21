@@ -17,7 +17,7 @@ using namespace std;
 * with degree greater than or equal to "degree"
 */
 template<class Engine>
-class MinDegree : public Stat< Engine > {
+class MinDegree : public BaseStat< Engine > {
 public:
 	int degree; //the minimum degree
 	
@@ -33,17 +33,19 @@ public:
 		}
 	}
 	
-	//A little boiler plate for StatController.h
-	virtual Stat<Engine>* create(List params) const{ return new MinDegree(params);}
-	virtual Stat<Engine>* cloneUnsafe(){ return new MinDegree<Engine>(*this);}
-	
 	//The name 
 	virtual string name(){return "minDegree";}
+	
+	std::vector<std::string> statNames(){
+	  std::vector<std::string> statnames(1,"minDegree");
+	  return statnames;
+	}
 	
 	//Calculate the statistic
 	virtual void calculate(const BinaryNet<Engine>& net){
 		vector<double> v(1,0);
 		this->stats=v;
+		this->lastStats = std::vector<double>(1,0.0);
 		if(this->thetas.size()!=1)
 			this->thetas = v;
 		for(int i=0;i<net.size();i++)
@@ -52,7 +54,8 @@ public:
 	}
 	
 	//Update the statistic given a dyad toggle
-	virtual void dyadUpdate(const BinaryNet<Engine>& net, int from, int to){
+	virtual void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
+	  BaseOffset<Engine>::resetLastStats();
 		if(!net.hasEdge(from,to)){
 			if(net.degree(from)==degree-1)
 				this->stats[0]++;
@@ -66,12 +69,19 @@ public:
 		}
 	}
 	
-	//Do nothing for vertex variable toggles
-	virtual void discreteVertexUpdate(const BinaryNet<Engine>& net, int vert,
-	int variable, int newValue){}		
-	virtual void continVertexUpdate(const BinaryNet<Engine>& net, int vert,
-	int variable, double newValue){}
+	//Declare that this statistic is order independent
+	bool isOrderIndependent(){
+	  return true;
+	}
+	
+	//Declare that this statistic is dyad independent
+	bool isDyadIndependent(){
+	  return false;
+	}
+	
 };
+
+typedef Stat<Undirected, MinDegree<Undirected> > UndirectedMinDegree;
 
 /**
 * This function registers the new MinDegree statistic so that

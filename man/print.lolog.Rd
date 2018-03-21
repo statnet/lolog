@@ -4,7 +4,7 @@
 \alias{print.lolog}
 \title{Print of a lolog object}
 \usage{
-\method{print}{lologVariationalFit}(x, ...)
+\method{print}{lolog}(x, ...)
 }
 \arguments{
 \item{x}{the object}

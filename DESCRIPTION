@@ -12,11 +12,14 @@ Date: 2018-03-15
 Depends:
     methods,
     Rcpp (>= 0.9.4)
-Imports: 
+Imports:
     network, 
     parallel
 Suggests:
     testthat,
-    inline
+    inline,
+    knitr,
+    rmarkdown
 RcppModules: lolog
 RoxygenNote: 5.0.1
+VignetteBuilder: knitr
