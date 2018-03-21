@@ -2,7 +2,7 @@
 title: "An Introduction to Latent Order LOGistic (LOLOG) Network Models"
 author: "The Statnet Development Team"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{An Introduction to LOLOG Network Models}
   %\VignetteEngine{knitr::rmarkdown}
@@ -67,7 +67,7 @@ Remember a LOLOG represents the probability of a tie, given the network grown up
 $$
 \textrm{logit}\big(p(y_{s_t}=1 | \eta, y^{t-1}, s_{ \leq t})\big) = \theta \cdot c(y_{s_t}=1 | y^{t-1}, s_{ \leq t})
 $$
-where $s_{\leq t} is the growth order of the network up to time $t$, $y^{t-1}$ is the state of the graph at time $t-1$. $c(y_{s_t} | y^{t-1}, s_{ \leq t})$ is a vector representing the change in graph statistics from time $t-1$ to $t$ if an edge is present, and $\theta$ is a vector of parameters.
+where $s_{\leq t}$ is the growth order of the network up to time $t$, $y^{t-1}$ is the state of the graph at time $t-1$. $c(y_{s_t} | y^{t-1}, s_{ \leq t})$ is a vector representing the change in graph statistics from time $t-1$ to $t$ if an edge is present, and $\theta$ is a vector of parameters.
 
 ### An Erdos-Renyi model
 
@@ -190,14 +190,16 @@ Now lets try adding in transitivity and 2-stars (a measure of degree spread)
 
 ```{r}
 # This may take a minute or two
-fauxmodel.02 <- lolog(mesa ~edges + nodeMatch('GradeCat') + nodeMatch('Race') + triangles + star(2), verbose=FALSE)
+fauxmodel.02 <- lolog(mesa ~edges + nodeMatch('GradeCat') + nodeMatch('Race') + 
+                        triangles + star(2), verbose=FALSE)
 summary(fauxmodel.02)
 ```
 
 We see strong eidence of additional transitivity, but little evidence that the degrees have higher spread than expected given the other terms. With LOLOG models, we avoid some of the degeneracy problems present in ERGM models. Let's try the same model in ergm
 
 ```{r, error=TRUE}
-fauxmodel.01.ergm <- ergm(mesa ~edges + nodematch('GradeCat') + nodematch('Race') + triangles + kstar(2))
+fauxmodel.01.ergm <- ergm(mesa ~edges + nodematch('GradeCat') + nodematch('Race') + 
+                            triangles + kstar(2))
 ```
 Of course it is highly recommended that you take great care in selecting terms for use with ergm for precisly the reason that many can lead to model degeneracy. A much better choice here for the ergm model would have been to use gwesp and gwdegree in place of triangles and 2-stars.
 
@@ -276,7 +278,8 @@ net$outNeighbors(c(1,2,3))
 #dyad assignment
 net[1,1:5] <- rep(NA,5)
 net[1:2,1:5]
-net[1:2,1:5,maskMissing=FALSE] #remove the mask over missing values and see nothing was really changed
+net[1:2,1:5,maskMissing=FALSE] #remove the mask over missing values and see 
+                               #nothing was really changed
 
 #node variables
 net$variableNames()
@@ -293,12 +296,13 @@ All user facing functions in the lolog package accept BinaryNets as arguments, a
 
 ## Order Dependent Terms
 
-LOLOG allows for network statistics tat depend not just on the network, but also the (unobserved) order in which syads were 'added' to the network. One model of this class is the Babarasi-Albert preferential attachment model, which is closely approximated by a lolog model with an edges and preferentialAttachment term.
+LOLOG allows for network statistics tat depend not just on the network, but also the (unobserved) order in which dyads were 'added' to the network. One model of this class is the Babarasi-Albert preferential attachment model, which is closely approximated by a lolog model with an edges and preferentialAttachment term.
 
 For each order dependent statistic, one or more order independent statistics must be specified as moment matching targets. In this case, w will use two-star
 
 ```{r}
-flomodel.04 <- lolog(flomarriage ~ edges() + preferentialAttachment(), flomarriage ~ star(2), verbose=FALSE)
+flomodel.04 <- lolog(flomarriage ~ edges() + preferentialAttachment(), 
+                     flomarriage ~ star(2), verbose=FALSE)
 summary(flomodel.04)
 ```
 

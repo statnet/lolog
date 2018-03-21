@@ -81,11 +81,13 @@ summary(fauxmodel.01)
 
 ## ------------------------------------------------------------------------
 # This may take a minute or two
-fauxmodel.02 <- lolog(mesa ~edges + nodeMatch('GradeCat') + nodeMatch('Race') + triangles + star(2), verbose=FALSE)
+fauxmodel.02 <- lolog(mesa ~edges + nodeMatch('GradeCat') + nodeMatch('Race') + 
+                        triangles + star(2), verbose=FALSE)
 summary(fauxmodel.02)
 
 ## ---- error=TRUE---------------------------------------------------------
-fauxmodel.01.ergm <- ergm(mesa ~edges + nodematch('GradeCat') + nodematch('Race') + triangles + kstar(2))
+fauxmodel.01.ergm <- ergm(mesa ~edges + nodematch('GradeCat') + nodematch('Race') + 
+                            triangles + kstar(2))
 
 ## ----eval=FALSE----------------------------------------------------------
 #  help('lolog-terms')
@@ -118,7 +120,8 @@ net$outNeighbors(c(1,2,3))
 #dyad assignment
 net[1,1:5] <- rep(NA,5)
 net[1:2,1:5]
-net[1:2,1:5,maskMissing=FALSE] #remove the mask over missing values and see nothing was really changed
+net[1:2,1:5,maskMissing=FALSE] #remove the mask over missing values and see 
+                               #nothing was really changed
 
 #node variables
 net$variableNames()
@@ -131,7 +134,8 @@ net[["rnorm"]]
 #print(UndirectedNet)
 
 ## ------------------------------------------------------------------------
-flomodel.04 <- lolog(flomarriage ~ edges() + preferentialAttachment(), flomarriage ~ star(2), verbose=FALSE)
+flomodel.04 <- lolog(flomarriage ~ edges() + preferentialAttachment(), 
+                     flomarriage ~ star(2), verbose=FALSE)
 summary(flomodel.04)
 
 ## ----  out.width="100%", dpi=340-----------------------------------------
