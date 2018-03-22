@@ -45,9 +45,9 @@ logodds = round(logodds, 3)
 ps = round(ps, 3)
 
 ## ------------------------------------------------------------------------
-class(flomodel.02) # this has the class ergm
+class(flomodel.02) # this has the class lolog
 
-names(flomodel.02) # let's look straight at the ERGM obj.
+names(flomodel.02) # let's look straight at the lolog obj.
 
 ## ------------------------------------------------------------------------
 flomodel.02$theta 
