@@ -170,12 +170,18 @@ public:
         for(int i=0;i<starDegrees.size();i++){
             int d = starDegrees[i];
             std::string nm = "star."+asString(d);
+            if(direction == IN)
+            		nm = "in-" + nm;
+            if(direction == OUT)
+            		nm = "out-" + nm;
             statnames.push_back(nm);
         }
         return statnames;
 	}
     
 	void calculate(const BinaryNet<Engine>& net){
+		if(!net.isDirected())
+			direction = UNDIRECTED;
 		std::vector<double> v(starDegrees.size(),0.0);
 		this->lastStats = std::vector<double>(starDegrees.size(),0.0);
 		for(int i=0; i<net.size();i++){
@@ -998,6 +1004,10 @@ public:
         for(int i=0;i<degrees.size();i++){
             int d = degrees[i];
             std::string nm = "degree."+asString(d);
+            if(direction == IN)
+            		nm = "in-" + nm;
+            if(direction == OUT)
+            		nm = "out-" + nm;
             statnames.push_back(nm);
         }
         return statnames;
@@ -1619,6 +1629,10 @@ public:
     std::vector<std::string> statNames(){
         std::string a = asString(alpha);
         std::string termname = "gwdegree."+a;
+        if(direction == IN)
+        	termname = "in-" + termname;
+        if(direction == OUT)
+        	termname = "out-" + termname;
         std::vector<std::string> statnames(1,termname);
         return statnames;
         
