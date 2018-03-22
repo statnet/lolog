@@ -5,7 +5,7 @@
 \title{Plots a gofit object}
 \usage{
 \method{plot}{gofit}(x, y, type = c("line", "box"), normalize = FALSE,
-  line.alpha = 0.02, line.size = 1, ...)
+  lineAlpha = 0.06, lineSize = 1, ...)
 }
 \arguments{
 \item{x}{the gofit object}
@@ -16,9 +16,9 @@
 
 \item{normalize}{If true, netwrok statistics are normalized by subtracting off the observed statistics and scaling by the standard deviation.}
 
-\item{line.alpha}{The transparancy of the simulated statistics lines}
+\item{lineAlpha}{The transparancy of the simulated statistics lines}
 
-\item{line.size}{The width of the lines}
+\item{lineSize}{The width of the lines}
 
 \item{...}{passed to either boxplot or geom_line}
 }

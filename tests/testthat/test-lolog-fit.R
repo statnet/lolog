@@ -7,11 +7,11 @@ context("LOLOG Fit")
 test_that("lolog_fit",{
   data(sampson)
   fit <- lolog(samplike ~ edges() + triangles(), 
-                  samplike ~ edges() + triangles(),
-                  theta=c(-1.2304996,0),
-                  nsamp=200,
-                  includeOrderIndependent = FALSE,
-                  verbose=FALSE)
+               samplike ~ edges() + triangles(),
+               theta=c(-1.2304996,0),
+               nsamp=200,
+               includeOrderIndependent = FALSE,
+               verbose=FALSE)
   expect_true(all(fit$theta > c(-1.26,.19)) & all(fit$theta < c(-1.23,.21))) 
   
   # Test Dyad Independent
@@ -20,8 +20,8 @@ test_that("lolog_fit",{
   expect_true(all(round(efit$coef - vfit$theta,6) == 0))
   
   gmmfit <- lolog(samplike ~ edges() + nodeMatch("group"),
-                     theta=vfit$theta,nsamp=500,
-                     verbose=FALSE)
+                  theta=vfit$theta,nsamp=500,
+                  verbose=FALSE)
   svar <- summary(vfit)
   sgmm <- summary(gmmfit)
   expect_true(all(abs(svar$se - sgmm$se) < .04))
@@ -32,10 +32,10 @@ test_that("lolog_fit",{
   data(flo)
   flomarriage <- network(flo,directed=FALSE)
   fit <- lolog(flomarriage ~ edges() + preferentialAttachment(), 
-                  flomarriage ~ star(2L),
-                  theta=c(-1.54998018,0),
-                  nsamp=400,
-                  verbose=FALSE)
+               flomarriage ~ star(2L),
+               theta=c(-1.54998018,0),
+               nsamp=400,
+               verbose=FALSE)
   expect_true(all(fit$theta > c(-1.9,0)) & all(fit$theta < c(-1.1,.2))) 
   
 })
@@ -49,19 +49,19 @@ test_that("lolog_fit_parallel",{
   data(flo)
   flomarriage <- network(flo,directed=FALSE)
   fit <- lolog(flomarriage ~ edges() + preferentialAttachment(), 
-                  flomarriage ~ star(2L),
-                  theta=c(-1.54998018,0),
-                  nsamp=400,
-                  cluster=cluster,
-                  verbose=FALSE)
+               flomarriage ~ star(2L),
+               theta=c(-1.54998018,0),
+               nsamp=400,
+               cluster=cluster,
+               verbose=FALSE)
   expect_true(all(fit$theta > c(-1.9,0)) & all(fit$theta < c(-1.1,.2))) 
   
   
   fit <- lolog(flomarriage ~ edges() + star(2), 
-                  theta=c(-1.54998018,0),
-                  nsamp=200,
-                  cluster=cluster,
-                  verbose=FALSE)
+               theta=c(-1.54998018,0),
+               nsamp=200,
+               cluster=cluster,
+               verbose=FALSE)
   expect_true(all(fit$theta > c(-1.65,0)) & all(fit$theta < c(-1.55,.2))) 
   parallel::stopCluster(cluster)
 })

@@ -3,7 +3,7 @@
 
 loadModule("lolog",TRUE)
 .onLoad <- function(libname, pkgname){
-	.C("initStats")
+  .C("initStats")
 }
 
 .onUnload <- function(libpath) {}

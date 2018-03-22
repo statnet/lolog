@@ -2,16 +2,16 @@
 #' create a skeleton for a package extending lolog
 #' @param path where to create the package
 lologPackageSkeleton <- function( path = "."){
-	pkgPath <- find.package("lolog")
-	p <- file.path(pkgPath,"examplePackage","LologExtension")
-	file.copy(p,path,recursive=TRUE)
+  pkgPath <- find.package("lolog")
+  p <- file.path(pkgPath,"examplePackage","LologExtension")
+  file.copy(p,path,recursive=TRUE)
 }
 
 # Used to indicate a required parameter
 .required <- function(){
-	r <- NA
-	class(r) <- ".requiredParam"
-	r
+  r <- NA
+  class(r) <- ".requiredParam"
+  r
 }
 
 # Parses evaulated parameters as if in a function call.
@@ -44,8 +44,8 @@ lologPackageSkeleton <- function( path = "."){
     j <- j + 1
   }
   for(i in 1:length(result)){
-  	if(inherits(result[[i]],".requiredParam"))
-  		stop(paste("parameter",names(result)[i],"required but not present"))
+    if(inherits(result[[i]],".requiredParam"))
+      stop(paste("parameter",names(result)[i],"required but not present"))
   }
   result
 }

@@ -325,8 +325,8 @@ summary.lolog <- function(object, ...){
 #' }
 #' 
 lolog <- function(formula, auxFormula=NULL, theta=NULL, nsamp=1000, includeOrderIndependent=TRUE, 
-                     weights="full", tol= .1, nHalfSteps=10, maxIter=100, minIter=2,
-                     startingStepSize=.1, maxStepSize=.5, cluster=NULL,verbose=TRUE){
+                  weights="full", tol= .1, nHalfSteps=10, maxIter=100, minIter=2,
+                  startingStepSize=.1, maxStepSize=.5, cluster=NULL,verbose=TRUE){
   
   #initialize theta via variational inference
   if(is.null(theta)){
@@ -687,8 +687,8 @@ print.gofit <- function(x, ...){
 #' @param y unused
 #' @param type type of plot, boxplot or lineplot
 #' @param normalize If true, netwrok statistics are normalized by subtracting off the observed statistics and scaling by the standard deviation.
-#' @param line.alpha The transparancy of the simulated statistics lines
-#' @param line.size The width of the lines
+#' @param lineAlpha The transparancy of the simulated statistics lines
+#' @param lineSize The width of the lines
 #' @param ... passed to either boxplot or geom_line
 #' 
 #' 
@@ -703,7 +703,7 @@ print.gofit <- function(x, ...){
 #' plot(gind)
 #' plot(gind, type="box")
 #' @method plot gofit
-plot.gofit <- function(x, y, type=c("line", "box"), normalize=FALSE, line.alpha=.02, line.size=1, ...){
+plot.gofit <- function(x, y, type=c("line", "box"), normalize=FALSE, lineAlpha=.06, lineSize=1, ...){
   type <- match.arg(type)
   stats <- x$stats
   ostats <- x$ostats
@@ -729,9 +729,12 @@ plot.gofit <- function(x, y, type=c("line", "box"), normalize=FALSE, line.alpha=
     mstats <- reshape2::melt(stats)
     o <- data.frame(xx=nms, yy=ostats,gg="observed")
     gg <- ggplot2::ggplot(data=mstats) + 
-      ggplot2::geom_line(ggplot2::aes(x=Var2,y=value,group=Var1),alpha=line.alpha,size=line.size,...) +
-      ggplot2::geom_line(ggplot2::aes(x=xx,y=yy,group=gg),data=o,color="red",size=line.size,...) + 
-      ggplot2::theme_bw() + ggplot2::ylab(ylab) + ggplot2::xlab("")
+      ggplot2::geom_line(ggplot2::aes(x=Var2,y=value,group=Var1),alpha=lineAlpha,size=lineSize,...) +
+      ggplot2::geom_line(ggplot2::aes(x=xx,y=yy,group=gg),data=o,color="red",size=lineSize,...) + 
+      ggplot2::theme_bw() + ggplot2::ylab(ylab) + ggplot2::xlab("")  +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+                     panel.grid.major.x = ggplot2::element_blank(),
+                     panel.grid.minor.x = ggplot2::element_blank())
     return(gg)
   }
 }
