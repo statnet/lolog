@@ -74,7 +74,169 @@ NULL
 #' LOLOG Model Terms
 #' @name lolog-terms
 #' @docType methods
-#' @details 
-#' A place holder for model term documentation.
+#' @section Term Descriptions:
+#' \itemize{
+#' \item{\code{edges}  (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
+#' \emph{Edges:} This term adds one network statistic equal to the number of edges 
+#' (i.e. nonzero values) in the network. }
+#' 
+#' \item{\code{ star(k, direction=1L  } (order-independent) (directed)  (undirected)}{ 
+#' The \code{k} argument is a vector of distinct integers. 
+#' This term adds one network statistic to the model for each element in \code{k}. 
+#' The \eqn{i}th such statistic counts the number of distinct \code{k[i]}-stars in the network, 
+#' where a \eqn{k}-star is defined to be a node \eqn{N} and a set of \eqn{k} different nodes 
+#' \eqn{\{O_1, \dots, O_k\}} such that the ties \eqn{\{N, O_i\}} exist for \eqn{i=1, \dots, k}. 
+#' For directed networks, direction indicates whether the count is of in-stars (direction=1L) 
+#' or out-stars (direction=2L)}
+#' 
+#' \item{\code{triangles()} (order-independent) (directed)  (undirected)}{ 
+#' This term adds one statistic to the model equal to the number of triangles
+#' in the network. For an undirected network, a triangle is defined to be any
+#' set \eqn{\{(i,j), (j,k), (k,i)\}} of three edges. For a directed network, a
+#' triangle is defined as any set of three edges \eqn{(i{\rightarrow}j)}{(i,j)}
+#' and \eqn{(j{\rightarrow}k)}{(j,k)} and either \eqn{(k{\rightarrow}i)}{(k,i)}
+#' or \eqn{(k{\leftarrow}i)}{(i,k)}. }
+#' 
+#' 
+#' \item{\code{clustering()}  (order-independent) (undirected)}{ 
+#' The global clustering coefficient, defined as the number of triangles over the
+#' number of possible triangles \url{https://en.wikipedia.org/wiki/Clustering_coefficient}, or
+#' 3 * triangles / 2-stars.
+#' }
+#' 
+#' \item{\code{transitivity()}  (order-independent) (undirected)}{ 
+#' The soffer vasquez transitivity. This is clustering metric that adjusts for large degree
+#' differences and is described by C in Equation 6 of 
+#' \url{https://pdfs.semanticscholar.org/7af5/f8c871d99b868cd0ed70c5fd09f59b399769.pdf}. Note 
+#' The approximation of the number of possible shared neighbors between node i and j of min(d_i,d_j) - 1
+#' in this implementation.
+#'  }
+#'  
+#' \item{\code{ reciprocity() } (order-independent) (directed)}{ A count of the number of pairs of actors 
+#' \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)} and \eqn{(j{\rightarrow}i)}{(j,i)} 
+#' both exist. 
+#' }
+#' \item{\code{ nodeMatch(name) } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
+#'  For categorical network nodal variable 'name,' the number of edges between nodes with the same 
+#'  variable value.
+#'  }
+#' \item{\code{ nodeMix(name) } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
+#' For categorical network nodal variable 'name,' adds one statistic for each combination of levels of the
+#' variable equal to the count of edges between those levels.
+#'   }
+#' \item{\code{ degree(d, direction=0L, lessThanOrEqual=FALSE) } (order-independent)  (directed)  
+#' (undirected)}{ 
+#' The \code{d} argument is a vector of distinct integers. This term adds one
+#' network statistic to the model for each element in \code{d}; the \eqn{i}th
+#' such statistic equals the number of nodes in the network of degree
+#' \code{d[i]}, i.e. with exactly \code{d[i]} edges. 
+#' 
+#' For directed networks if direction=0L
+#' degree is counted as the sum of the in and out degrees of a node. If direction=1L then in-degrees are
+#' used ans direction=2L indicates out-degrees.
+#' 
+#' If lessThanOrEqual=TRUE, then the count is the number of nodes with degree less than or equal to d.
+#'   }
+#'   
+#'   
+#' \item{\code{ degreeCrossProd() (order-independent)  (undirected) }}{ 
+#'     This term adds one network statistic equal to the mean of the cross-products
+#'     of the degrees of all pairs of nodes in the network which are tied.
+#'   }
+#'   
+#' \item{\code{ nodeCov(name) } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
+#' The \code{attrname} argument is a character string giving the name of a
+#' numeric attribute in the network's vertex attribute list.
+#' This term adds a single network statistic to the model equaling the sum of
+#' \code{name(i)} and \code{name(j)} for all edges \eqn{(i,j)} in the
+#' network. For categorical variables, levels are coded as 1,..,nlevels.
+#'   }
+#'   
+#' \item{\code{gwesp(alpha)}  (order-independent)  (directed)  (undirected)}{ 
+#' This term is just like \code{gwdsp} except it adds a statistic equal to the
+#' geometrically weighted \emph{edgewise} (not dyadwise) shared partner
+#' distribution with decay parameter
+#' \code{alpha} parameter, which should be non-negative.
+#'   }
+#'
+#' \item{\code{ gwdegree(alpha, direction=0L) }  (order-independent)  (directed)  (undirected)}{ 
+#' This term adds one network statistic to the model equal to the weighted
+#' degree distribution with decay controlled by the \code{decay} parameter.
+#' The \code{alpha} parameter is the same as theta_s in equation (14) in Hunter (2007).
+#' 
+#' For directed networks if direction=0L degree is counted as the sum of the in and 
+#' out degrees of a node. If direction=1L then in-degrees are used ans direction=2L 
+#' indicates out-degrees.
+#' 
+#'  }
+#'  
+#' \item{\code{ gwdsp(alpha) } (order-independent)  (directed)  (undirected)}{ 
+#' 
+#'  This term adds one network statistic to the model equal to the geometrically
+#'  weighted dyadwise shared partner distribution with decay parameter
+#'  \code{decay} parameter, which should be non-negative. 
+#' 
+#'  }
+#'  
+#' \item{\code{ esp(d) } (order-independent)  (directed)  (undirected)}{ 
+#' 
+#' This term adds one network
+#' statistic to the model for each element in \code{d} where the \eqn{i}th such
+#' statistic equals the number of \emph{edges} (rather than dyads) in the
+#' network with exactly \code{d[i]} shared partners. This term can be used with
+#' directed and undirected networks. For directed networks the count is over
+#' cylces of the form: node --> nbr1 --> nbr2 --> node.
+#' 
+#'  }
+#'  
+#' \item{\code{ geoDist(long, lat, distCuts=Inf) }(dyad-independent)  (order-independent)  (undirected)}{  
+#' 
+#' given nodal variables for longitude and latitude, calculates the sum of the
+#' great circle distance between connected nodes. distCuts splits this into
+#' seperate statistics that count the sum of the minimum of the cut point and the
+#' distance.
+#' 
+#' }
+#' \item{\code{ dist(names } (dyad-independent)  (order-independent) (undirected)}{ 
+#' 
+#' Calculates a statistic equal to the sum of the euclidian distances between
+#' connected nodes on the numeric nodal variables specified in names.
+#' 
+#' }
+#' \item{\code{ preferentialAttachment(k=1) } (undirected)}{ 
+#' 
+#' An order dependent preferential attachment term. For each edge, adds
+#' 
+#' log( (k+degree) / (n * (meanDegree + k)))
+#' 
+#' where degree is the current degree of the acting node, n is the network size, and meanDegree is
+#' the mean degree of the network. This depends upon the order in which edges are added.
+#' 
+#'  }
+#' \item{\code{ sharedNbrs(k=1) } (undirected)}{ 
+#' 
+#' for each edge adds
+#' 
+#' log(k + shared / minDeg)
+#' 
+#' where shared is the current number of shared neighbors between the two nodes, and
+#' minDeg is the minimum of the currect degrees of the two nodes (i.e. the number of possible shared 
+#' neighbors).
+#' 
+#'  }
+#' \item{\code{ nodeLogMaxCov(name) } (order-independent)  (undirected)}{ 
+#' 
+#' For each edge (i,j) and nodal variable variable, add to the statistic
+#' 
+#' log(max(variable[i],variable[j]))
+#' 
+#' If the variable is a (partial) rank order of nodal inclusion into the network,
+#' this statistic can be useful in modeling the mean degree over the course of the
+#' growth process.
+#' 
+#'  }
+#'  
+#'  }
+#' 
 NULL
 
