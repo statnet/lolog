@@ -2,7 +2,7 @@
 % Please edit documentation in R/BinaryNet.R
 \name{as.network.Rcpp_UndirectedNet}
 \alias{as.network.Rcpp_UndirectedNet}
-\title{convert and UndirectedNet to a network object}
+\title{Convert and UndirectedNet to a network object}
 \usage{
 \method{as.network}{Rcpp_UndirectedNet}(x, ...)
 }
@@ -11,6 +11,22 @@
 
 \item{...}{unused}
 }
+\value{
+A network object
+}
 \description{
-convert and UndirectedNet to a network object
+Convert and UndirectedNet to a network object
+}
+\examples{
+el <- matrix(c(1,2),ncol=2)
+
+#make an UndirectedNet with one edge and 5 nodes
+net <- new(UndirectedNet, el, 5L)
+net[1:5,1:5]
+
+nw <- as.network(net)
+nw
+}
+\seealso{
+\code{\link{UndirectedNet}}
 }

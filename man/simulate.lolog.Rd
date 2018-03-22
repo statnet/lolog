@@ -4,15 +4,30 @@
 \alias{simulate.lolog}
 \title{Generates BinaryNetworks from a fit lolog object}
 \usage{
-\method{simulate}{lolog}(object, nsim = 1, convert = FALSE, ...)
+\method{simulate}{lolog}(object, nsim = 1, seed = NULL, convert = FALSE,
+  ...)
 }
 \arguments{
 \item{object}{The lolog object}
 
 \item{nsim}{The number of simulated networks}
 
+\item{seed}{Either NULL or an integer that will be used in a call to set.seed before simulating}
+
 \item{convert}{convert to a network object#'}
+
+\item{...}{unused}
 }
 \description{
 Generates BinaryNetworks from a fit lolog object
+}
+\examples{
+library(network)
+data(flo)
+flomarriage <- network(flo,directed=FALSE)
+flomarriage \%v\% "wealth" <- c(10,36,27,146,55,44,20,8,42,103,48,49,10,48,32,3)
+fit <- lolog(flomarriage ~ edges + nodeCov("wealth"))
+net <- simulate(fit)[[1]]
+plot(net)
+
 }

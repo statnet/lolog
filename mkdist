@@ -15,9 +15,9 @@ rm -rf tmp/lolog/mkdist
 cp -rf tmp/lolog/src/*.h tmp/lolog/inst/include
 cp -rf tmp/lolog/src/tests/* tmp/lolog/src
 rm -rf tmp/lolog/src/tests
+rm -rf tmp/lolog/inst/examplePackage/LologExtension/.*
 
 if [ $1 = "quick" ]; then
-echo "here"
   $R CMD build  --no-build-vignettes tmp/lolog
 else
 $R CMD build  tmp/lolog

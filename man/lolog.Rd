@@ -2,7 +2,7 @@
 % Please edit documentation in R/latent-order.R
 \name{lolog}
 \alias{lolog}
-\title{Fits a LOLOG model via Generalized Method of Moments}
+\title{Fits a LOLOG model via Mote Carlo Generalized Method of Moments}
 \usage{
 lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
   includeOrderIndependent = TRUE, weights = "full", tol = 0.1,
@@ -10,11 +10,11 @@ lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
   maxStepSize = 0.5, cluster = NULL, verbose = TRUE)
 }
 \arguments{
-\item{formula}{A lolog formula for the sufficient statistics}
+\item{formula}{A lolog formula for the sufficient statistics (see details).}
 
 \item{auxFormula}{A lolog formula of statistics to use for moment matching}
 
-\item{theta}{Initial parameters values}
+\item{theta}{Initial parameters values. Estimated via \code{\link{lologVariational}} if NULL.}
 
 \item{nsamp}{The number of sample neteworks to draw at each iteration}
 
@@ -36,11 +36,112 @@ lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
 
 \item{cluster}{A parallel cluster to use for graph simulation.}
 
-\item{verbose}{Level of verbosity 0-2}
+\item{verbose}{Level of verbosity 0-2.}
 }
 \value{
-An object of class 'lolog'
+An object of class 'lolog'. If the model is dyad independent, the returned object will
+also be of class "lologVariational" (see \code{\link{lologVariational}}, otherwise it will 
+also be a "lologGmm" obejct.
+
+lologGmm objects contain:
+
+\item{method}{"Method of Moments" for order independent models, otherwise "Generalized Method of Moments"}
+\item{formula}{The model formula}
+\item{auxFormula}{The formula containing additional moment conditions}
+\item{theta}{The parameter estimates}
+\item{stats}{The statistics for each network in the last iteration}
+\item{estats}{the expected stats (G(y,s)) for each network in the last iteration}
+\item{obsStats}{the observed network statistics}
+\item{net}{A network simulated from the fit model}
+\item{grad}{The gradient of the moment conditions}
+\item{vcov}{The asymptotic covariance matrix of the parameter estimates}
+\item{likelihoodModel}{An object of class *LatentOrderLikelihood at the fit parameters}
 }
 \description{
-Fits a LOLOG model via Generalized Method of Moments
+\code{lolog} is used to fit Latent Order LOGistic Graph (LOLOG) models. LOLOG models are
+motivated by the idea of network growth where the network begins empty, and edge variables
+are sequentially 'added' to the network with an eather unobserved, or partially observed 
+order \eqn{s}. Conditional upon the inclusion order, the probability of an edge has a 
+logistic relationship with the change in network statistics.
+}
+\details{
+LOLOG represents the probability of a tie, given the network grown up to a timepoint as
+\deqn{
+  \textrm{logit}\big(p(y_{s_t}=1 | \eta, y^{t-1}, s_{ \leq t})\big) = \theta \cdot c(y_{s_t}=1 | y^{t-1}, s_{ \leq t})
+}
+where \eqn{s_{\leq t}} is the growth order of the network up to time \eqn{t}, \eqn{y^{t-1}} is the 
+state of the graph at time \eqn{t-1}. \eqn{c(y_{s_t} | y^{t-1}, s_{ \leq t})} is a vector 
+representing the change in graph statistics from time \eqn{t-1} to \eqn{t} if an edge is present, and 
+\eqn{\theta} is a vector of parameters.
+
+The motivating growth order proceeds 'by vertex.' The network begins 'empty' and then vertices are 'added'
+to the network sequentially. The order of vertex inclusion may be random or fixed. When a vertex 'enters' the 
+network, each of the edge variables connecting it and vertices already in the network are considered for
+edge creation in a completely random order.
+
+LOLOG formulas contain a network, DirectedNet or UndirectedNet object on the left hand side.
+the right hand side contains the model terms used. for example,
+
+\code{net ~ edges}
+
+represents and Erdos-Renyi model and
+
+\code{net ~ edges + preferentialAttachment()}
+
+represents a Barabasi-Albert model. See \code{\link{lolog-terms}} for a list of allowed model statstics.
+
+Conditioning on (partial) vertex order can be done by
+placing an ordering variable on the right hand side of the '|' operator, as in
+
+\code{net ~ edges + preferentialAttachment() | order}
+
+'order' should be a numeric vector with as many elements as there are vertices in the network.
+Ties are allowed. Vertices with higher order values will always be included later. Those with the same
+values will be included in a random order in each simulated network.
+
+offsets and constraints are specified by wraping them with either \code{offset()} or \code{contraint()},
+for example, the following specifies an Erdos-renyi model with the constraint that degrees must be less
+that 10
+
+\code{net ~ edges + constraint(boundedDegree(0L, 10L))}
+
+If the model contains any order dependent statistics, additional moment constraints
+must be specified in \code{auxFormula}. Ideally these should be chosen to capture
+the features modeled by the order dependent statistic. For example, \code{preferentialAttachment}
+models the degree structure, so we might choose two-stars as a moment constraint.
+
+ \code{lolog(net ~ edges + preferentialAttachment(), net ~ star(2))}
+  
+will fit a Barabasi-Albert model with the # of edges and # of two-stars as moment constraints.
+}
+\examples{
+library(network)
+set.seed(1)
+data(flo)
+flomarriage <- network(flo,directed=FALSE)
+flomarriage \%v\% "wealth" <- c(10,36,27,146,55,44,20,8,42,103,48,49,10,48,32,3)
+
+# A dyad independent model
+fit <- lolog(flomarriage ~ edges + nodeCov("wealth"))
+summary(fit)
+
+# A dyad dependent model with 2-stars and triangles
+fit2 <- lolog(flomarriage ~ edges + nodeCov("wealth") + star(2) + triangles, verbose=FALSE)
+summary(fit2)
+
+# An order dependent model
+fit3 <- lolog(flomarriage ~ edges + nodeCov("wealth") + preferentialAttachment(), 
+              flomarriage ~ star(2), verbose=FALSE)
+summary(fit3)
+
+# Try something a bit more real
+\dontrun{
+
+data(ukFaculty)
+fituk <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC") + triangles + star(2))
+summary(fituk)
+plot(fituk$net, vertex.col= ukFaculty \%v\% "Group" + 2)
+
+}
+
 }

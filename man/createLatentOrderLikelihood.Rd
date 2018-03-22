@@ -7,7 +7,7 @@
 createLatentOrderLikelihood(formula, theta = NULL)
 }
 \arguments{
-\item{formula}{A LOLOG formula}
+\item{formula}{A LOLOG formula. See \code{link{lolog}}}
 
 \item{theta}{Parameter values.}
 }
@@ -16,4 +16,18 @@ An Rcpp object representing the likeilhood model
 }
 \description{
 Creates a probability model for a latent ordered network model
+}
+\details{
+# See the methods of the objects returned by this function
+UndirectedLatentOrderLikelihood
+DirectedLatentOrderLikelihood
+
+# A Barabasi-Albert type graph model with 1000 vertices
+el <- matrix(0, nrow=0, ncol=2)
+net <- new(UndirectedNet, el, 1000L)
+lolik <- createLatentOrderLikelihood(net ~ preferentialAttachment(), theta=1)
+banet <- lolik$generateNetwork()$network # generate a random network from the model
+degrees <- banet$degree(1:1000)
+hist(degrees, breaks=100) # plot the degree distribution
+banet[["__order__"]] # The vertex inclusion order
 }

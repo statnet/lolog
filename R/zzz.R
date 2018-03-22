@@ -10,6 +10,5 @@ loadModule("lolog",TRUE)
 
 
 
-#setwd("/Users/ianfellows/Documents/Eclipse_workspace/")
 #library(roxygen2)
 #roxygenize('lolog',roclets='rd')

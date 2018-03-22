@@ -46,3 +46,24 @@ indexing
 
 indexing
 }
+\examples{
+data(ukFaculty)
+net <- as.BinaryNet(ukFaculty)
+
+
+#dyad Extraction
+net[1:2,1:5]
+net$outNeighbors(c(1,2,3))
+
+#dyad assignment
+net[1,1:5] <- rep(NA,5)
+net[1:2,1:5]
+net[1:2,1:5,maskMissing=FALSE] #remove the mask over missing values and see 
+#nothing was really changed
+
+#node variables
+net$variableNames()
+net[["Group"]]
+net[["rnorm"]] <- rnorm(net$size())
+net[["rnorm"]]
+}

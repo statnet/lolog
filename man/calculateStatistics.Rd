@@ -2,13 +2,17 @@
 % Please edit documentation in R/lolog.R
 \name{calculateStatistics}
 \alias{calculateStatistics}
-\title{calculate model statistics from a formula}
+\title{Calculate network statistics from a formula}
 \usage{
 calculateStatistics(formula)
 }
 \arguments{
-\item{formula}{An lolog formula}
+\item{formula}{A lolog formula (See \code{\link{lolog}}).}
 }
 \description{
-calculate model statistics from a formula
+Calculate network statistics from a formula
+}
+\examples{
+data(ukFaculty)
+calculateStatistics(ukFaculty ~ edges + reciprocity + triangles)
 }

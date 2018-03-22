@@ -1,8 +1,27 @@
 
 
-#' convert and UndirectedNet to a network object
+#' Network conversion
+#' @param x The object
+#' @param ... Additional parameters
+as.network <- function(x, ...){
+  UseMethod("as.network")
+}
+
+#' Convert and UndirectedNet to a network object
 #' @param x the object
 #' @param ... unused
+#' @return A network object
+#' @examples 
+#' el <- matrix(c(1,2),ncol=2)
+#' 
+#' #make an UndirectedNet with one edge and 5 nodes
+#' net <- new(UndirectedNet, el, 5L)
+#' net[1:5,1:5]
+#' 
+#' nw <- as.network(net)
+#' nw
+#' @seealso \code{\link{UndirectedNet}}
+#' @method as.network Rcpp_UndirectedNet
 as.network.Rcpp_UndirectedNet <- function(x,...){
 	el <- x$edges()
 	attr(el,"n") <- n <- x$size()
@@ -33,9 +52,20 @@ as.network.Rcpp_UndirectedNet <- function(x,...){
 	nw
 }
 
-#' convert and DirectedNet to a network object
+#' Convert and DirectedNet to a network object
 #' @param x the object
 #' @param ... unused
+#' @return A network object
+#' @examples 
+#' el <- matrix(c(1,2),ncol=2)
+#' 
+#' #make an UndirectedNet with one edge and 5 nodes
+#' net <- new(UndirectedNet, el, 5L)
+#' 
+#' nw <- as.network(net)
+#' nw
+#' @seealso \code{\link{DirectedNet}}
+#' @method as.network Rcpp_DirectedNet
 as.network.Rcpp_DirectedNet <- function(x,...){
 	el <- x$edges()
 	attr(el,"n") <- n <- x$size()
@@ -67,26 +97,45 @@ as.network.Rcpp_DirectedNet <- function(x,...){
 }
 
 #' plot an DirectedNet object
-#' @param x the object
+#' @param x the Rcpp_DirectedNet object
 #' @param ... additional parameters for plot.network
+#' @details
+#' This is a thin wrapper around \code{\link{plot.network}}.
+#' @examples
+#' data(ukFaculty)
+#' net <- as.BinaryNet(ukFaculty)
+#' plot(net, vertex.col=net[["Group"]]+1)
 #' @method plot Rcpp_DirectedNet
 plot.Rcpp_DirectedNet <- function(x,...){
 	x <- as.network(x)
 	plot(x,...)
 }
 
-#' plot an UndirectedNet object
+#' Plot an UndirectedNet object
 #' @param x the object
 #' @param ... additional parameters for plot.network
+#' @details
+#' This is a thin wrapper around \code{\link{plot.network}}.
+#' @examples
+#' el <- matrix(c(1,2),ncol=2)
+#' net <- new(UndirectedNet, el, 5L)
+#' net[1,5] <- 1
+#' net[2,5] <- 1
+#' plot(net)
 #' @method plot Rcpp_UndirectedNet
 plot.Rcpp_UndirectedNet <- function(x,...){
 	x <- as.network(x)
 	plot(x,...)
 }
 
-#' convert and network to either an UndirectedNet or DirectedNet object
+#' Convert and network to either an UndirectedNet or DirectedNet object
 #' @param x the object
 #' @param ... unused
+#' @return either an Rcpp_UndirectedNet or Rcpp_DirectedNet object
+#' @examples 
+#' data(ukFaculty)
+#' net <- as.BinaryNet(ukFaculty)
+#' net
 as.BinaryNet <- function(x,...){
 	if(inherits(x,"Rcpp_UndirectedNet"))
 		return(x)
@@ -118,6 +167,26 @@ as.BinaryNet <- function(x,...){
 #' @param maskMissing should missing values be masked by NA
 #' @param drop unused
 #' @docType methods
+#' @examples
+#' data(ukFaculty)
+#' net <- as.BinaryNet(ukFaculty)
+#' 
+#' 
+#' #dyad Extraction
+#' net[1:2,1:5]
+#' net$outNeighbors(c(1,2,3))
+#' 
+#' #dyad assignment
+#' net[1,1:5] <- rep(NA,5)
+#' net[1:2,1:5]
+#' net[1:2,1:5,maskMissing=FALSE] #remove the mask over missing values and see 
+#' #nothing was really changed
+#' 
+#' #node variables
+#' net$variableNames()
+#' net[["Group"]]
+#' net[["rnorm"]] <- rnorm(net$size())
+#' net[["rnorm"]]
 #' @rdname extract-methods
 setMethod("[", c("Rcpp_DirectedNet"),
 		function(x, i, j, ..., maskMissing=TRUE, drop=TRUE)

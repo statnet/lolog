@@ -25,3 +25,14 @@
 \description{
 Plots a gofit object
 }
+\examples{
+data(ukFaculty)
+# A dyad independent model
+fitind <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC"))
+summary(fitind)
+
+# Check gof on degree distribution (bad!)
+gind <- gofit(fitind, ukFaculty ~ degree(0:50))
+plot(gind)
+plot(gind, type="box")
+}

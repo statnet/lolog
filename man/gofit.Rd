@@ -2,7 +2,7 @@
 % Please edit documentation in R/latent-order.R
 \name{gofit}
 \alias{gofit}
-\title{conduct goodness of fit diagnostics}
+\title{Conduct goodness of fit diagnostics}
 \usage{
 gofit(object, ...)
 }
@@ -12,8 +12,8 @@ gofit(object, ...)
 \item{...}{additional parameters}
 }
 \description{
-conduct goodness of fit diagnostics
+Conduct goodness of fit diagnostics
 }
 \details{
-see ?gof.lolog
+see \code{\link{gofit.lolog}}
 }

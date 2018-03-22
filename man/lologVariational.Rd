@@ -2,23 +2,65 @@
 % Please edit documentation in R/latent-order.R
 \name{lologVariational}
 \alias{lologVariational}
-\title{Fits a latent ordered network model using maximum likelihood}
+\title{Fits a latent ordered network model using Monte Carlo variational inference}
 \usage{
-lologVariational(formula, nReplicates = 5L, downsampleRate = NULL,
+lologVariational(formula, nReplicates = 5L, dyadInclusionRate = NULL,
   targetFrameSize = 5e+05)
 }
 \arguments{
-\item{formula}{A lolog formula}
+\item{formula}{A lolog formula. See \code{link{lolog}}}
 
 \item{nReplicates}{An integer controling how many dyad ordering to perform.}
 
-\item{downsampleRate}{Controls what proportion of dyads in each ordering should be dropped.}
+\item{dyadInclusionRate}{Controls what proportion of dyads in each ordering should be dropped.}
 
-\item{targetFrameSize}{Sets downsampleRate so that the model frame for the logistic regression will have on average this amount of observations.}
+\item{targetFrameSize}{Sets dyadInclusionRate so that the model frame for the logistic regression will have on average this amount of observations.}
 }
 \value{
-An object of class 'lologVariationalFit'.
+An object of class c('lologVariationalFit','lolog','list') consisting of the following
+items:
+\item{formula}{ The model formula}
+\item{method}{"variational"}
+\item{theta}{The fit parameter values}
+\item{vcov}{The asymptotic covariance matrix for the parameter values.}
+\item{nReplicates}{The number of replicates}
+\item{dyadInclusionRate}{The rate at which dyads are included}
+\item{allDyadIndependent}{Logical indicating model dyad independence}
+\item{likelihoodModel}{An object of class *LatentOrderLikelihood at the fit parameters}
+\item{outcome}{The outcome vector for the logistic regression}
+\item{predictors}{The change statistic predictor matrix for the logistic rergession}
 }
 \description{
-Fits a latent ordered network model using maximum likelihood
+Fits a latent ordered network model using Monte Carlo variational inference
+}
+\details{
+This function approximates the maximum liklihood solution via a variational inference on the 
+graph (y) over the latent edge variable inclusion order (s). Specifically, it replaces 
+the conditional probability p(s | y) by p(s). If the LOLOG model contains only dyad independent
+terms, then these two probabilities are identical, and thus variational inference is
+exactly maximum likelihood inference. The objective function is
+
+\deqn{E_{p(s)}\bigg(\log p(y| S, \theta) \bigg)}
+
+This can be approximated by drawing samples from p(s) to approximate the expectation. The
+number of samples is controled by the nReplaices parameter. The memory required is on the
+order of nReplicates * (# of dyads). For large networks this can be impractical, so 
+adjusting dyadInclusionRate allows one to downsample the # of dyads in each replicate.
+
+If the model is dyad independent, replicates are reducntand, and so nReplicates is set to 
+1 with a note.
+
+The functional form of the objective function is equivalent to logistic regression, and so
+the \code{\link{glm}} function is used to maximize it. The asymptotic covariance of the parameter
+estimates is calculated using the methods of Westling (2015).
+}
+\examples{
+data(ukFaculty)
+fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"),nReplicates=1L, dyadInclusionRate=1)
+summary(fit)
+
+
+}
+\references{
+Westling, T., & McCormick, T. H. (2015). Beyond prediction: A framework for inference with variational approximations in mixture models. arXiv preprint arXiv:1510.08151.
 }

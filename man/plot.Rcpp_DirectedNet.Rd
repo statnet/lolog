@@ -7,10 +7,18 @@
 \method{plot}{Rcpp_DirectedNet}(x, ...)
 }
 \arguments{
-\item{x}{the object}
+\item{x}{the Rcpp_DirectedNet object}
 
 \item{...}{additional parameters for plot.network}
 }
 \description{
 plot an DirectedNet object
+}
+\details{
+This is a thin wrapper around \code{\link{plot.network}}.
+}
+\examples{
+data(ukFaculty)
+net <- as.BinaryNet(ukFaculty)
+plot(net, vertex.col=net[["Group"]]+1)
 }

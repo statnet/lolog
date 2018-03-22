@@ -126,12 +126,12 @@ $$
 - if it will add two triangles to the network, its log-odds is: $`r coef1`+`r coef2`\times2=`r logodds[3]`$
 - the corresponding probabilities are `r ps[1]`, `r ps[2]`, and `r ps[3]`.
 
-Let's take a closer look at the ergm object itself:
+Let's take a closer look at the lolog object itself:
 
 ```{r}
-class(flomodel.02) # this has the class ergm
+class(flomodel.02) # this has the class lolog
 
-names(flomodel.02) # let's look straight at the ERGM obj.
+names(flomodel.02) # let's look straight at the lolog obj.
 ```
 
 ```{r}
@@ -207,7 +207,7 @@ Of course it is highly recommended that you take great care in selecting terms f
 
 Model terms are the expressions (e.g. triangle) used to represent predictors on the right-hand size of equations used
 in:
-- calls to lolog (to estimate an ergm model)
+- calls to lolog (to estimate an lolog model)
 - calls to simulate (to simulate networks from an lolog model
 fit)
 - calls to calculateStatistics (to obtain measurements of network statistics
@@ -215,7 +215,7 @@ on a dataset)
 
 ### Terms Provided with lolog
 
-For a list of available terms that can be used to specify an ERGM,
+For a list of available terms that can be used to specify a LOLOG,
 type:
 ```{r eval=FALSE}
 help('lolog-terms')
@@ -296,9 +296,9 @@ All user facing functions in the lolog package accept BinaryNets as arguments, a
 
 ## Order Dependent Terms
 
-LOLOG allows for network statistics tat depend not just on the network, but also the (unobserved) order in which dyads were 'added' to the network. One model of this class is the Babarasi-Albert preferential attachment model, which is closely approximated by a lolog model with an edges and preferentialAttachment term.
+LOLOG allows for network statistics that depend not just on the network, but also the (unobserved) order in which dyads were 'added' to the network. One model of this class is the Babarasi-Albert preferential attachment model, which is closely approximated by a lolog model with an edges and preferentialAttachment term.
 
-For each order dependent statistic, one or more order independent statistics must be specified as moment matching targets. In this case, w will use two-star
+For each order dependent statistic, one or more order independent statistics must be specified as moment matching targets. In this case, we will use two-star
 
 ```{r}
 flomodel.04 <- lolog(flomarriage ~ edges() + preferentialAttachment(), 

@@ -18,3 +18,40 @@
 \description{
 Goodness of Fit Diagnostics for a LOLOG fit
 }
+\examples{
+
+data(ukFaculty)
+# A dyad independent model
+fitind <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC"))
+summary(fitind)
+
+# Check gof on degree distribution (bad!)
+gind <- gofit(fitind, ukFaculty ~ degree(0:50))
+gind
+plot(gind)
+
+#check gof on esp distribution (bad!)
+gind <- gofit(fitind, ukFaculty ~ esp(0:25))
+gind
+plot(gind)
+
+\dontrun{
+
+#include triangles and 2-stars
+fitdep <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC") + triangles + star(2))
+summary(fitdep)
+
+# Check gof on degree distribution (good!)
+gdep <- gofit(fitdep, ukFaculty ~ degree(0:50))
+gdep
+plot(gdep)
+
+#check gof on esp dsitribution (good!)
+gdep <- gofit(fitdep, ukFaculty ~ esp(0:25))
+gdep
+plot(gdep)
+
+}
+
+
+}

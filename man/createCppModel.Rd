@@ -2,7 +2,7 @@
 % Please edit documentation in R/lolog.R
 \name{createCppModel}
 \alias{createCppModel}
-\title{creates a model}
+\title{Creates a model}
 \usage{
 createCppModel(formula, cloneNet = TRUE, theta = NULL)
 }
@@ -14,5 +14,15 @@ createCppModel(formula, cloneNet = TRUE, theta = NULL)
 \item{theta}{the model parameters.}
 }
 \description{
-creates a model
+Creates a model
+}
+\details{
+Creates a C++ Model object. In general this isn't needed by most users of the
+package.
+}
+\examples{
+data(ukFaculty)
+model <- createCppModel(ukFaculty ~ edges)
+model$calculate()
+model$statistics()
 }

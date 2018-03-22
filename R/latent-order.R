@@ -1,10 +1,29 @@
 
 
 #' Creates a probability model for a latent ordered network model
-#' @param formula A LOLOG formula
+#' 
+#' 
+#' @param formula A LOLOG formula. See \code{link{lolog}}
 #' @param theta Parameter values.
+#' 
+#' 
 #' @return 
 #' An Rcpp object representing the likeilhood model
+#' 
+#' 
+#' @details
+#' # See the methods of the objects returned by this function
+#' UndirectedLatentOrderLikelihood
+#' DirectedLatentOrderLikelihood
+#' 
+#' # A Barabasi-Albert type graph model with 1000 vertices
+#' el <- matrix(0, nrow=0, ncol=2)
+#' net <- new(UndirectedNet, el, 1000L)
+#' lolik <- createLatentOrderLikelihood(net ~ preferentialAttachment(), theta=1)
+#' banet <- lolik$generateNetwork()$network # generate a random network from the model
+#' degrees <- banet$degree(1:1000)
+#' hist(degrees, breaks=100) # plot the degree distribution
+#' banet[["__order__"]] # The vertex inclusion order
 createLatentOrderLikelihood <- function(formula, theta=NULL){
   env <- environment(formula)
   net <- as.BinaryNet(eval(formula[[2]],envir=env))
@@ -34,13 +53,60 @@ createLatentOrderLikelihood <- function(formula, theta=NULL){
 }
 
 
-#' Fits a latent ordered network model using maximum likelihood
-#' @param formula A lolog formula
+#' Fits a latent ordered network model using Monte Carlo variational inference
+#' 
+#' 
+#' @param formula A lolog formula. See \code{link{lolog}}
 #' @param nReplicates An integer controling how many dyad ordering to perform.
-#' @param downsampleRate Controls what proportion of dyads in each ordering should be dropped.
-#' @param targetFrameSize Sets downsampleRate so that the model frame for the logistic regression will have on average this amount of observations.
-#' @return An object of class 'lologVariationalFit'.
-lologVariational <- function(formula, nReplicates=5L, downsampleRate=NULL, targetFrameSize=500000){
+#' @param dyadInclusionRate Controls what proportion of dyads in each ordering should be dropped.
+#' @param targetFrameSize Sets dyadInclusionRate so that the model frame for the logistic regression will have on average this amount of observations.
+#' 
+#' 
+#' @details 
+#' This function approximates the maximum liklihood solution via a variational inference on the 
+#' graph (y) over the latent edge variable inclusion order (s). Specifically, it replaces 
+#' the conditional probability p(s | y) by p(s). If the LOLOG model contains only dyad independent
+#' terms, then these two probabilities are identical, and thus variational inference is
+#' exactly maximum likelihood inference. The objective function is
+#' 
+#' \deqn{E_{p(s)}\bigg(\log p(y| S, \theta) \bigg)}
+#' 
+#' This can be approximated by drawing samples from p(s) to approximate the expectation. The
+#' number of samples is controled by the nReplaices parameter. The memory required is on the
+#' order of nReplicates * (# of dyads). For large networks this can be impractical, so 
+#' adjusting dyadInclusionRate allows one to downsample the # of dyads in each replicate.
+#' 
+#' If the model is dyad independent, replicates are reducntand, and so nReplicates is set to 
+#' 1 with a note.
+#' 
+#' The functional form of the objective function is equivalent to logistic regression, and so
+#' the \code{\link{glm}} function is used to maximize it. The asymptotic covariance of the parameter
+#' estimates is calculated using the methods of Westling (2015).
+#' 
+#' 
+#' @return An object of class c('lologVariationalFit','lolog','list') consisting of the following
+#' items:
+#' \item{formula}{ The model formula}
+#' \item{method}{"variational"}
+#' \item{theta}{The fit parameter values}
+#' \item{vcov}{The asymptotic covariance matrix for the parameter values.}
+#' \item{nReplicates}{The number of replicates}
+#' \item{dyadInclusionRate}{The rate at which dyads are included}
+#' \item{allDyadIndependent}{Logical indicating model dyad independence}
+#' \item{likelihoodModel}{An object of class *LatentOrderLikelihood at the fit parameters}
+#' \item{outcome}{The outcome vector for the logistic regression}
+#' \item{predictors}{The change statistic predictor matrix for the logistic rergession}
+#' 
+#' 
+#' @examples 
+#' data(ukFaculty)
+#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"),nReplicates=1L, dyadInclusionRate=1)
+#' summary(fit)
+#' 
+#' 
+#' @references
+#' Westling, T., & McCormick, T. H. (2015). Beyond prediction: A framework for inference with variational approximations in mixture models. arXiv preprint arXiv:1510.08151.
+lologVariational <- function(formula, nReplicates=5L, dyadInclusionRate=NULL, targetFrameSize=500000){
   
   lolik <- createLatentOrderLikelihood(formula)
   nReplicates <- as.integer(nReplicates)
@@ -57,10 +123,10 @@ lologVariational <- function(formula, nReplicates=5L, downsampleRate=NULL, targe
   ndyads <- n * (n-1)
   if(!network$isDirected())
     ndyads <- ndyads / 2
-  if(is.null(downsampleRate)){
-    downsampleRate <-min( 1, targetFrameSize / ndyads)
+  if(is.null(dyadInclusionRate)){
+    dyadInclusionRate <-min( 1, targetFrameSize / ndyads)
   }
-  samples <- lolik$variationalModelFrame(nReplicates, downsampleRate)
+  samples <- lolik$variationalModelFrame(nReplicates, dyadInclusionRate)
   predictors <- lapply(samples,function(x) as.data.frame(x[[2]],
                                                          col.names=1:length(x[[2]])))
   predictors <- do.call(rbind, predictors)
@@ -70,13 +136,14 @@ lologVariational <- function(formula, nReplicates=5L, downsampleRate=NULL, targe
   theta <- logFit$coefficients
   names(theta) <- names(lolik$getModel()$statistics())
   result <- list(method="variational",
+                 formula=formula,
                  theta=theta,
-                 vcov=vcov(logFit)*nReplicates / downsampleRate,
+                 vcov=vcov(logFit)*nReplicates / dyadInclusionRate,
                  nReplicates=nReplicates,
-                 downsampleRate=downsampleRate,
+                 dyadInclusionRate=dyadInclusionRate,
+                 allDyadIndependent = allDyadIndependent,
                  likelihoodModel=lolik,
                  outcome=outcome,
-                 allDyadIndependent = allDyadIndependent,
                  predictors=predictors)
   class(result) <- c("lologVariationalFit","lolog","list")
   result
@@ -90,8 +157,8 @@ lologVariational <- function(formula, nReplicates=5L, downsampleRate=NULL, targe
 print.lologVariationalFit <- function(x, ...){
   if(x$allDyadIndependent) cat("MLE Coefficients:\n") else cat("Variational Inference Coefficients:\n")
   print(x$theta)
-  if(x$downsampleRate != 1){
-    cat("Downsampling rate:",x$downsampleRate,"\n")
+  if(x$dyadInclusionRate != 1){
+    cat("Inclusion rate:",x$dyadInclusionRate,"\n")
   }
   if(!x$allDyadIndependent) cat("# of replicates:",x$nReplicates,"\n")
 }
@@ -111,6 +178,11 @@ print.lolog <- function(x, ...){
 #' @param object the object
 #' @param ... additional parameters (unused)
 #' @method summary lolog
+#' @examples 
+#' data(ukFaculty)
+#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"), nReplicates=1L, dyadInclusionRate=1)
+#' summary(fit)
+#' @method summary lolog
 summary.lolog <- function(object, ...){
   x <- object
   theta <- x$theta
@@ -125,10 +197,20 @@ summary.lolog <- function(object, ...){
 }
 
 
-#' Fits a LOLOG model via Generalized Method of Moments
-#' @param formula A lolog formula for the sufficient statistics
+#' Fits a LOLOG model via Mote Carlo Generalized Method of Moments
+#' 
+#' 
+#' @description 
+#' \code{lolog} is used to fit Latent Order LOGistic Graph (LOLOG) models. LOLOG models are
+#' motivated by the idea of network growth where the network begins empty, and edge variables
+#' are sequentially 'added' to the network with an eather unobserved, or partially observed 
+#' order \eqn{s}. Conditional upon the inclusion order, the probability of an edge has a 
+#' logistic relationship with the change in network statistics.
+#' 
+#' 
+#' @param formula A lolog formula for the sufficient statistics (see details).
 #' @param auxFormula A lolog formula of statistics to use for moment matching
-#' @param theta Initial parameters values
+#' @param theta Initial parameters values. Estimated via \code{\link{lologVariational}} if NULL.
 #' @param nsamp The number of sample neteworks to draw at each iteration
 #' @param includeOrderIndependent If true, all order independent terms in formula are used for moment matching.
 #' @param weights The type of weights to use in the GMM objective. Either 'full' for the inverse of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.
@@ -139,8 +221,109 @@ summary.lolog <- function(object, ...){
 #' @param startingStepSize The starting dampening of the parameter update.
 #' @param maxStepSize The largest allowed value for dampening.
 #' @param cluster A parallel cluster to use for graph simulation.
-#' @param verbose Level of verbosity 0-2
-#' @return An object of class 'lolog'
+#' @param verbose Level of verbosity 0-2.
+#' 
+#' 
+#' @details 
+#' LOLOG represents the probability of a tie, given the network grown up to a timepoint as
+#' \deqn{
+#'   \textrm{logit}\big(p(y_{s_t}=1 | \eta, y^{t-1}, s_{ \leq t})\big) = \theta \cdot c(y_{s_t}=1 | y^{t-1}, s_{ \leq t})
+#' }
+#' where \eqn{s_{\leq t}} is the growth order of the network up to time \eqn{t}, \eqn{y^{t-1}} is the 
+#' state of the graph at time \eqn{t-1}. \eqn{c(y_{s_t} | y^{t-1}, s_{ \leq t})} is a vector 
+#' representing the change in graph statistics from time \eqn{t-1} to \eqn{t} if an edge is present, and 
+#' \eqn{\theta} is a vector of parameters.
+#' 
+#' The motivating growth order proceeds 'by vertex.' The network begins 'empty' and then vertices are 'added'
+#' to the network sequentially. The order of vertex inclusion may be random or fixed. When a vertex 'enters' the 
+#' network, each of the edge variables connecting it and vertices already in the network are considered for
+#' edge creation in a completely random order.
+#' 
+#' LOLOG formulas contain a network, DirectedNet or UndirectedNet object on the left hand side.
+#' the right hand side contains the model terms used. for example,
+#' 
+#' \code{net ~ edges}
+#' 
+#' represents and Erdos-Renyi model and
+#' 
+#' \code{net ~ edges + preferentialAttachment()}
+#' 
+#' represents a Barabasi-Albert model. See \code{\link{lolog-terms}} for a list of allowed model statstics.
+#' 
+#' Conditioning on (partial) vertex order can be done by
+#' placing an ordering variable on the right hand side of the '|' operator, as in
+#' 
+#' \code{net ~ edges + preferentialAttachment() | order}
+#' 
+#' 'order' should be a numeric vector with as many elements as there are vertices in the network.
+#' Ties are allowed. Vertices with higher order values will always be included later. Those with the same
+#' values will be included in a random order in each simulated network.
+#' 
+#' offsets and constraints are specified by wraping them with either \code{offset()} or \code{contraint()},
+#' for example, the following specifies an Erdos-renyi model with the constraint that degrees must be less
+#' that 10
+#' 
+#' \code{net ~ edges + constraint(boundedDegree(0L, 10L))}
+#' 
+#' If the model contains any order dependent statistics, additional moment constraints
+#' must be specified in \code{auxFormula}. Ideally these should be chosen to capture
+#' the features modeled by the order dependent statistic. For example, \code{preferentialAttachment}
+#' models the degree structure, so we might choose two-stars as a moment constraint.
+#' 
+#'  \code{lolog(net ~ edges + preferentialAttachment(), net ~ star(2))}
+#'   
+#' will fit a Barabasi-Albert model with the # of edges and # of two-stars as moment constraints.
+#' 
+#' 
+#' @return An object of class 'lolog'. If the model is dyad independent, the returned object will
+#' also be of class "lologVariational" (see \code{\link{lologVariational}}, otherwise it will 
+#' also be a "lologGmm" obejct.
+#' 
+#' lologGmm objects contain:
+#' 
+#' \item{method}{"Method of Moments" for order independent models, otherwise "Generalized Method of Moments"}
+#' \item{formula}{The model formula}
+#' \item{auxFormula}{The formula containing additional moment conditions}
+#' \item{theta}{The parameter estimates}
+#' \item{stats}{The statistics for each network in the last iteration}
+#' \item{estats}{the expected stats (G(y,s)) for each network in the last iteration}
+#' \item{obsStats}{the observed network statistics}
+#' \item{net}{A network simulated from the fit model}
+#' \item{grad}{The gradient of the moment conditions}
+#' \item{vcov}{The asymptotic covariance matrix of the parameter estimates}
+#' \item{likelihoodModel}{An object of class *LatentOrderLikelihood at the fit parameters}
+#' 
+#' 
+#' @examples 
+#' library(network)
+#' set.seed(1)
+#' data(flo)
+#' flomarriage <- network(flo,directed=FALSE)
+#' flomarriage %v% "wealth" <- c(10,36,27,146,55,44,20,8,42,103,48,49,10,48,32,3)
+#' 
+#' # A dyad independent model
+#' fit <- lolog(flomarriage ~ edges + nodeCov("wealth"))
+#' summary(fit)
+#' 
+#' # A dyad dependent model with 2-stars and triangles
+#' fit2 <- lolog(flomarriage ~ edges + nodeCov("wealth") + star(2) + triangles, verbose=FALSE)
+#' summary(fit2)
+#' 
+#' # An order dependent model
+#' fit3 <- lolog(flomarriage ~ edges + nodeCov("wealth") + preferentialAttachment(), 
+#'               flomarriage ~ star(2), verbose=FALSE)
+#' summary(fit3)
+#' 
+#' # Try something a bit more real
+#' \dontrun{
+#' 
+#' data(ukFaculty)
+#' fituk <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC") + triangles + star(2))
+#' summary(fituk)
+#' plot(fituk$net, vertex.col= ukFaculty %v% "Group" + 2)
+#' 
+#' }
+#' 
 lolog <- function(formula, auxFormula=NULL, theta=NULL, nsamp=1000, includeOrderIndependent=TRUE, 
                      weights="full", tol= .1, nHalfSteps=10, maxIter=100, minIter=2,
                      startingStepSize=.1, maxStepSize=.5, cluster=NULL,verbose=TRUE){
@@ -148,7 +331,7 @@ lolog <- function(formula, auxFormula=NULL, theta=NULL, nsamp=1000, includeOrder
   #initialize theta via variational inference
   if(is.null(theta)){
     if(verbose) cat("Initializing using variational fit\n")
-    varFit <- lologVariational(formula,downsampleRate = 1)
+    varFit <- lologVariational(formula,dyadInclusionRate = 1)
     if(varFit$allDyadIndependent){
       if(verbose) cat("Model is dyad independent. Returning maximum likelihood estimate.\n")
       return(varFit)
@@ -165,7 +348,7 @@ lolog <- function(formula, auxFormula=NULL, theta=NULL, nsamp=1000, includeOrder
   dyadIndependentOffsets <- lolik$getModel()$isIndependent(TRUE,FALSE)
   if(all(dyadIndependent) & all(dyadIndependentOffsets)){
     if(verbose) cat("Model is dyad independent. Returning maximum likelihood estimate.\n")
-    varFit <- lologVariational(formula,downsampleRate = 1)
+    varFit <- lologVariational(formula,dyadInclusionRate = 1)
     return(varFit)
   }
   
@@ -233,10 +416,10 @@ lolog <- function(formula, auxFormula=NULL, theta=NULL, nsamp=1000, includeOrder
       worker <- function(i, theta){
         cat(i," ")
         network <- as.BinaryNet(network)
-        lolik <- lolog:::.createLatentOrderLikelihoodFromTerms(terms, network, theta)
+        lolik <- .createLatentOrderLikelihoodFromTerms(terms, network, theta)
         samp <- lolik$generateNetwork()
         if(!is.null(auxTerms)){
-          auxModel <- lolog:::.makeCppModelFromTerms(auxTerms, network)
+          auxModel <- .makeCppModelFromTerms(auxTerms, network)
           auxModel$setNetwork(samp$network)
           auxModel$calculate()
           as <- auxModel$statistics()
@@ -341,6 +524,8 @@ lolog <- function(formula, auxFormula=NULL, theta=NULL, nsamp=1000, includeOrder
   method <- if(is.null(auxFormula)) "Method of Moments" else "Generalized Method Of Moments"
   
   result <- list(method=method,
+                 formula=formula,
+                 auxFromula=auxFormula,
                  theta=lastTheta,
                  stats=stats,
                  estats=estats, 
@@ -356,12 +541,28 @@ lolog <- function(formula, auxFormula=NULL, theta=NULL, nsamp=1000, includeOrder
 
 
 #' Generates BinaryNetworks from a fit lolog object
+#' 
+#' 
 #' @param object The lolog object
 #' @param nsim The number of simulated networks
+#' @param seed Either NULL or an integer that will be used in a call to set.seed before simulating
 #' @param convert convert to a network object#' 
 #' @param ... unused
+#' 
+#' 
+#' @examples
+#' library(network)
+#' data(flo)
+#' flomarriage <- network(flo,directed=FALSE)
+#' flomarriage %v% "wealth" <- c(10,36,27,146,55,44,20,8,42,103,48,49,10,48,32,3)
+#' fit <- lolog(flomarriage ~ edges + nodeCov("wealth"))
+#' net <- simulate(fit)[[1]]
+#' plot(net)
+#' 
 #' @method simulate lolog
-simulate.lolog <- function(object, nsim=1, convert=FALSE,...){
+simulate.lolog <- function(object, nsim=1, seed=NULL, convert=FALSE,...){
+  if(!is.null(seed))
+    set.seed(seed)
   l <- list()
   for(i in 1:nsim){
     l[[i]] <- object$likelihoodModel$generateNetwork()$network
@@ -372,21 +573,64 @@ simulate.lolog <- function(object, nsim=1, convert=FALSE,...){
 }
 
 
-#' conduct goodness of fit diagnostics
+#' Conduct goodness of fit diagnostics
+#' 
+#' 
 #' @param object the object to evaulate
 #' @param ... additional parameters
+#' 
+#' 
 #' @details 
-#' see ?gof.lolog
+#' see \code{\link{gofit.lolog}}
 gofit <- function(object, ...){
   UseMethod("gofit")
 }
 
 
 #' Goodness of Fit Diagnostics for a LOLOG fit
+#' 
+#' 
 #' @param object the object to evaulate
 #' @param formula A formula specifying the statistics on which to evaluate the fit
 #' @param nsim The number of simulated statistics
 #' @param ... additional parameters
+#' 
+#' @examples 
+#' 
+#' data(ukFaculty)
+#' # A dyad independent model
+#' fitind <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC"))
+#' summary(fitind)
+#' 
+#' # Check gof on degree distribution (bad!)
+#' gind <- gofit(fitind, ukFaculty ~ degree(0:50))
+#' gind
+#' plot(gind)
+#' 
+#' #check gof on esp distribution (bad!)
+#' gind <- gofit(fitind, ukFaculty ~ esp(0:25))
+#' gind
+#' plot(gind)
+#' 
+#' \dontrun{
+#' 
+#' #include triangles and 2-stars
+#' fitdep <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC") + triangles + star(2))
+#' summary(fitdep)
+#' 
+#' # Check gof on degree distribution (good!)
+#' gdep <- gofit(fitdep, ukFaculty ~ degree(0:50))
+#' gdep
+#' plot(gdep)
+#' 
+#' #check gof on esp dsitribution (good!)
+#' gdep <- gofit(fitdep, ukFaculty ~ esp(0:25))
+#' gdep
+#' plot(gdep)
+#' 
+#' }
+#' 
+#' 
 #' @method gofit lolog
 gofit.lolog <- function(object, formula, nsim=100, ...){
   model <- createCppModel(formula)
@@ -425,14 +669,20 @@ gofit.lolog <- function(object, formula, nsim=100, ...){
 }
 
 #' prints a gofit object
+#' 
+#' 
 #' @param x The object
 #' @param ... passed to print.data.frame
+#' 
+#' 
 #' @method print gofit
 print.gofit <- function(x, ...){
   print(x$summary, ...)
 }
 
 #' Plots a gofit object
+#' 
+#' 
 #' @param x the gofit object
 #' @param y unused
 #' @param type type of plot, boxplot or lineplot
@@ -440,6 +690,18 @@ print.gofit <- function(x, ...){
 #' @param line.alpha The transparancy of the simulated statistics lines
 #' @param line.size The width of the lines
 #' @param ... passed to either boxplot or geom_line
+#' 
+#' 
+#' @examples 
+#' data(ukFaculty)
+#' # A dyad independent model
+#' fitind <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC"))
+#' summary(fitind)
+#' 
+#' # Check gof on degree distribution (bad!)
+#' gind <- gofit(fitind, ukFaculty ~ degree(0:50))
+#' plot(gind)
+#' plot(gind, type="box")
 #' @method plot gofit
 plot.gofit <- function(x, y, type=c("line", "box"), normalize=FALSE, line.alpha=.02, line.size=1, ...){
   type <- match.arg(type)

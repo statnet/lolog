@@ -2,10 +2,18 @@
 
 
 
-#' creates a model
+#' Creates a model
 #' @param formula the model formula
 #' @param cloneNet create a deep copy of the network within the model object
 #' @param theta the model parameters.
+#' @details 
+#' Creates a C++ Model object. In general this isn't needed by most users of the
+#' package.
+#' @examples 
+#' data(ukFaculty)
+#' model <- createCppModel(ukFaculty ~ edges)
+#' model$calculate()
+#' model$statistics()
 createCppModel <- function(formula,cloneNet=TRUE,theta=NULL){
   modelClass <- "Model"
 	form <- formula
@@ -18,7 +26,9 @@ createCppModel <- function(formula,cloneNet=TRUE,theta=NULL){
 	model
 }
 
-
+#
+# evaluates the formula to get all terms, which can then be used to construct a model
+#
 .prepModelTerms <- function(formula){
   if(is.null(formula))
     return(NULL)
@@ -85,7 +95,9 @@ createCppModel <- function(formula,cloneNet=TRUE,theta=NULL){
 	list(stats=stats,offsets=offsets,vertexOrder=vertexOrder)
 }
 
-
+#
+# constructs a model from terms output by .prepModelTerms
+#
 .makeCppModelFromTerms <- function(terms, net, theta=NULL, modelClass="Model"){
 	net <- as.BinaryNet(net)
 	
@@ -121,8 +133,11 @@ createCppModel <- function(formula,cloneNet=TRUE,theta=NULL){
 
 
 
-#'calculate model statistics from a formula
-#' @param formula An lolog formula
+#' Calculate network statistics from a formula
+#' @param formula A lolog formula (See \code{\link{lolog}}).
+#' @examples 
+#' data(ukFaculty)
+#' calculateStatistics(ukFaculty ~ edges + reciprocity + triangles)
 calculateStatistics <- function(formula){
 	createCppModel(formula,cloneNet=FALSE)$statistics()
 }

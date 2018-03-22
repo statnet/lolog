@@ -1,7 +1,7 @@
 Package: lolog
 Maintainer: Ian Fellows <ian@fellstat.com>
-License: LGPL-2.1
-Title: Exponential-Family Random Network Models
+License: MIT + file LICENSE
+Title: Latent Order Logistic Graph Models
 LinkingTo: Rcpp, BH
 Type: Package
 LazyLoad: yes
@@ -10,6 +10,7 @@ Description: Estimation of Latent Order LOGistic (LOLOG) graph models.
 Version: 1.0
 Date: 2018-03-15
 Depends:
+    R (>= 3.0.0),
     methods,
     Rcpp (>= 0.9.4)
 Imports:
@@ -21,7 +22,8 @@ Suggests:
     testthat,
     inline,
     knitr,
-    rmarkdown
+    rmarkdown,
+    ergm
 RcppModules: lolog
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
