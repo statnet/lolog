@@ -1,9 +1,10 @@
 
 
 
+
 #' An lolog plug-in for easy C++ prototyping and access
 #' @param ... plug-in arguments
-#' @details 
+#' @details
 #' The lolog Rcpp plugin allows for the rapid prototyping of compiled code.
 #' new functions can be registered and exposed using \code{\link{cppFunction}}
 #' and new statistics can be compiled and registered using \code{\link{sourceCpp}}.
@@ -23,9 +24,9 @@
 #' net[1:10,1:10]
 #' @seealso \code{\link{cppFunction}}, \code{\link{sourceCpp}}, \code{\link{cppFunction}}
 inlineLologPlugin <- Rcpp::Rcpp.plugin.maker(
-  include.after = "#include <lolog.h>", 
-  LinkingTo = unique(c("lolog","BH", "Rcpp")), 
-  Depends = unique(c("lolog","BH", "Rcpp")), 
-  Imports = unique(c("lolog","BH", "Rcpp")),
+  include.after = "#include <lolog.h>",
+  LinkingTo = unique(c("lolog", "BH", "Rcpp")),
+  Depends = unique(c("lolog", "BH", "Rcpp")),
+  Imports = unique(c("lolog", "BH", "Rcpp")),
   package        = "lolog"
 )

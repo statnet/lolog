@@ -1,12 +1,14 @@
 
 
 
-loadModule("lolog",TRUE)
-.onLoad <- function(libname, pkgname){
+
+loadModule("lolog", TRUE)
+.onLoad <- function(libname, pkgname) {
   .C("initStats")
 }
 
-.onUnload <- function(libpath) {}
+.onUnload <- function(libpath) {
+}
 
 
 
