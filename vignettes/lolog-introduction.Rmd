@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 This vingette is based on the vignette from the ergm package, and is designed to give a working introduction to LOLOG modeling.
 
-This package will utilize the statnet suite of packages for data and network manipulation. To install these:
+This vignette will utilize the statnet suite of packages for data and network manipulation. To install these:
 
 ```{r, eval=FALSE}
 install.packages("statnet")

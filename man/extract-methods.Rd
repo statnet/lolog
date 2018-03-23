@@ -58,7 +58,7 @@ net$outNeighbors(c(1,2,3))
 #dyad assignment
 net[1,1:5] <- rep(NA,5)
 net[1:2,1:5]
-net[1:2,1:5,maskMissing=FALSE] #remove the mask over missing values and see 
+net[1:2,1:5,maskMissing=FALSE] #remove the mask over missing values and see
 #nothing was really changed
 
 #node variables

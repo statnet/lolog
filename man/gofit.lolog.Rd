@@ -37,11 +37,12 @@ plot(gind)
 
 \dontrun{
 
-#include triangles and 2-stars
-fitdep <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC") + triangles + star(2))
+#include triangles and 2-stars (in and out)
+fitdep <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC") + 
+                triangles + star(2, direction=1L) + star(2, direction=2L), nsamp=1500)
 summary(fitdep)
 
-# Check gof on degree distribution (good!)
+# Check gof on (in + out) degree distribution (good!)
 gdep <- gofit(fitdep, ukFaculty ~ degree(0:50))
 gdep
 plot(gdep)

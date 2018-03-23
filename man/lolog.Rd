@@ -40,7 +40,7 @@ lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
 }
 \value{
 An object of class 'lolog'. If the model is dyad independent, the returned object will
-also be of class "lologVariational" (see \code{\link{lologVariational}}, otherwise it will 
+also be of class "lologVariational" (see \code{\link{lologVariational}}, otherwise it will
 also be a "lologGmm" obejct.
 
 lologGmm objects contain:
@@ -60,8 +60,8 @@ lologGmm objects contain:
 \description{
 \code{lolog} is used to fit Latent Order LOGistic Graph (LOLOG) models. LOLOG models are
 motivated by the idea of network growth where the network begins empty, and edge variables
-are sequentially 'added' to the network with an eather unobserved, or partially observed 
-order \eqn{s}. Conditional upon the inclusion order, the probability of an edge has a 
+are sequentially 'added' to the network with an eather unobserved, or partially observed
+order \eqn{s}. Conditional upon the inclusion order, the probability of an edge has a
 logistic relationship with the change in network statistics.
 }
 \details{
@@ -69,13 +69,13 @@ LOLOG represents the probability of a tie, given the network grown up to a timep
 \deqn{
   \textrm{logit}\big(p(y_{s_t}=1 | \eta, y^{t-1}, s_{ \leq t})\big) = \theta \cdot c(y_{s_t}=1 | y^{t-1}, s_{ \leq t})
 }
-where \eqn{s_{\leq t}} is the growth order of the network up to time \eqn{t}, \eqn{y^{t-1}} is the 
-state of the graph at time \eqn{t-1}. \eqn{c(y_{s_t} | y^{t-1}, s_{ \leq t})} is a vector 
-representing the change in graph statistics from time \eqn{t-1} to \eqn{t} if an edge is present, and 
+where \eqn{s_{\leq t}} is the growth order of the network up to time \eqn{t}, \eqn{y^{t-1}} is the
+state of the graph at time \eqn{t-1}. \eqn{c(y_{s_t} | y^{t-1}, s_{ \leq t})} is a vector
+representing the change in graph statistics from time \eqn{t-1} to \eqn{t} if an edge is present, and
 \eqn{\theta} is a vector of parameters.
 
 The motivating growth order proceeds 'by vertex.' The network begins 'empty' and then vertices are 'added'
-to the network sequentially. The order of vertex inclusion may be random or fixed. When a vertex 'enters' the 
+to the network sequentially. The order of vertex inclusion may be random or fixed. When a vertex 'enters' the
 network, each of the edge variables connecting it and vertices already in the network are considered for
 edge creation in a completely random order.
 
@@ -111,7 +111,7 @@ the features modeled by the order dependent statistic. For example, \code{prefer
 models the degree structure, so we might choose two-stars as a moment constraint.
 
  \code{lolog(net ~ edges + preferentialAttachment(), net ~ star(2))}
-  
+
 will fit a Barabasi-Albert model with the # of edges and # of two-stars as moment constraints.
 }
 \examples{
@@ -130,7 +130,7 @@ fit2 <- lolog(flomarriage ~ edges + nodeCov("wealth") + star(2) + triangles, ver
 summary(fit2)
 
 # An order dependent model
-fit3 <- lolog(flomarriage ~ edges + nodeCov("wealth") + preferentialAttachment(), 
+fit3 <- lolog(flomarriage ~ edges + nodeCov("wealth") + preferentialAttachment(),
               flomarriage ~ star(2), verbose=FALSE)
 summary(fit3)
 
