@@ -74,13 +74,13 @@ NULL
 #' LOLOG Model Terms
 #' @name lolog-terms
 #' @docType methods
-#' @section Term Descriptions:
+#' @section Statistic Descriptions:
 #' \itemize{
 #' \item{\code{edges}  (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
 #' \emph{Edges:} This term adds one network statistic equal to the number of edges 
 #' (i.e. nonzero values) in the network. }
 #' 
-#' \item{\code{ star(k, direction=1L  } (order-independent) (directed)  (undirected)}{ 
+#' \item{\code{ star(k, direction=1L)  } (order-independent) (directed)  (undirected)}{ 
 #' The \code{k} argument is a vector of distinct integers. 
 #' This term adds one network statistic to the model for each element in \code{k}. 
 #' The \eqn{i}th such statistic counts the number of distinct \code{k[i]}-stars in the network, 
@@ -237,6 +237,14 @@ NULL
 #'  }
 #'  
 #'  }
+#'  
+#' @section Contraint Descriptions:
+#' \itemize{
+#' \item{\code{boundedDegree(lower,upper)}  (order-independent)  (undirected)}{ 
+#' Adds a constraint that the degrees for the network must be between lower and upper.
+#'   }
+#' 
+#' }
 #' 
 NULL
 
