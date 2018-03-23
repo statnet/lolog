@@ -5,6 +5,18 @@ LOLOG is a general framework for generative statistical modeling of graph datase
 
 ## Installation
 
+Make sure you have the dependacies installed
+
+```
+install.packages(c("network","parallel","ggplot2","reshape2","Rcpp"))
+```
+
+For good measure, the suggested packages too
+
+```
+install.packages(c("testthat","inline","knitr","rmarkdown","ergm"))
+```
+
 To install the latest development version from github run the following (you'll need a sh shell and git):
 
 ```
