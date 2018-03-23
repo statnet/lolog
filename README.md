@@ -24,9 +24,10 @@ git clone https://github.com/fellstat/lolog.git
 sh lolog/mkdist
 ```
 
-## Run a model
+## Using the package
 
 ```
+library(lolog)
 data(ukFaculty)
 
 # A dyad independent model
@@ -34,7 +35,9 @@ fitind <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC"))
 summary(fitind)
 ```
 
-## Development Using Eclipse
+For a more detailed desciption of what can be done with lolog, [see the package vignette](inst/doc/lolog-introduction.pdf)
+
+## Development using Eclipse
 
 This package is set up as an Eclipse project, and the C++ code can be compiled and run without reinstalling the package. To set up in your eclipse IDE, select import project -> General -> Existing Projects into Workspace and select the lolog directory.
 
