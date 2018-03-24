@@ -32,9 +32,9 @@ NULL
 #' @docType class
 #' @details 
 #' Rcpp_DirectedNet and Rcpp_UndirectedNet are the native network classes for the
-#' lolog package. They are designed for algortihmic performance, and are thin wrappers
+#' lolog package. They are designed for algorithmic performance, and are thin wrappers
 #' for an underlying C++ object. These network objects can be passed back and forth between
-#' R and C++ with little overhaed. Because they are pointers to C++ objects, serialization
+#' R and C++ with little overhead. Because they are pointers to C++ objects, serialization
 #' via 'save' or 'dput' are not supported
 #' @aliases DirectedNet UndirectedNet Rcpp_DirectedNet-class Rcpp_UndirectedNet-class
 NULL
@@ -63,7 +63,7 @@ NULL
 #' 
 #' Nepusz T., Petroczi A., Negyessy L., Bazso F.: Fuzzy communities and the 
 #' concept of bridgeness in complex networks. Physical Review E 77:016107, 2008.
-#' @source The data set was origenally reported by Nepusz et. al. (2008) and was
+#' @source The data set was originally reported by Nepusz et. al. (2008) and was
 #' subsequently processed and included by the igraphdata package. We have simply
 #' converted their network from an igraph to a network object.
 #' @keywords datasets
@@ -105,7 +105,7 @@ NULL
 #' }
 #' 
 #' \item{\code{transitivity()}  (order-independent) (undirected)}{ 
-#' The soffer vasquez transitivity. This is clustering metric that adjusts for large degree
+#' The Soffer-Vazquez   transitivity. This is clustering metric that adjusts for large degree
 #' differences and is described by C in Equation 6 of 
 #' \url{https://pdfs.semanticscholar.org/7af5/f8c871d99b868cd0ed70c5fd09f59b399769.pdf}. Note 
 #' The approximation of the number of possible shared neighbors between node i and j of min(d_i,d_j) - 1
@@ -149,7 +149,7 @@ NULL
 #' numeric attribute in the network's vertex attribute list.
 #' This term adds a single network statistic to the model equaling the sum of
 #' \code{name(i)} and \code{name(j)} for all edges \eqn{(i,j)} in the
-#' network. For categorical variables, levels are coded as 1,..,nlevels.
+#' network. For categorical variables, levels are coded as 1,..,nlevels`.
 #'   }
 #'   
 #' \item{\code{gwesp(alpha)}  (order-independent)  (directed)  (undirected)}{ 
@@ -185,7 +185,7 @@ NULL
 #' statistic equals the number of \emph{edges} (rather than dyads) in the
 #' network with exactly \code{d[i]} shared partners. This term can be used with
 #' directed and undirected networks. For directed networks the count is over
-#' cylces of the form: node --> nbr1 --> nbr2 --> node.
+#' cycles of the form: node --> nbr1 --> nbr2 --> node.
 #' 
 #'  }
 #'  
@@ -193,13 +193,13 @@ NULL
 #' 
 #' given nodal variables for longitude and latitude, calculates the sum of the
 #' great circle distance between connected nodes. distCuts splits this into
-#' seperate statistics that count the sum of the minimum of the cut point and the
+#' separate statistics that count the sum of the minimum of the cut point and the
 #' distance.
 #' 
 #' }
 #' \item{\code{ dist(names } (dyad-independent)  (order-independent) (undirected)}{ 
 #' 
-#' Calculates a statistic equal to the sum of the euclidian distances between
+#' Calculates a statistic equal to the sum of the euclidean distances between
 #' connected nodes on the numeric nodal variables specified in names.
 #' 
 #' }
@@ -220,7 +220,7 @@ NULL
 #' log(k + shared / minDeg)
 #' 
 #' where shared is the current number of shared neighbors between the two nodes, and
-#' minDeg is the minimum of the currect degrees of the two nodes (i.e. the number of possible shared 
+#' minDeg is the minimum of the current degrees of the two nodes (i.e. the number of possible shared 
 #' neighbors).
 #' 
 #'  }
@@ -238,7 +238,7 @@ NULL
 #'  
 #'  }
 #'  
-#' @section Contraint Descriptions:
+#' @section Constraint Descriptions:
 #' \itemize{
 #' \item{\code{boundedDegree(lower,upper)}  (order-independent)  (undirected)}{ 
 #' Adds a constraint that the degrees for the network must be between lower and upper.

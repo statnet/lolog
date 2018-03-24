@@ -133,7 +133,7 @@ net[["rnorm"]]
 #print(DirectedNet)
 #print(UndirectedNet)
 
-## ------------------------------------------------------------------------
+## ---- tidy=FALSE---------------------------------------------------------
 flomodel.04 <- lolog(flomarriage ~ edges() + preferentialAttachment(), 
                      flomarriage ~ star(2), verbose=FALSE)
 summary(flomodel.04)
