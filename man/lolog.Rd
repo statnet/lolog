@@ -60,12 +60,12 @@ lologGmm objects contain:
 \description{
 \code{lolog} is used to fit Latent Order LOGistic Graph (LOLOG) models. LOLOG models are
 motivated by the idea of network growth where the network begins empty, and edge variables
-are sequentially 'added' to the network with an eather unobserved, or partially observed
+are sequentially 'added' to the network with an either unobserved, or partially observed
 order \eqn{s}. Conditional upon the inclusion order, the probability of an edge has a
 logistic relationship with the change in network statistics.
 }
 \details{
-LOLOG represents the probability of a tie, given the network grown up to a timepoint as
+LOLOG represents the probability of a tie, given the network grown up to a time point as
 \deqn{
   \textrm{logit}\big(p(y_{s_t}=1 | \eta, y^{t-1}, s_{ \leq t})\big) = \theta \cdot c(y_{s_t}=1 | y^{t-1}, s_{ \leq t})
 }
@@ -88,7 +88,7 @@ represents and Erdos-Renyi model and
 
 \code{net ~ edges + preferentialAttachment()}
 
-represents a Barabasi-Albert model. See \code{\link{lolog-terms}} for a list of allowed model statstics.
+represents a Barabasi-Albert model. See \code{\link{lolog-terms}} for a list of allowed model statistics
 
 Conditioning on (partial) vertex order can be done by
 placing an ordering variable on the right hand side of the '|' operator, as in
@@ -99,8 +99,8 @@ placing an ordering variable on the right hand side of the '|' operator, as in
 Ties are allowed. Vertices with higher order values will always be included later. Those with the same
 values will be included in a random order in each simulated network.
 
-offsets and constraints are specified by wraping them with either \code{offset()} or \code{contraint()},
-for example, the following specifies an Erdos-renyi model with the constraint that degrees must be less
+offsets and constraints are specified by wrapping them with either \code{offset()} or \code{contraint()},
+for example, the following specifies an Erdos-Renyi model with the constraint that degrees must be less
 that 10
 
 \code{net ~ edges + constraint(boundedDegree(0L, 10L))}

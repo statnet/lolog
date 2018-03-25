@@ -34,7 +34,7 @@ items:
 Fits a latent ordered network model using Monte Carlo variational inference
 }
 \details{
-This function approximates the maximum liklihood solution via a variational inference on the
+This function approximates the maximum likelihood solution via a variational inference on the
 graph (y) over the latent edge variable inclusion order (s). Specifically, it replaces
 the conditional probability p(s | y) by p(s). If the LOLOG model contains only dyad independent
 terms, then these two probabilities are identical, and thus variational inference is
@@ -43,11 +43,11 @@ exactly maximum likelihood inference. The objective function is
 \deqn{E_{p(s)}\bigg(\log p(y| S, \theta) \bigg)}
 
 This can be approximated by drawing samples from p(s) to approximate the expectation. The
-number of samples is controled by the nReplaices parameter. The memory required is on the
+number of samples is controlled by the nReplaices parameter. The memory required is on the
 order of nReplicates * (# of dyads). For large networks this can be impractical, so
-adjusting dyadInclusionRate allows one to downsample the # of dyads in each replicate.
+adjusting dyadInclusionRate allows one to down sample the # of dyads in each replicate.
 
-If the model is dyad independent, replicates are reducntand, and so nReplicates is set to
+If the model is dyad independent, replicates are redundant, and so nReplicates is set to
 1 with a note.
 
 The functional form of the objective function is equivalent to logistic regression, and so

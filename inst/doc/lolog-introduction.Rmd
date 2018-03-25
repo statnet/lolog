@@ -43,7 +43,7 @@ sh lolog/mkdist
 
 ## Statistical Network Modeling: The lolog Command and lolog Object
 
-Make sure the lolog pacakge is attached:
+Make sure the lolog package is attached:
 
 ```{r}
 library(lolog)
@@ -195,13 +195,13 @@ fauxmodel.02 <- lolog(mesa ~edges + nodeMatch('GradeCat') + nodeMatch('Race') +
 summary(fauxmodel.02)
 ```
 
-We see strong eidence of additional transitivity, but little evidence that the degrees have higher spread than expected given the other terms. With LOLOG models, we avoid some of the degeneracy problems present in ERGM models. Let's try the same model in ergm
+We see strong evidence of additional transitivity, but little evidence that the degrees have higher spread than expected given the other terms. With LOLOG models, we avoid some of the degeneracy problems present in ERGM models. Let's try the same model in ergm
 
 ```{r, error=TRUE}
 fauxmodel.01.ergm <- ergm(mesa ~edges + nodematch('GradeCat') + nodematch('Race') + 
                             triangles + kstar(2))
 ```
-Of course it is highly recommended that you take great care in selecting terms for use with ergm for precisly the reason that many can lead to model degeneracy. A much better choice here for the ergm model would have been to use gwesp and gwdegree in place of triangles and 2-stars.
+Of course it is highly recommended that you take great care in selecting terms for use with ergm for precisely the reason that many can lead to model degeneracy. A much better choice here for the ergm model would have been to use gwesp and gwdegree in place of triangles and 2-stars.
 
 ## Model Terms Available for LOLOG Estimation and Simulation
 
@@ -236,7 +236,7 @@ R CMD INSTALL LologExtension_1.0.tar.gz
 ```
 A new package will be installed implementing the minDegree (minimum degree) statistic.
 
-Alternatively, C++ extensions can be added directly from R without the need of any pacakge infustructure via the inlining features of the Rcpp package. lolog provides an inline plugin for this feature. For details, see
+Alternatively, C++ extensions can be added directly from R without the need of any package infrastructure via the inlining features of the Rcpp package. lolog provides an inline plugin for this feature. For details, see
 ```{r, eval=FALSE}
 help("inlineLologPlugin")
 ```

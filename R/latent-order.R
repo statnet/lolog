@@ -71,7 +71,7 @@ createLatentOrderLikelihood <- function(formula, theta = NULL) {
 #'
 #'
 #' @details
-#' This function approximates the maximum liklihood solution via a variational inference on the
+#' This function approximates the maximum likelihood solution via a variational inference on the
 #' graph (y) over the latent edge variable inclusion order (s). Specifically, it replaces
 #' the conditional probability p(s | y) by p(s). If the LOLOG model contains only dyad independent
 #' terms, then these two probabilities are identical, and thus variational inference is
@@ -80,11 +80,11 @@ createLatentOrderLikelihood <- function(formula, theta = NULL) {
 #' \deqn{E_{p(s)}\bigg(\log p(y| S, \theta) \bigg)}
 #'
 #' This can be approximated by drawing samples from p(s) to approximate the expectation. The
-#' number of samples is controled by the nReplaices parameter. The memory required is on the
+#' number of samples is controlled by the nReplaices parameter. The memory required is on the
 #' order of nReplicates * (# of dyads). For large networks this can be impractical, so
-#' adjusting dyadInclusionRate allows one to downsample the # of dyads in each replicate.
+#' adjusting dyadInclusionRate allows one to down sample the # of dyads in each replicate.
 #'
-#' If the model is dyad independent, replicates are reducntand, and so nReplicates is set to
+#' If the model is dyad independent, replicates are redundant, and so nReplicates is set to
 #' 1 with a note.
 #'
 #' The functional form of the objective function is equivalent to logistic regression, and so
@@ -233,7 +233,7 @@ summary.lolog <- function(object, ...) {
 #' @description
 #' \code{lolog} is used to fit Latent Order LOGistic Graph (LOLOG) models. LOLOG models are
 #' motivated by the idea of network growth where the network begins empty, and edge variables
-#' are sequentially 'added' to the network with an eather unobserved, or partially observed
+#' are sequentially 'added' to the network with an either unobserved, or partially observed
 #' order \eqn{s}. Conditional upon the inclusion order, the probability of an edge has a
 #' logistic relationship with the change in network statistics.
 #'
@@ -255,7 +255,7 @@ summary.lolog <- function(object, ...) {
 #'
 #'
 #' @details
-#' LOLOG represents the probability of a tie, given the network grown up to a timepoint as
+#' LOLOG represents the probability of a tie, given the network grown up to a time point as
 #' \deqn{
 #'   \textrm{logit}\big(p(y_{s_t}=1 | \eta, y^{t-1}, s_{ \leq t})\big) = \theta \cdot c(y_{s_t}=1 | y^{t-1}, s_{ \leq t})
 #' }
@@ -278,7 +278,7 @@ summary.lolog <- function(object, ...) {
 #'
 #' \code{net ~ edges + preferentialAttachment()}
 #'
-#' represents a Barabasi-Albert model. See \code{\link{lolog-terms}} for a list of allowed model statstics.
+#' represents a Barabasi-Albert model. See \code{\link{lolog-terms}} for a list of allowed model statistics
 #'
 #' Conditioning on (partial) vertex order can be done by
 #' placing an ordering variable on the right hand side of the '|' operator, as in
@@ -289,8 +289,8 @@ summary.lolog <- function(object, ...) {
 #' Ties are allowed. Vertices with higher order values will always be included later. Those with the same
 #' values will be included in a random order in each simulated network.
 #'
-#' offsets and constraints are specified by wraping them with either \code{offset()} or \code{contraint()},
-#' for example, the following specifies an Erdos-renyi model with the constraint that degrees must be less
+#' offsets and constraints are specified by wrapping them with either \code{offset()} or \code{contraint()},
+#' for example, the following specifies an Erdos-Renyi model with the constraint that degrees must be less
 #' that 10
 #'
 #' \code{net ~ edges + constraint(boundedDegree(0L, 10L))}
