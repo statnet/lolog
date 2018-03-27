@@ -248,11 +248,8 @@ Adds a constraint that the degrees for the network must be between lower and upp
 
 Key terms still to be added are:
 
-- Offset()
 - ctriple
 - ttriple
-- mutual
-- absdiff
 - triadcensus
 - ?
 

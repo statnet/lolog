@@ -2278,6 +2278,110 @@ typedef Stat<Undirected, Dist<Undirected> > UndirectedDist;
 
 
 /*!
+ * distance measure
+ */
+template<class Engine>
+class AbsDiff : public BaseStat< Engine > {
+protected:
+	std::vector< std::string > varNames;
+	std::vector<int> indices;
+	double power;
+public:
+
+	AbsDiff() : power(1.0){}
+
+	virtual ~AbsDiff(){};
+
+	AbsDiff(List params){
+		try{
+			varNames = as< std::vector<std::string> >(params(0));
+		}catch(...){
+			::Rf_error("The first parameter of absDiff must be a character vector");
+		}
+		try{
+			power = as< double >(params(1));
+		}catch(...){
+			power = 1.0;
+		}
+	}
+
+	std::string name(){
+		return "absDiff";
+	}
+
+    std::vector<std::string> statNames(){
+        std::string nm = "absDiff";
+        for(int i=0;i<varNames.size();i++)
+        		nm = nm + "." + varNames.at(i);
+        	std::vector<std::string> statnames(1, nm);
+        return statnames;
+	}
+
+	double dist(const BinaryNet<Engine>& net, int from, int to){
+		double ssq = 0.0;
+		for(int j=0;j<indices.size();j++){
+			ssq += pow(abs(net.continVariableValue(indices[j],from) -
+					net.continVariableValue(indices[j],to)), power);
+		}
+		return ssq;
+	}
+
+	virtual void calculate(const BinaryNet<Engine>& net){
+		std::vector<std::string> vars = net.continVarNames();
+		//int variableIndex = -1;
+		indices = std::vector<int>(varNames.size(),-1);
+		for(int i=0;i<vars.size();i++){
+			for(int j=0;j<varNames.size();j++){
+				if(vars[i] == varNames[j]){
+					indices[j] = i;
+				}
+			}
+		}
+		for(int i=0;i<varNames.size();i++)
+			if(indices[i] < 0)
+				::Rf_error("dist: variable not found in network");
+
+		int nstats = 1;
+		this->stats = std::vector<double>(nstats,0.0);
+		this->lastStats = std::vector<double>(nstats,0.0);
+		if(this->thetas.size()!=nstats)
+			this->thetas = std::vector<double>(nstats,0.0);
+
+
+		boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
+		double result = 0.0;
+		for(int i=0;i<el->size();i++){
+			int from = el->at(i).first;
+			int to = el->at(i).second;
+			result += dist(net, from,to);
+		}
+		this->stats[0] = result;
+		//this->stats[0] = result / (double) net.nEdges();
+	}
+
+
+	void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
+		BaseOffset<Engine>::resetLastStats();
+		double change = 2.0 * (!net.hasEdge(from,to) - 0.5);
+		this->stats[0] = this->stats[0] + change * dist(net, from, to);
+	}
+
+	bool isOrderIndependent(){
+		return true;
+	}
+
+	bool isDyadIndependent(){
+		return true;
+	}
+
+};
+
+typedef Stat<Directed, AbsDiff<Directed> > DirectedAbsDiff;
+typedef Stat<Undirected, AbsDiff<Undirected> > UndirectedAbsDiff;
+
+
+
+/*!
  * barabasi-albert type change statistic. Order dependent
  */
 template<class Engine>

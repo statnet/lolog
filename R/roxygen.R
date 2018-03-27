@@ -235,6 +235,9 @@ NULL
 #' growth process.
 #' 
 #'  }
+#'  
+#'  
+#'  
 #' \item{\code{ nodeFactor(name, direction=0L) } (order-independent)  (undirected) (directed)}{ 
 #' 
 #' The \code{name} argument is a character vector giving
@@ -247,6 +250,17 @@ NULL
 #' network. In particular, for edges whose endpoints both have the same
 #' attribute values, this value is counted twice.  For directed networks, if direction=1L then in-edges are
 #' used and direction=2L indicates out-edges.
+#' 
+#'  }
+#'  
+#'  
+#' \item{\code{ absDiff(name, power=1) } (order-independent)  (undirected) (directed)}{ 
+#' 
+#' The \code{name} argument is a character string giving the name
+#' of one or mode quantitative attribute in the network's vertex attribute
+#' list. This term adds one network statistic to the model equaling the
+#' sum of \code{sum(abs(name[i]-name[j])^pow)} for all edges (i,j)
+#' in the network. 
 #' 
 #'  }
 #'  
