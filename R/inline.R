@@ -9,6 +9,7 @@
 #' new functions can be registered and exposed using \code{\link{cppFunction}}
 #' and new statistics can be compiled and registered using \code{\link{sourceCpp}}.
 #' @examples
+#' \dontrun{
 #' # This creates a function in C++ to create an empty network of size n
 #' # and expose it to R.
 #' src <- "
@@ -22,6 +23,8 @@
 #' emptyNetwork <- cppFunction(src,plugin="lolog")
 #' net <- emptyNetwork(10L)
 #' net[1:10,1:10]
+#' 
+#' }
 #' @seealso \code{\link{cppFunction}}, \code{\link{sourceCpp}}, \code{\link{cppFunction}}
 inlineLologPlugin <- Rcpp::Rcpp.plugin.maker(
   include.after = "#include <lolog.h>",
