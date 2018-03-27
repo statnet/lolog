@@ -16,5 +16,5 @@ test_that("Stats", {
   
   es <- summary(ukFaculty ~ mutual)
   lss <- calculateStatistics(ukFaculty ~ mutual)
-  
+  expect_true(all(es == lss))
   })
