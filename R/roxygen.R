@@ -133,7 +133,7 @@ NULL
 #' 
 #' For directed networks if direction=0L
 #' degree is counted as the sum of the in and out degrees of a node. If direction=1L then in-degrees are
-#' used ans direction=2L indicates out-degrees.
+#' used and direction=2L indicates out-degrees.
 #' 
 #' If lessThanOrEqual=TRUE, then the count is the number of nodes with degree less than or equal to d.
 #'   }
@@ -233,6 +233,20 @@ NULL
 #' If the variable is a (partial) rank order of nodal inclusion into the network,
 #' this statistic can be useful in modeling the mean degree over the course of the
 #' growth process.
+#' 
+#'  }
+#' \item{\code{ nodeFactor(name, direction=0L) } (order-independent)  (undirected) (directed)}{ 
+#' 
+#' The \code{name} argument is a character vector giving
+#' one or more names of categorical attributes in the network's vertex
+#' attribute list. This term adds multiple network statistics to the
+#' model, one for each of (a subset of) the unique values of the
+#' \code{attrname} attribute (or each combination of the attributes
+#' given). Each of these statistics gives the number of times a node
+#' with that attribute or those attributes appears in an edge in the
+#' network. In particular, for edges whose endpoints both have the same
+#' attribute values, this value is counted twice.  For directed networks, if direction=1L then in-edges are
+#' used and direction=2L indicates out-edges.
 #' 
 #'  }
 #'  

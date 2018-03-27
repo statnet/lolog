@@ -55,6 +55,8 @@ public:
 	 * \param net the network
 	 * \param from toggled edge (from)
 	 * \param to toggled edge (to)
+	 * \param order The order in which vertices are 'added' to the network. The vertex order[i] is The ith added vertex
+	 * \param actorIndex order[actorIndex] is the current node being 'added'
 	 */
 	virtual void vDyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex) = 0;
 
@@ -69,6 +71,8 @@ public:
 	 * \param vert the index of the vertex change
 	 * \param variable the id of the variable
 	 * \param newValue the hypothetical new value
+	 * \param order The order in which vertices are 'added' to the network. The vertex order[i] is The ith added vertex
+	 * \param actorIndex order[actorIndex] is the current node being 'added'
 	 */
 	virtual void vDiscreteVertexUpdate(const BinaryNet<Engine>& net,const int& vert,
 			const int& variable, const int& newValue,const std::vector<int> &order,const int &actorIndex) = 0;
@@ -84,6 +88,8 @@ public:
 	 * \param vert the index of the vertex change
 	 * \param variable the id of the variable
 	 * \param newValue the hypothetical new value
+	 * \param order The order in which vertices are 'added' to the network. The vertex order[i] is The ith added vertex
+	 * \param actorIndex order[actorIndex] is the current node being 'added'
 	 */
 	virtual void vContinVertexUpdate(const BinaryNet<Engine>& net, const int& vert,
 			const int& variable, const double& newValue, const std::vector<int> &order, const int &actorIndex) = 0;

@@ -136,6 +136,11 @@ void changeStatTest(std::string statName){
     	ncpar.push_back("fact");
     	stat = boost::shared_ptr< Stat<Engine, NodeCov<Engine> > >(
     	    		new Stat<Engine, NodeCov<Engine> >(ncpar));
+    }else if(statName == "NodeFactor"){
+    	Rcpp::List ncpar;
+    	ncpar.push_back("fact");
+    	stat = boost::shared_ptr< Stat<Engine, NodeFactor<Engine> > >(
+    	    		new Stat<Engine, NodeFactor<Engine> >(ncpar));
     }else if(statName == "Gwesp"){
     	Rcpp::List ncpar;
     	ncpar.push_back(.5);
@@ -225,6 +230,7 @@ void testStats(){
 	RUN_TEST(changeStatTest<Directed>("Gwesp"));
     RUN_TEST(changeStatTest<Directed>("Gwdegree"));
     RUN_TEST(changeStatTest<Directed>("Triangles"));
+    RUN_TEST(changeStatTest<Directed>("NodeFactor"));
 
 	RUN_TEST(changeStatTest<Undirected>("Triangles"));
 	RUN_TEST(changeStatTest<Undirected>("Clustering"));
@@ -240,6 +246,8 @@ void testStats(){
     RUN_TEST(changeStatTest<Undirected>("Gwdsp"));
     RUN_TEST(changeStatTest<Undirected>("Esp"));
     RUN_TEST(changeStatTest<Undirected>("DegreeCrossProd"));
+    RUN_TEST(changeStatTest<Undirected>("NodeFactor"));
+
 }
 
 

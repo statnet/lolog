@@ -43,6 +43,7 @@ RcppExport void initStats(){
     registerStatistic( DirStatPtr( new DirectedGwDegree() ) );
     registerStatistic( DirStatPtr( new DirectedGwdsp() ) );
     registerStatistic( DirStatPtr( new DirectedEsp() ) );
+    registerStatistic( DirStatPtr( new DirectedNodeFactor() ) );
 	////////			Offsets				/////////
 
 	//Make registration available outside lolog compilation unit
@@ -72,6 +73,7 @@ RcppExport void initStats(){
     registerStatistic( UndirStatPtr( new UndirectedDegreeCrossProd() ) );
     registerStatistic( UndirStatPtr( new UndirectedPreferentialAttachment() ) );
     registerStatistic( UndirStatPtr( new UndirectedSharedNbrs() ) );
+    registerStatistic( UndirStatPtr( new UndirectedNodeFactor() ) );
 
 	////////			Offsets				/////////
 	registerOffset( UndirOffsetPtr( new UndirectedBoundedDegreeConstraint() ) );

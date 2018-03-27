@@ -2580,6 +2580,147 @@ typedef Stat<Directed, NodeLogMaxCov<Directed> > DirectedNodeLogMaxCov;
 typedef Stat<Undirected, NodeLogMaxCov<Undirected> > UndirectedNodeLogMaxCov;
 
 
+
+/*!
+ * Differential activity by group
+ *
+ */
+template<class Engine>
+class NodeFactor : public BaseStat< Engine > {
+protected:
+	EdgeDirection direction;
+	std::string variableName;
+	int varIndex;
+	int nstats;
+public:
+
+	NodeFactor(){
+		varIndex = nstats = 0;
+		direction = UNDIRECTED;
+	}
+
+	NodeFactor(std::string name,EdgeDirection d){
+		varIndex = nstats = 0;
+		direction = d;
+		variableName = name;
+	}
+
+	NodeFactor(std::string name){
+		varIndex = nstats = 0;
+		direction = UNDIRECTED;
+		variableName = name;
+	}
+
+
+	NodeFactor(List params){
+		varIndex = nstats = 0;
+		try{
+			variableName = as< std::string >(params(0));
+		}catch(...){
+			::Rf_error("NodeCount requires a nodal variable name");
+		}
+
+		try{
+			int tmp = as< int >(params(1));
+			if(tmp==0)
+				direction = UNDIRECTED;
+			else if(tmp==1)
+				direction = IN;
+			else if(tmp==2)
+				direction = OUT;
+			else
+				::Rf_error("invalid direction");
+		}catch(...){
+			direction = UNDIRECTED;
+		}
+	}
+
+	std::string name(){
+		return "nodeFactor";
+	}
+
+    std::vector<std::string> statNames(){
+        std::vector<std::string> statnames;
+        for(int i=0;i<nstats;i++){
+            std::string nm = "nodeFactor."+variableName+"."+asString(i+1);
+            if(direction == IN)
+            		nm = "in-" + nm;
+            if(direction == OUT)
+            		nm = "out-" + nm;
+            statnames.push_back(nm);
+        }
+        return statnames;
+	}
+
+
+	inline int degree(const BinaryNet<Engine>& net,int i){
+		int result = 0;
+		if(net.isDirected()){
+			if(direction==OUT || direction==UNDIRECTED)
+				result += net.outdegree(i);
+			if(direction==IN || direction==UNDIRECTED)
+				result += net.indegree(i);
+		}else
+			result = net.degree(i);
+		return result;
+	}
+
+	void calculate(const BinaryNet<Engine>& net){
+		std::vector<std::string> vars = net.discreteVarNames();
+		int variableIndex = -1;
+		for(int i=0;i<vars.size();i++){
+			if(vars[i] == variableName){
+				variableIndex = i;
+			}
+		}
+		if(variableIndex<0)
+			::Rf_error("nodal attribute not found in network");
+		varIndex = variableIndex;
+		int nlevels = net.discreteVariableAttributes(variableIndex).labels().size();
+		nstats = nlevels-1;
+		this->stats = std::vector<double>(nstats,0.0);
+		this->lastStats = std::vector<double>(nstats,0.0);
+		if(this->thetas.size()!=nstats)
+			this->thetas = std::vector<double>(nstats,0.0);
+		double n = net.size();
+		double deg = 0.0;
+		for(int i=0;i<n;i++){
+			deg = degree(net,i);
+			int val = net.discreteVariableValue(varIndex,i) - 1;
+			if(val<nstats)
+				this->stats[val] += deg;
+		}
+	}
+
+
+	void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
+		BaseOffset<Engine>::resetLastStats();
+		int fromVal = net.discreteVariableValue(varIndex,from)-1;
+		int toVal = net.discreteVariableValue(varIndex,to)-1;
+		int change;
+		change = !net.hasEdge(from,to)? 1 : -1;
+
+		if( (direction==UNDIRECTED || direction==OUT) && fromVal<nstats)
+			this->stats[fromVal] += change;
+		if( (direction==UNDIRECTED || direction==IN) && toVal<nstats)
+			this->stats[toVal] += change;
+
+	}
+
+	bool isOrderIndependent(){
+		return true;
+	}
+
+	bool isDyadIndependent(){
+		return true;
+	}
+};
+
+typedef Stat<Directed, NodeFactor<Directed> > DirectedNodeFactor;
+typedef Stat<Undirected, NodeFactor<Undirected> > UndirectedNodeFactor;
+
+
+
 #include <Rcpp.h>
 
 

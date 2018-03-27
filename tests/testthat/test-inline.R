@@ -6,7 +6,7 @@ library(testthat)
 
 context("inline tests")
 
-test_that("C++", {
+test_that("Inline", {
   # This creates a function in C++ to create an empty network of size n
   # and expose it to R.
   src <- "
@@ -43,14 +43,15 @@ test_that("C++", {
   }
   
   void calculate(const BinaryNet<Engine>& net){
-    std::vector<double> v(1,net.nEdges());
+    std::vector<double> v(1,2.0*net.nEdges());
     this->stats=v;
     this->lastStats = std::vector<double>(1,0.0);
+    this->thetas = std::vector<double>(1, 0.0);
   }
   
   void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
     BaseOffset<Engine>::resetLastStats();
-    BaseOffset<Engine>::update(net.hasEdge(from,to) ? -1.0 : 1.0, 0);
+    BaseOffset<Engine>::update(net.hasEdge(from,to) ? -2.0 : 2.0, 0);
   }
   
   bool isOrderIndependent(){return true;}
@@ -75,5 +76,5 @@ test_that("C++", {
   f1 <- lolog(ukFaculty~edges)
   registerEdges2()
   f2 <- lolog(ukFaculty~edges2)
-  expect_true(abs(f1$theta - f2$theta) < .000000000001)
+  expect_true(abs(f1$theta - f2$theta*2) < .000000000001)
 })
