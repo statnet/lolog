@@ -18,6 +18,11 @@
 
 \item{...}{unused}
 }
+\value{
+A list of BinaryNet (or network if convert=TRUE) objects. Networks contain an additional
+vertex covariate "__order__" that indicates the sequence order in which the vertex was 'added' 
+into the network.
+}
 \description{
 Generates BinaryNetworks from a fit lolog object
 }

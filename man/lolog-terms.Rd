@@ -39,7 +39,7 @@ number of possible triangles \url{https://en.wikipedia.org/wiki/Clustering_coeff
 }
 
 \item{\code{transitivity()}  (order-independent) (undirected)}{ 
-The soffer vasquez transitivity. This is clustering metric that adjusts for large degree
+The Soffer-Vazquez   transitivity. This is clustering metric that adjusts for large degree
 differences and is described by C in Equation 6 of 
 \url{https://pdfs.semanticscholar.org/7af5/f8c871d99b868cd0ed70c5fd09f59b399769.pdf}. Note 
 The approximation of the number of possible shared neighbors between node i and j of min(d_i,d_j) - 1
@@ -83,7 +83,7 @@ The \code{attrname} argument is a character string giving the name of a
 numeric attribute in the network's vertex attribute list.
 This term adds a single network statistic to the model equaling the sum of
 \code{name(i)} and \code{name(j)} for all edges \eqn{(i,j)} in the
-network. For categorical variables, levels are coded as 1,..,nlevels.
+network. For categorical variables, levels are coded as 1,..,nlevels`.
   }
   
 \item{\code{gwesp(alpha)}  (order-independent)  (directed)  (undirected)}{ 
@@ -119,7 +119,7 @@ statistic to the model for each element in \code{d} where the \eqn{i}th such
 statistic equals the number of \emph{edges} (rather than dyads) in the
 network with exactly \code{d[i]} shared partners. This term can be used with
 directed and undirected networks. For directed networks the count is over
-cylces of the form: node --> nbr1 --> nbr2 --> node.
+cycles of the form: node --> nbr1 --> nbr2 --> node.
 
  }
  
@@ -127,13 +127,13 @@ cylces of the form: node --> nbr1 --> nbr2 --> node.
 
 given nodal variables for longitude and latitude, calculates the sum of the
 great circle distance between connected nodes. distCuts splits this into
-seperate statistics that count the sum of the minimum of the cut point and the
+separate statistics that count the sum of the minimum of the cut point and the
 distance.
 
 }
 \item{\code{ dist(names } (dyad-independent)  (order-independent) (undirected)}{ 
 
-Calculates a statistic equal to the sum of the euclidian distances between
+Calculates a statistic equal to the sum of the euclidean distances between
 connected nodes on the numeric nodal variables specified in names.
 
 }
@@ -154,7 +154,7 @@ for each edge adds
 log(k + shared / minDeg)
 
 where shared is the current number of shared neighbors between the two nodes, and
-minDeg is the minimum of the currect degrees of the two nodes (i.e. the number of possible shared 
+minDeg is the minimum of the current degrees of the two nodes (i.e. the number of possible shared 
 neighbors).
 
  }
@@ -173,7 +173,7 @@ growth process.
  }
 }
 
-\section{Contraint Descriptions}{
+\section{Constraint Descriptions}{
 
 \itemize{
 \item{\code{boundedDegree(lower,upper)}  (order-independent)  (undirected)}{ 

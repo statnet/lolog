@@ -5,7 +5,7 @@
 \alias{ukFaculty}
 \title{Friendship network of a UK university faculty}
 \source{
-The data set was origenally reported by Nepusz et. al. (2008) and was
+The data set was originally reported by Nepusz et. al. (2008) and was
 subsequently processed and included by the igraphdata package. We have simply
 converted their network from an igraph to a network object.
 }

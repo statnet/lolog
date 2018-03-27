@@ -13,8 +13,8 @@ BinaryNet
 }
 \details{
 Rcpp_DirectedNet and Rcpp_UndirectedNet are the native network classes for the
-lolog package. They are designed for algortihmic performance, and are thin wrappers
+lolog package. They are designed for algorithmic performance, and are thin wrappers
 for an underlying C++ object. These network objects can be passed back and forth between
-R and C++ with little overhaed. Because they are pointers to C++ objects, serialization
+R and C++ with little overhead. Because they are pointers to C++ objects, serialization
 via 'save' or 'dput' are not supported
 }

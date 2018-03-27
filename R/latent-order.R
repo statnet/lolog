@@ -634,6 +634,10 @@ lolog <- function(formula,
 #' @param seed Either NULL or an integer that will be used in a call to set.seed before simulating
 #' @param convert convert to a network object#'
 #' @param ... unused
+#' 
+#' @return A list of BinaryNet (or network if convert=TRUE) objects. Networks contain an additional
+#' vertex covariate "__order__" that indicates the sequence order in which the vertex was 'added' 
+#' into the network.
 #'
 #'
 #' @examples
