@@ -66,7 +66,7 @@ data(samplk)
 ls() # directed data: Sampson's Monks
 samplk3
 plot(samplk3)
-sampmodel.01 <- lolog(samplk3~edges+reciprocity, verbose=FALSE)
+sampmodel.01 <- lolog(samplk3~edges+mutual, verbose=FALSE)
 summary(sampmodel.01)
 
 ## ------------------------------------------------------------------------

@@ -167,7 +167,7 @@ data(samplk)
 ls() # directed data: Sampson's Monks
 samplk3
 plot(samplk3)
-sampmodel.01 <- lolog(samplk3~edges+reciprocity, verbose=FALSE)
+sampmodel.01 <- lolog(samplk3~edges+mutual, verbose=FALSE)
 summary(sampmodel.01)
 ```
 
@@ -228,7 +228,7 @@ This currently produces:
 - `triangles()` (order-independent) (directed)  (undirected) 
 - `clustering()`  (order-independent) (undirected) 
 - `transitivity()`  (order-independent) (undirected) 
-- `reciprocity()` (order-independent) (directed)
+- `mutual()` (order-independent) (directed)
 - `nodeCov(name)` (dyad-independent)  (order-independent)  (directed)  (undirected) 
 - `nodeMatch(name)` (dyad-independent)  (order-independent)  (directed)  (undirected) 
 - `nodeMix(name)` (dyad-independent)  (order-independent)  (directed)  (undirected) 

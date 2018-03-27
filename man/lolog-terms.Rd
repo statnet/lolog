@@ -46,7 +46,7 @@ The approximation of the number of possible shared neighbors between node i and 
 in this implementation.
  }
  
-\item{\code{ reciprocity() } (order-independent) (directed)}{ A count of the number of pairs of actors 
+\item{\code{ mutual() } (order-independent) (directed)}{ A count of the number of pairs of actors 
 \eqn{i} and \eqn{j} for which \eqn{(i{\rightarrow}j)}{(i,j)} and \eqn{(j{\rightarrow}i)}{(j,i)} 
 both exist. 
 }

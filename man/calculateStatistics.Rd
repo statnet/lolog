@@ -14,5 +14,5 @@ Calculate network statistics from a formula
 }
 \examples{
 data(ukFaculty)
-calculateStatistics(ukFaculty ~ edges + reciprocity + triangles)
+calculateStatistics(ukFaculty ~ edges + mutual + triangles)
 }

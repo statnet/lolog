@@ -160,7 +160,7 @@ createCppModel <- function(formula,
 #' @param formula A lolog formula (See \code{\link{lolog}}).
 #' @examples
 #' data(ukFaculty)
-#' calculateStatistics(ukFaculty ~ edges + reciprocity + triangles)
+#' calculateStatistics(ukFaculty ~ edges + mutual + triangles)
 calculateStatistics <- function(formula) {
   createCppModel(formula, cloneNet = FALSE)$statistics()
 }

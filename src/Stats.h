@@ -598,9 +598,9 @@ typedef Stat<Undirected, Transitivity<Undirected> > UndirectedTransitivity;
  * the number of reciprocal edges in the network
  */
 template<class Engine>
-class Reciprocity : public BaseStat< Engine > {
+class Mutual : public BaseStat< Engine > {
 public:
-	Reciprocity(){
+	Mutual(){
 		std::vector<double> v(1,0.0);
 		std::vector<double> t(1,0.0);
 		this->stats = v;
@@ -610,7 +610,7 @@ public:
 	/*!
 	 * constructor. params is unused
 	 */
-	Reciprocity(List params){
+	Mutual(List params){
 		std::vector<double> v(1,0.0);
 		std::vector<double> t(1,0.0);
 		this->stats = v;
@@ -618,17 +618,17 @@ public:
 	}
 
 	std::string name(){
-		return "reciprocity";
+		return "mutual";
 	}
     std::vector<std::string> statNames(){
-        std::vector<std::string> statnames(1,"reciprocity");
+        std::vector<std::string> statnames(1,"mutual");
         return statnames;
 	}
 
 	void calculate(const BinaryNet<Engine>& net){
 		this->lastStats = std::vector<double>(1,0.0);
 		if(!net.isDirected())
-			Rf_error("Reciprocity only make sense for directed networks");
+			Rf_error("Mutual only make sense for directed networks");
 
 		double rec = 0.0;
 		int from, to;
@@ -662,8 +662,7 @@ public:
 	}
 };
 
-typedef Stat<Directed, Reciprocity<Directed> > DirectedReciprocity;
-typedef Stat<Undirected, Reciprocity<Undirected> > UndirectedReciprocity;
+typedef Stat<Directed, Mutual<Directed> > DirectedMutual;
 
 
 /*!

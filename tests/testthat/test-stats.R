@@ -13,4 +13,8 @@ test_that("Stats", {
   lss <- calculateStatistics(ukFaculty ~ nodeFactor("GroupC"))
   expect_true(all(es == lss))
   
+  
+  es <- summary(ukFaculty ~ mutual)
+  lss <- calculateStatistics(ukFaculty ~ mutual)
+  
   })
