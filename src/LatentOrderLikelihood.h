@@ -459,9 +459,12 @@ public:
 				}
 			}
 		}
+		std::vector<int> rankOrder = vert_order;
+		for(int i=0;i<vert_order.size();i++)
+			rankOrder[vert_order[i]] = i;
 		DiscreteAttrib attr = DiscreteAttrib();
 		attr.setName("__order__");
-		runningModel->network()->addDiscreteVariable(vert_order, attr);
+		runningModel->network()->addDiscreteVariable(rankOrder, attr);
 		PutRNGstate();
 		List result;
 		result["network"] = runningModel->network()->cloneR();

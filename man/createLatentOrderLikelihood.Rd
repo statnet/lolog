@@ -17,7 +17,7 @@ An Rcpp object representing the likeilhood model
 \description{
 Creates a probability model for a latent ordered network model
 }
-\details{
+\examples{
 # See the methods of the objects returned by this function
 UndirectedLatentOrderLikelihood
 DirectedLatentOrderLikelihood
@@ -29,5 +29,10 @@ lolik <- createLatentOrderLikelihood(net ~ preferentialAttachment(), theta=1)
 banet <- lolik$generateNetwork()$network # generate a random network from the model
 degrees <- banet$degree(1:1000)
 hist(degrees, breaks=100) # plot the degree distribution
-banet[["__order__"]] # The vertex inclusion order
+order <- banet[["__order__"]] # The vertex inclusion order
+
+# Earlier nodes have higher degrees
+library(ggplot2)
+qplot(order, degrees, alpha=I(.25)) + geom_smooth()
+
 }

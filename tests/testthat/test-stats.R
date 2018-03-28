@@ -17,4 +17,14 @@ test_that("Stats", {
   es <- summary(ukFaculty ~ mutual)
   lss <- calculateStatistics(ukFaculty ~ mutual)
   expect_true(all(es == lss))
+  
+  
+  es <- summary(flomarriage ~ absdiff("wealth"))
+  lss <- calculateStatistics(flomarriage ~ absDiff("wealth"))
+  expect_true(all(es == lss))
+  
+  es <- summary(flomarriage ~ absdiff("wealth",3))
+  lss <- calculateStatistics(flomarriage ~ absDiff("wealth",3))
+  expect_true(all(es == lss))
+  
   })
