@@ -89,6 +89,15 @@ summary(fauxmodel.02)
 fauxmodel.01.ergm <- ergm(mesa ~edges + nodematch('GradeCat') + nodematch('Race') + 
                             triangles + kstar(2))
 
+## ------------------------------------------------------------------------
+library(network)
+data(lazega)
+seniority <- as.numeric(lazega %v% "seniority") # Lower values are more senior
+fit <- lolog(lazega ~  edges() + triangles() + nodeCov("cSeniority") + 
+               nodeCov("cPractice") + nodeMatch("gender") + nodeMatch("practice") + 
+               nodeMatch("office") | seniority, verbose=FALSE)
+summary(fit)
+
 ## ----eval=FALSE----------------------------------------------------------
 #  help('lolog-terms')
 

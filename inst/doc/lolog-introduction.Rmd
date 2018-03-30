@@ -203,6 +203,25 @@ fauxmodel.01.ergm <- ergm(mesa ~edges + nodematch('GradeCat') + nodematch('Race'
 ```
 Of course it is highly recommended that you take great care in selecting terms for use with `ergm` for precisely the reason that many can lead to model degeneracy. A much better choice here for the `ergm` model would have been to use `gwesp` and `gwdegree` in place of `triangles` and 2-stars.
 
+## Specifying Vertex Inclusion Order
+
+LOLOG models are motivated by a growth process where edge variables are "added" to the network one at a time. The package implements a sequential vetex ordering process. Specifically, vertices are "added" to the network in random order, and then edge variables connecting the added vertex to each other vertex already added are included in random order.
+
+If you either observe or partially observe the inclusion order of vertices, this information can be included by specifying it in the model formula after a '|' character. In this example we will consider the network relations of a group of partners at a law firm. We observe the senority of the partner, the type of practice and the office where they work. (cSenority and cPractice are just categorical versions of the numerically coded practice and senority variables). It is plausible to posit that partners with more senority entered the law firm and hense the network prior to less senior individuals.
+
+```{r}
+library(network)
+data(lazega)
+seniority <- as.numeric(lazega %v% "seniority") # Lower values are more senior
+fit <- lolog(lazega ~  edges() + triangles() + nodeCov("cSeniority") + 
+               nodeCov("cPractice") + nodeMatch("gender") + nodeMatch("practice") + 
+               nodeMatch("office") | seniority, verbose=FALSE)
+summary(fit)
+```
+
+In some cases only a partial ordering is observed. For example we might observed the month someone joined a group, with multiple individuals joining per month. When ties like this exist in the ordering variable, network simulations respect the partial ordering, with ties broken at random for each simulated network.
+
+
 ## Model Terms Available for LOLOG Estimation and Simulation
 
 Model terms are the expressions (e.g., `triangle`) used to represent predictors on the right-hand size of equations used

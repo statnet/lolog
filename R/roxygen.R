@@ -69,6 +69,27 @@ NULL
 #' @keywords datasets
 NULL
 
+#' Collaboration Realtionships Amoung Partners at a New England Law Firm
+#' 
+#' This data set comes from a network study of corporate law partnership that was 
+#' carried out in a Northeastern US corporate law firm, referred to as SG&R, 1988-1991 
+#' in New England.
+#' @usage
+#' data(lazega)
+#' @docType data
+#' @name lazega
+#' @aliases lazega
+#' @section Licenses and Citation: CC BY 4.0. When publishing results obtained using this
+#' data set, the original authors (Lazega, 2001)
+#' should be cited, along with this \code{R} package.
+#' @references
+#' Lazega, Emmanuel (2001), The Collegial Phenomenon: The Social Mechanisms of Cooperation 
+#' among Peers in a Corporate Law Partnership, Oxford: Oxford University Press
+#' @source 
+#' See \url{http://elazega.fr/?page_id=609} and \url{https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm}
+#' @keywords datasets
+NULL
+
 
 
 #' LOLOG Model Terms
