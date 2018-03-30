@@ -36,7 +36,7 @@ lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
 
 \item{cluster}{A parallel cluster to use for graph simulation.}
 
-\item{verbose}{Level of verbosity 0-2.}
+\item{verbose}{Level of verbosity 0-3.}
 }
 \value{
 An object of class 'lolog'. If the model is dyad independent, the returned object will

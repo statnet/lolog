@@ -120,59 +120,59 @@ createLatentOrderLikelihood <- function(formula, theta = NULL) {
 #' @references
 #' Westling, T., & McCormick, T. H. (2015). Beyond prediction: A framework for inference with variational approximations in mixture models. arXiv preprint arXiv:1510.08151.
 lologVariational <- function(formula,
-           nReplicates = 5L,
-           dyadInclusionRate = NULL,
-           targetFrameSize = 500000) {
-    lolik <- createLatentOrderLikelihood(formula)
-    nReplicates <- as.integer(nReplicates)
-    
-    dyadIndependent <- lolik$getModel()$isIndependent(TRUE, TRUE)
-    dyadIndependentOffsets <-
-      lolik$getModel()$isIndependent(TRUE, FALSE)
-    allDyadIndependent <-
-      all(dyadIndependent) & all(dyadIndependentOffsets)
-    if (allDyadIndependent & nReplicates != 1L) {
-      cat(
-        "\n Model is dyad independent. Replications are redundant. Setting nReplicates <- 1L.\n"
-      )
-      nReplicates <- 1L
-    }
-    network <- lolik$getModel()$getNetwork()
-    n <- network$size()
-    ndyads <- n * (n - 1)
-    if (!network$isDirected())
-      ndyads <- ndyads / 2
-    if (is.null(dyadInclusionRate)) {
-      dyadInclusionRate <- min(1, targetFrameSize / ndyads)
-    }
-    samples <-
-      lolik$variationalModelFrame(nReplicates, dyadInclusionRate)
-    predictors <- lapply(samples, function(x)
-      as.data.frame(x[[2]],
-                    col.names = 1:length(x[[2]])))
-    predictors <- do.call(rbind, predictors)
-    outcome <- do.call(c, lapply(samples, function (x)
-      x[[1]]))
-    
-    logFit <-
-      glm(outcome ~ as.matrix(predictors) - 1, family = binomial())
-    theta <- logFit$coefficients
-    names(theta) <- names(lolik$getModel()$statistics())
-    result <- list(
-      method = "variational",
-      formula = formula,
-      theta = theta,
-      vcov = vcov(logFit) * nReplicates / dyadInclusionRate,
-      nReplicates = nReplicates,
-      dyadInclusionRate = dyadInclusionRate,
-      allDyadIndependent = allDyadIndependent,
-      likelihoodModel = lolik,
-      outcome = outcome,
-      predictors = predictors
+                             nReplicates = 5L,
+                             dyadInclusionRate = NULL,
+                             targetFrameSize = 500000) {
+  lolik <- createLatentOrderLikelihood(formula)
+  nReplicates <- as.integer(nReplicates)
+  
+  dyadIndependent <- lolik$getModel()$isIndependent(TRUE, TRUE)
+  dyadIndependentOffsets <-
+    lolik$getModel()$isIndependent(TRUE, FALSE)
+  allDyadIndependent <-
+    all(dyadIndependent) & all(dyadIndependentOffsets)
+  if (allDyadIndependent & nReplicates != 1L) {
+    cat(
+      "\n Model is dyad independent. Replications are redundant. Setting nReplicates <- 1L.\n"
     )
-    class(result) <- c("lologVariationalFit", "lolog", "list")
-    result
+    nReplicates <- 1L
   }
+  network <- lolik$getModel()$getNetwork()
+  n <- network$size()
+  ndyads <- n * (n - 1)
+  if (!network$isDirected())
+    ndyads <- ndyads / 2
+  if (is.null(dyadInclusionRate)) {
+    dyadInclusionRate <- min(1, targetFrameSize / ndyads)
+  }
+  samples <-
+    lolik$variationalModelFrame(nReplicates, dyadInclusionRate)
+  predictors <- lapply(samples, function(x)
+    as.data.frame(x[[2]],
+                  col.names = 1:length(x[[2]])))
+  predictors <- do.call(rbind, predictors)
+  outcome <- do.call(c, lapply(samples, function (x)
+    x[[1]]))
+  
+  logFit <-
+    glm(outcome ~ as.matrix(predictors) - 1, family = binomial())
+  theta <- logFit$coefficients
+  names(theta) <- names(lolik$getModel()$statistics())
+  result <- list(
+    method = "variational",
+    formula = formula,
+    theta = theta,
+    vcov = vcov(logFit) * nReplicates / dyadInclusionRate,
+    nReplicates = nReplicates,
+    dyadInclusionRate = dyadInclusionRate,
+    allDyadIndependent = allDyadIndependent,
+    likelihoodModel = lolik,
+    outcome = outcome,
+    predictors = predictors
+  )
+  class(result) <- c("lologVariationalFit", "lolog", "list")
+  result
+}
 
 
 #' Print of a lologVariationalFit object
@@ -256,7 +256,7 @@ summary.lolog <- function(object, ...) {
 #' @param startingStepSize The starting dampening of the parameter update.
 #' @param maxStepSize The largest allowed value for dampening.
 #' @param cluster A parallel cluster to use for graph simulation.
-#' @param verbose Level of verbosity 0-2.
+#' @param verbose Level of verbosity 0-3.
 #'
 #'
 #' @details
@@ -360,275 +360,259 @@ summary.lolog <- function(object, ...) {
 #' }
 #'
 lolog <- function(formula,
-           auxFormula = NULL,
-           theta = NULL,
-           nsamp = 1000,
-           includeOrderIndependent = TRUE,
-           weights = "full",
-           tol = .1,
-           nHalfSteps = 10,
-           maxIter = 100,
-           minIter = 2,
-           startingStepSize = .1,
-           maxStepSize = .5,
-           cluster = NULL,
-           verbose = TRUE) {
-    #initialize theta via variational inference
-    if (is.null(theta)) {
-      if (verbose)
-        cat("Initializing using variational fit\n")
-      varFit <- lologVariational(formula, dyadInclusionRate = 1)
-      if (varFit$allDyadIndependent) {
-        if (verbose)
-          cat("Model is dyad independent. Returning maximum likelihood estimate.\n")
-        return(varFit)
-      }
-      theta <- varFit$theta
-      if (verbose)
-        cat("theta:\n")
-      if (verbose)
-        print(theta)
-    }
-    
-    lolik <- createLatentOrderLikelihood(formula, theta = theta)
-    
-    orderIndependent <- lolik$getModel()$isIndependent(FALSE, TRUE)
-    dyadIndependent <- lolik$getModel()$isIndependent(TRUE, TRUE)
-    dyadIndependentOffsets <-
-      lolik$getModel()$isIndependent(TRUE, FALSE)
-    if (all(dyadIndependent) & all(dyadIndependentOffsets)) {
-      if (verbose)
-        cat("Model is dyad independent. Returning maximum likelihood estimate.\n")
-      varFit <- lologVariational(formula, dyadInclusionRate = 1)
+                  auxFormula = NULL,
+                  theta = NULL,
+                  nsamp = 1000,
+                  includeOrderIndependent = TRUE,
+                  weights = "full",
+                  tol = .1,
+                  nHalfSteps = 10,
+                  maxIter = 100,
+                  minIter = 2,
+                  startingStepSize = .1,
+                  maxStepSize = .5,
+                  cluster = NULL,
+                  verbose = TRUE) {
+  vcat <- function(..., vl=1){ if(verbose >= vl) cat(...) }
+  vprint <- function(..., vl=1){ if(verbose >= vl) print(...) }
+  #initialize theta via variational inference
+  if (is.null(theta)) {
+    vcat("Initializing Using Variational Fit\n")
+    varFit <- lologVariational(formula, dyadInclusionRate = 1)
+    if (varFit$allDyadIndependent) {
+      vcat("Model is dyad independent. Returning maximum likelihood estimate.\n")
       return(varFit)
     }
-    
-    terms <- .prepModelTerms(formula)
-    auxTerms <- .prepModelTerms(auxFormula)
-    samp <- NULL
-    obsStats <- NULL
-    if (!is.null(auxFormula)) {
-      auxModel <- createCppModel(auxFormula)
-      auxModel$setNetwork(lolik$getModel()$getNetwork())
-      auxModel$calculate()
-      obsStats <- auxModel$statistics()
-    }
-    if (includeOrderIndependent) {
-      obsStats <-
-        c(lolik$getModel()$statistics()[orderIndependent], obsStats)
-    }
-    stepSize <- startingStepSize
-    lastTheta <- NULL
-    lastObjective <- Inf
-    hsCount <- 0
-    iter <- 0
-    if (!is.null(cluster)) {
-      clusterEvalQ(cluster, {
-        library(lolog)
-        library(network)
-      })
-      tmpNet <- lolik$getModel()$getNetwork()$clone()
-      tmpNet$emptyGraph()
-      network <- as.network(tmpNet)
-      clusterExport(cluster, "terms", envir = environment())
-      clusterExport(cluster, "auxTerms", envir = environment())
-      clusterExport(cluster, "network", envir = environment())
-      clusterExport(cluster, "orderIndependent", envir = environment())
-      clusterExport(cluster, "includeOrderIndependent", envir = environment())
-    }
-    while (iter < maxIter) {
-      iter <- iter + 1
-      
-      #generate networks
-      lolik$setThetas(theta)
-      stats <- matrix(0, ncol = length(theta), nrow = nsamp)
-      estats <- matrix(0, ncol = length(theta), nrow = nsamp)
-      if (includeOrderIndependent)
-        auxStats <-
-        matrix(0,
-               ncol = length(obsStats) - sum(orderIndependent),
-               nrow = nsamp)
-      else
-        auxStats <- matrix(0, ncol = length(obsStats), nrow = nsamp)
-      if (is.null(cluster)) {
-        for (i in 1:nsamp) {
-          if (verbose)
-            cat(".")
-          samp <- lolik$generateNetwork()
-          if (!is.null(auxFormula)) {
-            auxModel$setNetwork(samp$network)
-            auxModel$calculate()
-            auxStats[i, ] <- auxModel$statistics()
-          }
-          stats[i, ] <- samp$stats + samp$emptyNetworkStats
-          estats[i, ] <- samp$expectedStats + samp$emptyNetworkStats
-        }
-        if (includeOrderIndependent)
-          auxStats <- cbind(stats[, orderIndependent], auxStats)
-        
-        if (verbose)
-          cat("\n")
-      } else{
-        workingNetwork <- as.network(lolik$getModel()$getNetwork())
-        worker <- function(i, theta) {
-          cat(i, " ")
-          network <- as.BinaryNet(network)
-          lolik <-
-            .createLatentOrderLikelihoodFromTerms(terms, network, theta)
-          samp <- lolik$generateNetwork()
-          if (!is.null(auxTerms)) {
-            auxModel <- .makeCppModelFromTerms(auxTerms, network)
-            auxModel$setNetwork(samp$network)
-            auxModel$calculate()
-            as <- auxModel$statistics()
-          } else{
-            as <- numeric()
-          }
-          list(
-            stats = samp$stats + samp$emptyNetworkStats,
-            estats = samp$expectedStats + samp$emptyNetworkStats,
-            auxStats = as
-          )
-        }
-        results <-
-          parallel::parLapply(cluster, 1:nsamp, worker, theta = theta)
-        stats <- t(sapply(results, function(x)
-          x$stats))
-        estats <- t(sapply(results, function(x)
-          x$estats))
-        if (!is.null(auxFormula))
-          auxStats <- t(sapply(results, function(x)
-            x$auxStats))
-        else
-          auxStats <- NULL
-        if (includeOrderIndependent)
-          auxStats <- cbind(stats[, orderIndependent], drop(auxStats))
-      }
-      
-      #calculate gradient of moment conditions
-      grad <- matrix(0, ncol = length(theta), nrow = length(obsStats))
-      for (i in 1:length(obsStats)) {
-        for (j in 1:length(theta)) {
-          grad[i, j] <-
-            -(cov(auxStats[, i], stats[, j]) - cov(auxStats[, i], estats[, j]))
-        }
-      }
-      
-      if (weights == "diagonal")
-        W <- diag(1 / (diag(var(auxStats))))
-      else
-        W <- solve(var(auxStats))
-      
-      #cacluate moment conditions and stat/observed stat differences transformed by W.
-      mh <- colMeans(auxStats)
-      diffs <- -sweep(auxStats, 2, obsStats)
-      transformedDiffs <- t(t(grad) %*% W %*% t(diffs))
-      momentCondition <- colMeans(transformedDiffs)
-      
-      objective <- colMeans(diffs) %*% W %*% colMeans(diffs)
-      if (verbose)
-        cat("Objective:\n")
-      if (verbose)
-        print(objective)
-      objCrit <-
-        max(-1000000, objective - lastObjective) / (lastObjective + 1)
-      
-      if (verbose)
-        cat("Moment Conditions:\n")
-      if (verbose)
-        print(momentCondition)
-      
-      
-      # Calculate inverse
-      invFailed <-
-        inherits(try(gradInv <-
-                       solve(t(grad) %*% W %*% grad), silent = TRUE)
-                 ,"try-error")
-      
-      if (verbose > 1)
-        pairs(stats)
-      
-      # If inverse failed, or the objective has increased singificantly, initiate half stepping
-      if (hsCount < nHalfSteps &&
-          !is.null(lastTheta) && (invFailed || objCrit > .3)) {
-        if (verbose)
-          cat("Half step back\n")
-        theta <- (lastTheta + theta) / 2
-        hsCount <- hsCount + 1
-        stepSize <- stepSize / 2
-        if (verbose)
-          cat("Theta:\n")
-        if (verbose)
-          print(theta)
-        next
-      } else{
-        stepSize <- min(maxStepSize, stepSize * 1.25)
-        hsCount <- 0
-      }
-      if (verbose)
-        print(stepSize)
-      
-      #Update theta
-      lastTheta <- theta
-      theta <- theta - stepSize * gradInv %*% momentCondition
-      lastObjective <- objective
-      
-      if (verbose)
-        print("auxStat Diffs:")
-      if (verbose)
-        print(colMeans(diffs) / sqrt(diag(var(diffs))))
-      
-      #Hotelling's T^2 test
-      hotT <-
-        momentCondition %*% solve(var(transformedDiffs) / nrow(transformedDiffs)) %*% momentCondition
-      pvalue <- pchisq(hotT, df = length(theta), lower.tail = FALSE)
-      if (verbose)
-        cat("Hotelling's T2 p-value: ", pvalue, "\n")
-      if (verbose)
-        cat("Theta:\n")
-      if (verbose)
-        print(theta)
-      if (pvalue > tol && iter >= minIter) {
-        break
-      } else if (iter < maxIter) {
-        
-      }
-    }
-    
-    if (is.null(samp)) {
-      samp <- lolik$generateNetwork()
-    }
-    
-    omega <- var(auxStats)
-    vcov <- solve(t(grad) %*% W %*% grad) %*%
-      t(grad) %*% W %*% omega %*% t(W) %*% grad %*%
-      solve(t(grad) %*% t(W) %*% grad)
-    
-    lastTheta <- drop(lastTheta)
-    names(lastTheta) <- names(lolik$getModel()$statistics())
-    method <-
-      if (is.null(auxFormula))
-        "Method of Moments"
-    else
-      "Generalized Method Of Moments"
-    
-    result <- list(
-      method = method,
-      formula = formula,
-      auxFromula = auxFormula,
-      theta = lastTheta,
-      stats = stats,
-      estats = estats,
-      auxStats = auxStats,
-      obsStats = obsStats,
-      net = samp$network,
-      grad = grad,
-      vcov = vcov,
-      likelihoodModel = lolik
-    )
-    class(result) <- c("lologGmm", "lolog", "list")
-    result
+    theta <- varFit$theta
+    vcat("Initial Theta:\n", drop(theta),"\n")
   }
+  
+  lolik <- createLatentOrderLikelihood(formula, theta = theta)
+  statNames <- names(lolik$getModel()$statistics())
+  
+  orderIndependent <- lolik$getModel()$isIndependent(FALSE, TRUE)
+  dyadIndependent <- lolik$getModel()$isIndependent(TRUE, TRUE)
+  dyadIndependentOffsets <-
+    lolik$getModel()$isIndependent(TRUE, FALSE)
+  if (all(dyadIndependent) & all(dyadIndependentOffsets)) {
+    vcat("Model is dyad independent. Returning maximum likelihood estimate.\n")
+    varFit <- lologVariational(formula, dyadInclusionRate = 1)
+    return(varFit)
+  }
+  
+  terms <- .prepModelTerms(formula)
+  auxTerms <- .prepModelTerms(auxFormula)
+  samp <- NULL
+  obsStats <- NULL
+  if (!is.null(auxFormula)) {
+    auxModel <- createCppModel(auxFormula)
+    auxModel$setNetwork(lolik$getModel()$getNetwork())
+    auxModel$calculate()
+    obsStats <- auxModel$statistics()
+  }
+  if (includeOrderIndependent) {
+    obsStats <-
+      c(lolik$getModel()$statistics()[orderIndependent], obsStats)
+  }
+  stepSize <- startingStepSize
+  lastTheta <- NULL
+  lastObjective <- Inf
+  hsCount <- 0
+  iter <- 0
+  if (!is.null(cluster)) {
+    clusterEvalQ(cluster, {
+      library(lolog)
+      library(network)
+    })
+    tmpNet <- lolik$getModel()$getNetwork()$clone()
+    tmpNet$emptyGraph()
+    network <- as.network(tmpNet)
+    clusterExport(cluster, "terms", envir = environment())
+    clusterExport(cluster, "auxTerms", envir = environment())
+    clusterExport(cluster, "network", envir = environment())
+    clusterExport(cluster, "orderIndependent", envir = environment())
+    clusterExport(cluster, "includeOrderIndependent", envir = environment())
+  }
+  while (iter < maxIter) {
+    iter <- iter + 1
+    vcat("\n\nIteration", iter,"\n") 
+    
+    #generate networks
+    lolik$setThetas(theta)
+    stats <- matrix(0, ncol = length(theta), nrow = nsamp)
+    estats <- matrix(0, ncol = length(theta), nrow = nsamp)
+    if (includeOrderIndependent)
+      auxStats <-
+      matrix(0,
+             ncol = length(obsStats) - sum(orderIndependent),
+             nrow = nsamp)
+    else
+      auxStats <- matrix(0, ncol = length(obsStats), nrow = nsamp)
+    if (is.null(cluster)) {
+      vcat("Drawing", nsamp, "Monte Carlo Samples:\n")
+      if(verbose)
+        pb <- utils::txtProgressBar(min = 0, max = nsamp, style = 3)
+      for (i in 1:nsamp) {
+        if (verbose)
+          utils::setTxtProgressBar(pb, i)
+        samp <- lolik$generateNetwork()
+        if (!is.null(auxFormula)) {
+          auxModel$setNetwork(samp$network)
+          auxModel$calculate()
+          auxStats[i, ] <- auxModel$statistics()
+        }
+        stats[i, ] <- samp$stats + samp$emptyNetworkStats
+        estats[i, ] <- samp$expectedStats + samp$emptyNetworkStats
+      }
+      if(verbose)
+        close(pb)
+      if (includeOrderIndependent)
+        auxStats <- cbind(stats[, orderIndependent], auxStats)
+    } else{
+      workingNetwork <- as.network(lolik$getModel()$getNetwork())
+      worker <- function(i, theta) {
+        network <- as.BinaryNet(network)
+        lolik <-
+          .createLatentOrderLikelihoodFromTerms(terms, network, theta)
+        samp <- lolik$generateNetwork()
+        if (!is.null(auxTerms)) {
+          auxModel <- .makeCppModelFromTerms(auxTerms, network)
+          auxModel$setNetwork(samp$network)
+          auxModel$calculate()
+          as <- auxModel$statistics()
+        } else{
+          as <- numeric()
+        }
+        list(
+          stats = samp$stats + samp$emptyNetworkStats,
+          estats = samp$expectedStats + samp$emptyNetworkStats,
+          auxStats = as
+        )
+      }
+      results <-
+        parallel::parLapply(cluster, 1:nsamp, worker, theta = theta)
+      stats <- t(sapply(results, function(x)
+        x$stats))
+      estats <- t(sapply(results, function(x)
+        x$estats))
+      if (!is.null(auxFormula))
+        auxStats <- t(sapply(results, function(x)
+          x$auxStats))
+      else
+        auxStats <- NULL
+      if (includeOrderIndependent)
+        auxStats <- cbind(stats[, orderIndependent], drop(auxStats))
+    }
+    
+    #calculate gradient of moment conditions
+    grad <- matrix(0, ncol = length(theta), nrow = length(obsStats))
+    for (i in 1:length(obsStats)) {
+      for (j in 1:length(theta)) {
+        grad[i, j] <-
+          -(cov(auxStats[, i], stats[, j]) - cov(auxStats[, i], estats[, j]))
+      }
+    }
+    
+    if (weights == "diagonal")
+      W <- diag(1 / (diag(var(auxStats))))
+    else
+      W <- solve(var(auxStats))
+    
+    #cacluate moment conditions and stat/observed stat differences transformed by W.
+    mh <- colMeans(auxStats)
+    diffs <- -sweep(auxStats, 2, obsStats)
+    transformedDiffs <- t(t(grad) %*% W %*% t(diffs))
+    momentCondition <- colMeans(transformedDiffs)
+    
+    objective <- colMeans(diffs) %*% W %*% colMeans(diffs)
+    vcat("Objective: ", drop(objective), "\n")
+    
+    objCrit <-
+      max(-1000000, objective - lastObjective) / (lastObjective + 1)
+    
+    # Calculate inverse
+    invFailed <-
+      inherits(try(gradInv <-
+                     solve(t(grad) %*% W %*% grad), silent = TRUE)
+               ,"try-error")
+    
+    if (verbose >= 3)
+      pairs(stats)
+    
+    # If inverse failed, or the objective has increased singificantly, initiate half stepping
+    if (hsCount < nHalfSteps &&
+        !is.null(lastTheta) && (invFailed || objCrit > .3)) {
+      vcat("Half Step Back\n")
+      theta <- (lastTheta + theta) / 2
+      hsCount <- hsCount + 1
+      stepSize <- stepSize / 2
+      vcat("Theta:", drop(theta), "\n", vl=2)
+      next
+    } else{
+      stepSize <- min(maxStepSize, stepSize * 1.25)
+      hsCount <- 0
+    }
+    
+    vcat("Step size:", stepSize, "\n", vl=2)
+    
+    #Update theta
+    lastTheta <- theta
+    theta <- theta - stepSize * gradInv %*% momentCondition
+    lastObjective <- objective
+    
+    algoState <- data.frame(lastTheta, theta,momentCondition,colMeans(diffs)/sqrt(diag(var(diffs))))
+    colnames(algoState) <- c("Theta","Next Theta","Moment Conditions","(h(y) - E(h(Y))) / sd(h(Y))")
+    rownames(algoState) <- statNames
+    vprint(algoState, vl=2)
+
+    #Hotelling's T^2 test
+    hotT <-
+      momentCondition %*% solve(var(transformedDiffs) / nrow(transformedDiffs)) %*% momentCondition
+    pvalue <- pchisq(hotT, df = length(theta), lower.tail = FALSE)
+    
+    vcat("Hotelling's T2 p-value: ", pvalue, "\n")
+
+    if (pvalue > tol && iter >= minIter) {
+      break
+    } else if (iter < maxIter) {
+      
+    }
+  }
+  
+  if (is.null(samp)) {
+    samp <- lolik$generateNetwork()
+  }
+  
+  omega <- var(auxStats)
+  vcov <- solve(t(grad) %*% W %*% grad) %*%
+    t(grad) %*% W %*% omega %*% t(W) %*% grad %*%
+    solve(t(grad) %*% t(W) %*% grad)
+  
+  lastTheta <- drop(lastTheta)
+  names(lastTheta) <- names(lolik$getModel()$statistics())
+  method <-
+    if (is.null(auxFormula))
+      "Method of Moments"
+  else
+    "Generalized Method Of Moments"
+  
+  result <- list(
+    method = method,
+    formula = formula,
+    auxFromula = auxFormula,
+    theta = lastTheta,
+    stats = stats,
+    estats = estats,
+    auxStats = auxStats,
+    obsStats = obsStats,
+    net = samp$network,
+    grad = grad,
+    vcov = vcov,
+    likelihoodModel = lolik
+  )
+  class(result) <- c("lologGmm", "lolog", "list")
+  result
+}
 
 
 #' Generates BinaryNetworks from a fit lolog object
