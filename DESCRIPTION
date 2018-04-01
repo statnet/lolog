@@ -6,7 +6,7 @@ LinkingTo: Rcpp, BH
 Type: Package
 LazyLoad: yes
 Author: Ian Fellows
-Description: Estimation of Latent Order LOGistic (LOLOG) graph models.
+Description: Estimation of Latent Order Logistic (LOLOG) Models for Networks.
 Version: 1.0
 Date: 2018-03-15
 Depends:
@@ -23,6 +23,7 @@ Suggests:
     inline,
     knitr,
     rmarkdown,
+    mgcv,
     ergm
 RcppModules: lolog
 RoxygenNote: 6.0.1
