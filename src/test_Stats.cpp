@@ -1,19 +1,10 @@
 #include <Rcpp.h>
-#ifdef INSIDE
-#include "../BinaryNet.h"
-#include "../Stat.h"
-#include "../Stats.h"
-#include "../Constraint.h"
-#include "../Model.h"
-#include "../VarAttrib.h"
-#else
 #include "BinaryNet.h"
 #include "Stat.h"
 #include "Stats.h"
 #include "Constraint.h"
 #include "Model.h"
 #include "VarAttrib.h"
-#endif
 #include "tests.h"
 
 namespace lolog{

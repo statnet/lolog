@@ -1,14 +1,7 @@
+#include "test_Constraints.h"
+
 #include <Rcpp.h>
-#ifdef INSIDE
-#include "../BinaryNet.h"
-#include "../Stat.h"
-#include "../Stats.h"
-#include "../Offsets.h"
-#include "../Constraint.h"
-#include "../Constraints.h"
-#include "../Model.h"
-#include "../VarAttrib.h"
-#else
+
 #include "BinaryNet.h"
 #include "Stat.h"
 #include "Stats.h"
@@ -17,9 +10,7 @@
 #include "Constraints.h"
 #include "Model.h"
 #include "VarAttrib.h"
-#endif
 #include "tests.h"
-#include "ConstraintTests.h"
 namespace lolog {
 
 namespace tests{

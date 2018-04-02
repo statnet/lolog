@@ -1,5 +1,5 @@
-#ifndef STATTESTS_H_
-#define STATTESTS_H_
+#ifndef TEST_STATS_H_
+#define TEST_STATS_H_
 
 namespace lolog{
 namespace tests{
@@ -13,4 +13,4 @@ void testStats();
 }
 
 
-#endif /* STATTESTS_H_ */
+#endif /* TEST_STATS_H_ */

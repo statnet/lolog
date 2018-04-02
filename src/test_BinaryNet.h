@@ -1,5 +1,5 @@
-#ifndef BINARYNETTESTS_H_
-#define BINARYNETTESTS_H_
+#ifndef TEST_BINARYNET_H_
+#define TEST_BINARYNET_H_
 
 namespace lolog{
 
@@ -16,4 +16,4 @@ void testBinaryNet();
 }
 
 
-#endif /* BINARYNETTESTS_H_ */
+#endif /* TEST_BINARYNET_H_ */

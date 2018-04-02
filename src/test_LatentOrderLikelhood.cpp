@@ -1,14 +1,5 @@
 #include <Rcpp.h>
-#ifdef INSIDE
-#include "../BinaryNet.h"
-#include "../Stat.h"
-#include "../Stats.h"
-#include "../Constraint.h"
-#include "../Model.h"
-#include "../VarAttrib.h"
-#include "../LatentOrderLikelihood.h"
-#include "../Ranker.h"
-#else
+
 #include "BinaryNet.h"
 #include "Stat.h"
 #include "Stats.h"
@@ -17,9 +8,8 @@
 #include "VarAttrib.h"
 #include "LatentOrderLikelihood.h"
 #include "Ranker.h"
-#endif
+#include "test_LatentOrderLikelihood.h"
 #include "tests.h"
-#include "LatentTests.h"
 namespace lolog {
 namespace tests {
 

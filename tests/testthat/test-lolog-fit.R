@@ -14,8 +14,8 @@ test_that("lolog_fit", {
     includeOrderIndependent = FALSE,
     verbose = FALSE
   )
-  expect_true(all(fit$theta > c(-1.26, .19)) &
-                all(fit$theta < c(-1.23, .21)))
+  expect_true(all(fit$theta > c(-1.28, .18)) &
+                all(fit$theta < c(-1.22, .22)))
   
   # Test Dyad Independent
   efit <- ergm(samplike ~ edges + nodematch("group"))
@@ -39,13 +39,22 @@ test_that("lolog_fit", {
   flomarriage <- network(flo, directed = FALSE)
   fit <- lolog(
     flomarriage ~ edges() + preferentialAttachment(),
-    flomarriage ~ star(2L),
+    flomarriage ~ star(2),
     theta = c(-1.54998018, 0),
     nsamp = 400,
     verbose = FALSE
   )
   expect_true(all(fit$theta > c(-1.9, 0)) &
                 all(fit$theta < c(-1.1, .2)))
+  
+  fit <- lolog(
+    flomarriage ~ edges() + preferentialAttachment(),
+    flomarriage ~ star(2:3),
+    theta = c(-1.54998018, 0),
+    nsamp = 400,
+    verbose = FALSE
+  )
+  expect_true(all(dim(fit$grad) == c(3,2)))
   
 })
 
@@ -76,7 +85,22 @@ test_that("lolog_fit_parallel", {
     cluster = cluster,
     verbose = FALSE
   )
-  expect_true(all(fit$theta > c(-1.65, 0)) &
-                all(fit$theta < c(-1.55, .2)))
+  expect_true(all(fit$theta > c(-1.8, -.1)) &
+                all(fit$theta < c(-1.4, .2)))
   parallel::stopCluster(cluster)
 })
+
+
+
+test_that("lolog_target_stats", {
+  data(sampson)
+  fit <- lolog(
+    samplike ~ edges(),
+    theta = c(-1.2304996),
+    nsamp = 200,
+    targetStats=40,
+    verbose = FALSE
+  )
+  expect_true(round(fit$theta,1) == -1.9)
+})
+

@@ -1,10 +1,4 @@
 
-#' initialize model statistics
-#' @name initLologStatistics
-#' @aliases initLologStatistics
-#' @usage initLologStatistics()
-NULL
-
 
 #' The inline plug-in for lolog
 #' @name inlineLologPlugin
@@ -90,7 +84,12 @@ NULL
 #' @keywords datasets
 NULL
 
-
+#' Internal Symbols
+#' @name call-symbols
+#' @description Internal symbols used to access compiles code.
+#' @docType methods
+#' @aliases _lolog_initStats _rcpp_module_boot_lolog initLologStatistics runLologCppTests
+NULL
 
 #' LOLOG Model Terms
 #' @name lolog-terms
