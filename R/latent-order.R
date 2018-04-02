@@ -113,8 +113,7 @@ createLatentOrderLikelihood <- function(formula, theta = NULL) {
 #'
 #' @examples
 #' data(ukFaculty)
-#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"), 
-#'                         nReplicates=1L, dyadInclusionRate=1)
+#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"),nReplicates=1L, dyadInclusionRate=1)
 #' summary(fit)
 #'
 #'
@@ -194,7 +193,7 @@ print.lologVariationalFit <- function(x, ...) {
 }
 
 
-#' Print a `lolog` object
+#' Print of a lolog object
 #' @param x the object
 #' @param ... additional parameters (unused)
 #' @method print lolog
@@ -204,14 +203,13 @@ print.lolog <- function(x, ...) {
 }
 
 
-#' Summary of a `lolog` object
+#' Summary of a lolog object
 #' @param object the object
 #' @param ... additional parameters (unused)
 #' @method summary lolog
 #' @examples
 #' data(ukFaculty)
-#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"),
-#'                         nReplicates=1L, dyadInclusionRate=1)
+#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"), nReplicates=1L, dyadInclusionRate=1)
 #' summary(fit)
 #' @method summary lolog
 summary.lolog <- function(object, ...) {
@@ -234,11 +232,11 @@ summary.lolog <- function(object, ...) {
 }
 
 
-#' Fits a LOLOG model via Monte Carlo Generalized Method of Moments
+#' Fits a LOLOG model via Mote Carlo Generalized Method of Moments
 #'
 #'
 #' @description
-#' \code{lolog} is used to fit Latent Order Logistic Graph (LOLOG) models. LOLOG models are
+#' \code{lolog} is used to fit Latent Order LOGistic Graph (LOLOG) models. LOLOG models are
 #' motivated by the idea of network growth where the network begins empty, and edge variables
 #' are sequentially 'added' to the network with an either unobserved, or partially observed
 #' order \eqn{s}. Conditional upon the inclusion order, the probability of an edge has a
@@ -249,17 +247,7 @@ summary.lolog <- function(object, ...) {
 #' @param auxFormula A lolog formula of statistics to use for moment matching
 #' @param theta Initial parameters values. Estimated via \code{\link{lologVariational}} if NULL.
 #' @param nsamp The number of sample neteworks to draw at each iteration
-#' @param includeOrderIndependent If TRUE, all order independent terms in formula are used for moment matching.
-#' @param targetStats {vector of "observed network statistics,"
-#' if these statistics are for some reason different than the 
-#' actual statistics of the network on the left-hand side of
-#' \code{formula}.
-#' Equivalently, this vector is the mean-value parameter values for the
-#' model.  If this is given, the algorithm finds the 
-#' parameter values corresponding to these mean-value parameters.
-#' If \code{NULL}, the mean-value parameters used are the observed
-#' statistics of the network in the formula.
-#' }
+#' @param includeOrderIndependent If true, all order independent terms in formula are used for moment matching.
 #' @param weights The type of weights to use in the GMM objective. Either 'full' for the inverse of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.
 #' @param tol The Hotteling's T^2 p-value tolerance for convergance for the transformed moment conditions.
 #' @param nHalfSteps The maximum number of half steps to take when the objective is not improved in an interation.
@@ -314,13 +302,12 @@ summary.lolog <- function(object, ...) {
 #'
 #' If the model contains any order dependent statistics, additional moment constraints
 #' must be specified in \code{auxFormula}. Ideally these should be chosen to capture
-#' the features modeled by the order dependent statistics. For example, \code{preferentialAttachment}
+#' the features modeled by the order dependent statistic. For example, \code{preferentialAttachment}
 #' models the degree structure, so we might choose two-stars as a moment constraint.
-#' For example,
 #'
 #'  \code{lolog(net ~ edges + preferentialAttachment(), net ~ star(2))}
 #'
-#' will fit a Barabasi-Albert model with the number of edges and number of two-stars as moment constraints.
+#' will fit a Barabasi-Albert model with the # of edges and # of two-stars as moment constraints.
 #'
 #'
 #' @return An object of class 'lolog'. If the model is dyad independent, the returned object will
@@ -336,7 +323,6 @@ summary.lolog <- function(object, ...) {
 #' \item{stats}{The statistics for each network in the last iteration}
 #' \item{estats}{the expected stats (G(y,s)) for each network in the last iteration}
 #' \item{obsStats}{the observed network statistics}
-#' \item{targetStats}{The targetStats used during estimation (passed through from the Arguments)}
 #' \item{net}{A network simulated from the fit model}
 #' \item{grad}{The gradient of the moment conditions}
 #' \item{vcov}{The asymptotic covariance matrix of the parameter estimates}
@@ -378,7 +364,6 @@ lolog <- function(formula,
                   theta = NULL,
                   nsamp = 1000,
                   includeOrderIndependent = TRUE,
-                  targetStats=NULL,
                   weights = "full",
                   tol = .1,
                   nHalfSteps = 10,
@@ -429,16 +414,6 @@ lolog <- function(formula,
     obsStats <-
       c(lolik$getModel()$statistics()[orderIndependent], obsStats)
   }
-  if(!is.null(targetStats)){
-    targetStats <- vector.namesmatch(targetStats, names(obsStats))
-    targetStats <- na.omit(targetStats)
-    if(length(obsStats)!=length(targetStats)){
-      stop("Incorrect length of the targetStats vector: should be ", length(obsStats), " but is ",length(targetStats),".")
-    }
-  }else{
-    targetStats <- obsStats
-  }
-
   stepSize <- startingStepSize
   lastTheta <- NULL
   lastObjective <- Inf
@@ -465,19 +440,14 @@ lolog <- function(formula,
     #generate networks
     lolik$setThetas(theta)
     stats <- matrix(0, ncol = length(theta), nrow = nsamp)
-    colnames(stats) <- statNames
     estats <- matrix(0, ncol = length(theta), nrow = nsamp)
-    colnames(estats) <- statNames
-    if (includeOrderIndependent){
+    if (includeOrderIndependent)
       auxStats <-
       matrix(0,
-             ncol = length(targetStats) - sum(orderIndependent),
+             ncol = length(obsStats) - sum(orderIndependent),
              nrow = nsamp)
-      colnames(auxStats) <- names(targetStats)[!orderIndependent]
-    }else{
-      auxStats <- matrix(0, ncol = length(targetStats), nrow = nsamp)
-      colnames(auxStats) <- names(targetStats)
-    }
+    else
+      auxStats <- matrix(0, ncol = length(obsStats), nrow = nsamp)
     if (is.null(cluster)) {
       vcat("Drawing", nsamp, "Monte Carlo Samples:\n")
       if(verbose)
@@ -513,7 +483,6 @@ lolog <- function(formula,
         } else{
           as <- numeric()
         }
-        colnames(samp$emptyNetworkStats) <- statNames
         list(
           stats = samp$stats + samp$emptyNetworkStats,
           estats = samp$expectedStats + samp$emptyNetworkStats,
@@ -536,8 +505,8 @@ lolog <- function(formula,
     }
     
     #calculate gradient of moment conditions
-    grad <- matrix(0, ncol = length(theta), nrow = length(targetStats))
-    for (i in 1:length(targetStats)) {
+    grad <- matrix(0, ncol = length(theta), nrow = length(obsStats))
+    for (i in 1:length(obsStats)) {
       for (j in 1:length(theta)) {
         grad[i, j] <-
           -(cov(auxStats[, i], stats[, j]) - cov(auxStats[, i], estats[, j]))
@@ -549,9 +518,9 @@ lolog <- function(formula,
     else
       W <- solve(var(auxStats))
     
-    #caculate moment conditions and stat/observed stat differences transformed by W.
+    #cacluate moment conditions and stat/observed stat differences transformed by W.
     mh <- colMeans(auxStats)
-    diffs <- -sweep(auxStats, 2, targetStats)
+    diffs <- -sweep(auxStats, 2, obsStats)
     transformedDiffs <- t(t(grad) %*% W %*% t(diffs))
     momentCondition <- colMeans(transformedDiffs)
     
@@ -630,13 +599,12 @@ lolog <- function(formula,
   result <- list(
     method = method,
     formula = formula,
-    auxFormula = auxFormula,
+    auxFromula = auxFormula,
     theta = lastTheta,
     stats = stats,
     estats = estats,
     auxStats = auxStats,
     obsStats = obsStats,
-    targetStats = targetStats,
     net = samp$network,
     grad = grad,
     vcov = vcov,
@@ -647,10 +615,10 @@ lolog <- function(formula,
 }
 
 
-#' Generates BinaryNetworks from a fit `lolog` object
+#' Generates BinaryNetworks from a fit lolog object
 #'
 #'
-#' @param object {an `lolog` object.}
+#' @param object The lolog object
 #' @param nsim The number of simulated networks
 #' @param seed Either NULL or an integer that will be used in a call to set.seed before simulating
 #' @param convert convert to a network object#'
