@@ -250,6 +250,8 @@ summary.lolog <- function(object, ...) {
 #' @param nsamp The number of sample neteworks to draw at each iteration.
 #' @param includeOrderIndependent If TRUE, all order independent terms in formula are used for 
 #' moment matching.
+#' @param targetStats A vector of network statistics to use as the target for the moment equations.
+#' If \code{NULL}, the observed statistics for the network are used.
 #' @param weights The type of weights to use in the GMM objective. Either 'full' for the inverse 
 #' of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.
 #' @param tol The Hotteling's T^2 p-value tolerance for convergance for the transformed moment conditions.
@@ -325,8 +327,9 @@ summary.lolog <- function(object, ...) {
 #' \item{auxFormula}{The formula containing additional moment conditions}
 #' \item{theta}{The parameter estimates}
 #' \item{stats}{The statistics for each network in the last iteration}
-#' \item{estats}{the expected stats (G(y,s)) for each network in the last iteration}
-#' \item{obsStats}{the observed network statistics}
+#' \item{estats}{The expected stats (G(y,s)) for each network in the last iteration}
+#' \item{obsStats}{The observed network statistics}
+#' \item{targetStats}{The target network statistics}
 #' \item{net}{A network simulated from the fit model}
 #' \item{grad}{The gradient of the moment conditions}
 #' \item{vcov}{The asymptotic covariance matrix of the parameter estimates}
@@ -350,7 +353,7 @@ summary.lolog <- function(object, ...) {
 #'
 #' # An order dependent model
 #' fit3 <- lolog(flomarriage ~ edges + nodeCov("wealth") + preferentialAttachment(),
-#'               flomarriage ~ star(2), verbose=FALSE)
+#'               flomarriage ~ star(2:3), verbose=FALSE)
 #' summary(fit3)
 #'
 #' # Try something a bit more real
@@ -368,6 +371,7 @@ lolog <- function(formula,
                   theta = NULL,
                   nsamp = 1000,
                   includeOrderIndependent = TRUE,
+                  targetStats = NULL,
                   weights = "full",
                   tol = .1,
                   nHalfSteps = 10,
@@ -379,6 +383,7 @@ lolog <- function(formula,
                   verbose = TRUE) {
   vcat <- function(..., vl=1){ if(verbose >= vl) cat(...) }
   vprint <- function(..., vl=1){ if(verbose >= vl) print(...) }
+  
   #initialize theta via variational inference
   if (is.null(theta)) {
     vcat("Initializing Using Variational Fit\n")
@@ -398,7 +403,7 @@ lolog <- function(formula,
   dyadIndependent <- lolik$getModel()$isIndependent(TRUE, TRUE)
   dyadIndependentOffsets <-
     lolik$getModel()$isIndependent(TRUE, FALSE)
-  if (all(dyadIndependent) & all(dyadIndependentOffsets)) {
+  if (all(dyadIndependent) && all(dyadIndependentOffsets) && is.null(targetStats)) {
     vcat("Model is dyad independent. Returning maximum likelihood estimate.\n")
     varFit <- lologVariational(formula, dyadInclusionRate = 1)
     return(varFit)
@@ -418,6 +423,16 @@ lolog <- function(formula,
     obsStats <-
       c(lolik$getModel()$statistics()[orderIndependent], obsStats)
   }
+  if(!is.null(targetStats)){
+    if(any(is.na(targetStats)))
+      stop("targetStats may not have missing values")
+    if(length(obsStats)!=length(targetStats))
+      stop("Incorrect length of the targetStats vector: should be ", 
+           length(obsStats), " but is ",length(targetStats),".")
+  }else{
+    targetStats <- obsStats
+  }
+  
   stepSize <- startingStepSize
   lastTheta <- NULL
   lastObjective <- Inf
@@ -448,10 +463,10 @@ lolog <- function(formula,
     if (includeOrderIndependent)
       auxStats <-
       matrix(0,
-             ncol = length(obsStats) - sum(orderIndependent),
+             ncol = length(targetStats) - sum(orderIndependent),
              nrow = nsamp)
     else
-      auxStats <- matrix(0, ncol = length(obsStats), nrow = nsamp)
+      auxStats <- matrix(0, ncol = length(targetStats), nrow = nsamp)
     if (is.null(cluster)) {
       vcat("Drawing", nsamp, "Monte Carlo Samples:\n")
       if(verbose)
@@ -508,9 +523,9 @@ lolog <- function(formula,
         auxStats <- cbind(stats[, orderIndependent], drop(auxStats))
     }
     
-    #calculate gradient of moment conditions
-    grad <- matrix(0, ncol = length(theta), nrow = length(obsStats))
-    for (i in 1:length(obsStats)) {
+    # Calculate gradient of moment conditions
+    grad <- matrix(0, ncol = length(theta), nrow = length(targetStats))
+    for (i in 1:length(targetStats)) {
       for (j in 1:length(theta)) {
         grad[i, j] <-
           -(cov(auxStats[, i], stats[, j]) - cov(auxStats[, i], estats[, j]))
@@ -522,9 +537,9 @@ lolog <- function(formula,
     else
       W <- solve(var(auxStats))
     
-    #cacluate moment conditions and stat/observed stat differences transformed by W.
+    # Calcuate moment conditions and stat/observed stat differences transformed by W.
     mh <- colMeans(auxStats)
-    diffs <- -sweep(auxStats, 2, obsStats)
+    diffs <- -sweep(auxStats, 2, targetStats)
     transformedDiffs <- t(t(grad) %*% W %*% t(diffs))
     momentCondition <- colMeans(transformedDiffs)
     
@@ -559,15 +574,26 @@ lolog <- function(formula,
     
     vcat("Step size:", stepSize, "\n", vl=2)
     
-    #Update theta
+    # Update theta
     lastTheta <- theta
     theta <- theta - stepSize * gradInv %*% momentCondition
     lastObjective <- objective
     
-    algoState <- data.frame(lastTheta, theta,momentCondition,colMeans(diffs)/sqrt(diag(var(diffs))))
-    colnames(algoState) <- c("Theta","Next Theta","Moment Conditions","(h(y) - E(h(Y))) / sd(h(Y))")
+    # Print diagnostic Information
+    algoState <- data.frame(lastTheta, theta,momentCondition)
+    colnames(algoState) <- c("Theta","Next Theta","Moment Conditions")
     rownames(algoState) <- statNames
-    vprint(algoState, vl=2)
+    if(!is.null(auxFormula)){
+      momState <- data.frame(colMeans(diffs)/sqrt(diag(var(diffs))))
+      colnames(momState) <- "(h(y) - E(h(Y))) / sd(h(Y))"
+      rownames(momState) <- names(obsStats)
+      vprint(algoState, vl=2)
+      vprint(momState, vl=2)
+    }else{
+      algoState[["(h(y) - E(h(Y))) / sd(h(Y))"]] <- colMeans(diffs)/sqrt(diag(var(diffs)))
+      vprint(algoState, vl=2)
+    }
+    
 
     #Hotelling's T^2 test
     hotT <-
@@ -587,13 +613,18 @@ lolog <- function(formula,
     samp <- lolik$generateNetwork()
   }
   
+  # Calculate parameter covariances
   omega <- var(auxStats)
   vcov <- solve(t(grad) %*% W %*% grad) %*%
     t(grad) %*% W %*% omega %*% t(W) %*% grad %*%
     solve(t(grad) %*% t(W) %*% grad)
   
+  # Some formating of return items
   lastTheta <- drop(lastTheta)
-  names(lastTheta) <- names(lolik$getModel()$statistics())
+  rownames(grad) <- colnames(auxStats) <- names(obsStats)
+  rownames(vcov) <- colnames(vcov) <- colnames(grad) <- 
+    colnames(stats) <- colnames(estats) <- names(lastTheta) <- statNames
+  
   method <-
     if (is.null(auxFormula))
       "Method of Moments"
@@ -609,6 +640,7 @@ lolog <- function(formula,
     estats = estats,
     auxStats = auxStats,
     obsStats = obsStats,
+    targetStats = targetStats,
     net = samp$network,
     grad = grad,
     vcov = vcov,

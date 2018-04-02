@@ -39,13 +39,22 @@ test_that("lolog_fit", {
   flomarriage <- network(flo, directed = FALSE)
   fit <- lolog(
     flomarriage ~ edges() + preferentialAttachment(),
-    flomarriage ~ star(2L),
+    flomarriage ~ star(2),
     theta = c(-1.54998018, 0),
     nsamp = 400,
     verbose = FALSE
   )
   expect_true(all(fit$theta > c(-1.9, 0)) &
                 all(fit$theta < c(-1.1, .2)))
+  
+  fit <- lolog(
+    flomarriage ~ edges() + preferentialAttachment(),
+    flomarriage ~ star(2:3),
+    theta = c(-1.54998018, 0),
+    nsamp = 400,
+    verbose = FALSE
+  )
+  expect_true(all(dim(fit$grad) == c(3,2)))
   
 })
 
@@ -80,3 +89,18 @@ test_that("lolog_fit_parallel", {
                 all(fit$theta < c(-1.55, .2)))
   parallel::stopCluster(cluster)
 })
+
+
+
+test_that("lolog_target_stats", {
+  data(sampson)
+  fit <- lolog(
+    samplike ~ edges(),
+    theta = c(-1.2304996),
+    nsamp = 200,
+    targetStats=40,
+    verbose = FALSE
+  )
+  expect_true(round(fit$theta,1) == -1.9)
+})
+

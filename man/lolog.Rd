@@ -5,9 +5,10 @@
 \title{Fits a LOLOG model via Monte Carlo Generalized Method of Moments}
 \usage{
 lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
-  includeOrderIndependent = TRUE, weights = "full", tol = 0.1,
-  nHalfSteps = 10, maxIter = 100, minIter = 2, startingStepSize = 0.1,
-  maxStepSize = 0.5, cluster = NULL, verbose = TRUE)
+  includeOrderIndependent = TRUE, targetStats = NULL, weights = "full",
+  tol = 0.1, nHalfSteps = 10, maxIter = 100, minIter = 2,
+  startingStepSize = 0.1, maxStepSize = 0.5, cluster = NULL,
+  verbose = TRUE)
 }
 \arguments{
 \item{formula}{A lolog formula for the sufficient statistics (see details).}
@@ -20,6 +21,9 @@ lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
 
 \item{includeOrderIndependent}{If TRUE, all order independent terms in formula are used for 
 moment matching.}
+
+\item{targetStats}{A vector of network statistics to use as the target for the moment equations.
+If \code{NULL}, the observed statistics for the network are used.}
 
 \item{weights}{The type of weights to use in the GMM objective. Either 'full' for the inverse 
 of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.}
@@ -53,8 +57,9 @@ lologGmm objects contain:
 \item{auxFormula}{The formula containing additional moment conditions}
 \item{theta}{The parameter estimates}
 \item{stats}{The statistics for each network in the last iteration}
-\item{estats}{the expected stats (G(y,s)) for each network in the last iteration}
-\item{obsStats}{the observed network statistics}
+\item{estats}{The expected stats (G(y,s)) for each network in the last iteration}
+\item{obsStats}{The observed network statistics}
+\item{targetStats}{The target network statistics}
 \item{net}{A network simulated from the fit model}
 \item{grad}{The gradient of the moment conditions}
 \item{vcov}{The asymptotic covariance matrix of the parameter estimates}
@@ -134,7 +139,7 @@ summary(fit2)
 
 # An order dependent model
 fit3 <- lolog(flomarriage ~ edges + nodeCov("wealth") + preferentialAttachment(),
-              flomarriage ~ star(2), verbose=FALSE)
+              flomarriage ~ star(2:3), verbose=FALSE)
 summary(fit3)
 
 # Try something a bit more real
