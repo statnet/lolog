@@ -4,11 +4,7 @@
 #include <Rcpp.h>
 #include <Rcpp/iostream/Rstreambuf.h>
 #include <string>
-#ifdef INSIDE
-#include "../util.h"
-#else
 #include "util.h"
-#endif
 
 namespace lolog{
 namespace tests{
@@ -82,7 +78,7 @@ x;                                                            \
 /*!
  * Runs all tests
  */
-RcppExport void runLologTests();
+void runLologTests();
 
 
 }

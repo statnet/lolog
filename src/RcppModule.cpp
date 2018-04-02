@@ -3,6 +3,7 @@
 
 #include <Rcpp.h>
 #include "BinaryNet.h"
+#include "tests.h"
 #include "LatentOrderLikelihood.h"
 
 /*
@@ -136,9 +137,9 @@ RCPP_MODULE(lolog){
 	function("registerUndirectedStatistic",&registerUndirectedStatistic);
 	function("registerDirectedStatistic",&registerDirectedOffset);
 	function("registerUndirectedStatistic",&registerUndirectedOffset);
-	//TODO: have not figured out how to get MakeVars to compile/link the tests dir
-	//function(".runCppTests",&tests::runTests);
-}                     
+	
+	function("runLologCppTests",&tests::runLologTests);
+}
 
 
 #endif

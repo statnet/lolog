@@ -7,6 +7,6 @@ library(testthat)
 context("C++ tests")
 
 test_that("C++", {
-  .C("runLologTests")
+  runLologCppTests()
   expect_true(TRUE)
 })

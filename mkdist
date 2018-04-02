@@ -18,7 +18,6 @@ rm -f tmp/lolog/.gitignore
 rm -rf tmp/lolog/.settings 
 mkdir tmp/lolog/inst/include
 cp -rf tmp/lolog/src/*\.h tmp/lolog/inst/include
-cp -rf tmp/lolog/src/tests/* tmp/lolog/src
 rm -rf tmp/lolog/src/tests
 rm -f tmp/lolog/src/*.o
 rm -f tmp/lolog/src/*.so

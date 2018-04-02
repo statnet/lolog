@@ -1,9 +1,6 @@
 #include <Rcpp.h>
-#ifdef INSIDE
-#include "../BinaryNet.h"
-#else
+
 #include "BinaryNet.h"
-#endif
 #include "tests.h"
 
 namespace lolog{

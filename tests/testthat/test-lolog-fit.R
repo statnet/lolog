@@ -14,8 +14,8 @@ test_that("lolog_fit", {
     includeOrderIndependent = FALSE,
     verbose = FALSE
   )
-  expect_true(all(fit$theta > c(-1.26, .19)) &
-                all(fit$theta < c(-1.23, .21)))
+  expect_true(all(fit$theta > c(-1.28, .18)) &
+                all(fit$theta < c(-1.22, .22)))
   
   # Test Dyad Independent
   efit <- ergm(samplike ~ edges + nodematch("group"))

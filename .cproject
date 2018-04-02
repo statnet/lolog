@@ -74,7 +74,6 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="tests" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/tests"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -124,7 +123,6 @@
 					<sourceEntries>
 						<entry excluding="tests|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry excluding="tests" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/tests"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -17,7 +17,7 @@
 #include <memory>
 #include <boost/shared_ptr.hpp>
 #include <assert.h>
-#include "tests/tests.h"
+#include "tests.h"
 #include <boost/container/flat_set.hpp>
 #include <ctime>
 #undef NDEBUG
@@ -25,6 +25,8 @@ using namespace Rcpp;
 using namespace std;
 using namespace lolog;
 
+
+RcppExport SEXP _rcpp_module_boot_lolog(){return NULL;}
 /*!
  * Main entry point when called from outside R (with R embedded via RInside).
  */

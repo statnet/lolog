@@ -1,9 +1,9 @@
 #include "tests.h"
-#include "BinaryNetTests.h"
-#include "StatTests.h"
-#include "ConstraintTests.h"
-#include "LatentTests.h"
 #include <Rcpp/iostream/Rstreambuf.h>
+#include "test_BinaryNet.h"
+#include "test_Constraints.h"
+#include "test_LatentOrderLikelihood.h"
+#include "test_Stats.h"
 
 namespace lolog{
 namespace tests{
@@ -11,7 +11,7 @@ namespace tests{
 std::string testContext;
 
 
-RcppExport void runLologTests(){
+void runLologTests(){
 #ifdef INSIDE
 	Rcpp::Rcout << "\n\t";
 #endif
