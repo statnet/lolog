@@ -27,7 +27,12 @@ template<> UndirOffsetMapPtr StatController<Undirected>::offsetMapPtr =
 		UndirOffsetMapPtr(new std::map< std::string, UndirOffsetPtr >);
 
 
-RcppExport void initStats(){
+}
+
+
+//[[Rcpp::export(name=".initStats")]]
+void initStats(){
+  using namespace lolog;
 	/*
 	 * Directed network statistics
 	 */
@@ -87,8 +92,6 @@ RcppExport void initStats(){
 
 }
 
-
-}
 
 void registerDirectedStatistic(Rcpp::XPtr< lolog::AbstractStat<lolog::Directed> > ps){
 	lolog::StatController<lolog::Directed>::addStat(
