@@ -86,16 +86,3 @@ lologPackageSkeleton <- function(path = ".") {
   }
   result
 }
-
-' @describeIn lolog extracts estimated model coefficients.
-#' 
-#' @param object {an `lolog` object.}
-#' @examples
-#' \donttest{
-#' # Extract parameter estimates as a numeric vector:
-#' coef(fit)
-#' }
-#' @import stats
-#' @importFrom stats coef
-#' @export
-coef.lolog <- function(object, ...){object$theta}
