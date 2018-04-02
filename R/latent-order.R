@@ -327,10 +327,11 @@ summary.lolog <- function(object, ...) {
 #' \item{theta}{The parameter estimates}
 #' \item{stats}{The statistics for each network in the last iteration}
 #' \item{estats}{The expected stats (G(y,s)) for each network in the last iteration}
-#' \item{obsStats}{The observed network statistics}
+#' \item{obsStats}{The observed h(y) network statistics}
 #' \item{targetStats}{The target network statistics}
+#' \item{obsModelStats}{The observed g(y,s) network statistics}
 #' \item{net}{A network simulated from the fit model}
-#' \item{grad}{The gradient of the moment conditions}
+#' \item{grad}{The gradient of the moment conditions (D)}
 #' \item{vcov}{The asymptotic covariance matrix of the parameter estimates}
 #' \item{likelihoodModel}{An object of class *LatentOrderLikelihood at the fit parameters}
 #'
@@ -396,7 +397,8 @@ lolog <- function(formula,
   }
   
   lolik <- createLatentOrderLikelihood(formula, theta = theta)
-  statNames <- names(lolik$getModel()$statistics())
+  obsModelStats <- lolik$getModel()$statistics()
+  statNames <- names(obsModelStats)
   
   orderIndependent <- lolik$getModel()$isIndependent(FALSE, TRUE)
   dyadIndependent <- lolik$getModel()$isIndependent(TRUE, TRUE)
@@ -407,6 +409,7 @@ lolog <- function(formula,
     varFit <- lologVariational(formula, dyadInclusionRate = 1)
     return(varFit)
   }
+  obsModelStats[!orderIndependent] <- NA
   
   terms <- .prepModelTerms(formula)
   auxTerms <- .prepModelTerms(auxFormula)
@@ -640,6 +643,7 @@ lolog <- function(formula,
     auxStats = auxStats,
     obsStats = obsStats,
     targetStats = targetStats,
+    obsModelStats = obsModelStats,
     net = samp$network,
     grad = grad,
     vcov = vcov,
@@ -690,6 +694,7 @@ simulate.lolog <- function(object, nsim = 1, seed = NULL, convert = FALSE, ...) 
 #' Extracts estimated model coefficients.
 #' 
 #' @param object A `lolog` object.
+#' @param ... unused
 #' @examples
 #' # Extract parameter estimates as a numeric vector:
 #' data(ukFaculty)
@@ -887,4 +892,86 @@ plot.gofit <- function(x,
       )
     return(gg)
   }
+}
+
+
+
+
+#' Conduct Monte Carlo diagnostics on a lolog model fit
+#' 
+#' This function prints diagnostic information and creates simple diagnostic
+#' plots for MC sampled statistics produced from a lolog fit.
+#' 
+#' A pair of plots are produced for each statistical trace of the sampled
+#' output statistic values on the left and density estimate for each variable
+#' in the Monte Carlo samples on the right.  Diagnostics printed to the console include
+#' correlations and convergence diagnostics.
+#'
+#' @param x A model fit object to be diagnosed.
+#' @param type The type of diagnostic plot
+#' @param ... Additional parameters. Passed to \link{geom_histogram} if type="histogram" 
+#' and \link{pairs} otherwise.
+#' 
+#' @examples 
+#' library(network)
+#' set.seed(1)
+#' data(flo)
+#' flomarriage <- network(flo,directed=FALSE)
+#' flomarriage %v% "wealth" <- c(10,36,27,146,55,44,20,8,42,103,48,49,10,48,32,3)
+#'
+#'
+#' # An order dependent model
+#' fit3 <- lolog(flomarriage ~ edges + nodeCov("wealth") + preferentialAttachment(),
+#'               flomarriage ~ star(2:3), verbose=FALSE)
+#' plot(fit3)
+#' plot(fit3, "target")
+#' plot(fit3, "model")
+plot.lologGmm <- function(x, type=c("histograms", "target","model"), ...) {
+  type <- match.arg(type, c("histograms", "target","model"))
+  
+  panelHist <- function(x, ...)
+  {
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(usr[1:2], 0, 1.5) )
+    h <- hist(x[-length(x)], plot = FALSE)
+    breaks <- h$breaks; nB <- length(breaks)
+    y <- h$counts; y <- y/max(y)
+    rect(breaks[-nB], 0, breaks[-1], y, col = "grey")
+    abline(v=x[length(x)], col="red", lwd=3)
+  }
+  
+  if(type == "target"){
+    stats <- x$auxStats
+    ns <- nrow(stats)
+    stats <- rbind(stats, x$targetStats)
+    pch <- c(rep(1, ns), 16)
+    cex <- c(rep(1, ns), 2)
+    col <- c(rep("black", ns), "red")
+    pairs(stats, pch=pch, cex=cex, col=col, ...)
+  }else if(type == "model"){
+    stats <- x$stats
+    ns <- nrow(stats)
+    stats <- rbind(stats, x$obsModelStats)
+    pch <- c(rep(1, ns), 16)
+    cex <- c(rep(1, ns), 2)
+    col <- c(rep("black", ns), "red")
+    pairs(stats, pch=pch, cex=cex, col=col, diag.panel = panelHist, ...)    
+  }else if(type == "histograms"){
+    stats <- x$auxStats
+    obs <- x$targetStats
+    nin <- !(colnames(x$stats) %in% colnames(stats))
+    stats <- cbind(x$stats[,nin,drop=FALSE], stats)
+    obs <- c(x$obsModelStats[nin], obs)
+    
+    Var2 <- value <- NULL # for R CMD check
+    ss <- reshape2::melt(stats)
+    oo <- na.omit(data.frame(Var2=names(obs),value=obs))
+    pp <- ggplot2::ggplot(data=ss, ggplot2::aes(x=value)) + 
+      ggplot2::geom_histogram(...) + 
+      ggplot2::geom_vline(ggplot2::aes(xintercept=value), data=oo, color=I("red"), size=I(1)) + 
+      ggplot2::facet_wrap(~Var2, scales="free") + ggplot2::xlab("") + ggplot2::theme_bw()
+    invisible(print(pp))
+  }else
+    stop("unknown plot type")
+  invisible()
 }

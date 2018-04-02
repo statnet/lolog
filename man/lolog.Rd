@@ -58,10 +58,11 @@ lologGmm objects contain:
 \item{theta}{The parameter estimates}
 \item{stats}{The statistics for each network in the last iteration}
 \item{estats}{The expected stats (G(y,s)) for each network in the last iteration}
-\item{obsStats}{The observed network statistics}
+\item{obsStats}{The observed h(y) network statistics}
 \item{targetStats}{The target network statistics}
+\item{obsModelStats}{The observed g(y,s) network statistics}
 \item{net}{A network simulated from the fit model}
-\item{grad}{The gradient of the moment conditions}
+\item{grad}{The gradient of the moment conditions (D)}
 \item{vcov}{The asymptotic covariance matrix of the parameter estimates}
 \item{likelihoodModel}{An object of class *LatentOrderLikelihood at the fit parameters}
 }
