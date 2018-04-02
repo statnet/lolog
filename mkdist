@@ -26,12 +26,14 @@ rm -rf tmp/lolog/inst/examplePackage/LologExtension/\.*
 
 if [ "$1" == "build" ]; then
   $R CMD build  --no-build-vignettes tmp/lolog
+  rm -rf tmp
   exit
 fi
 
 if [ "$1" == "check" ]; then
   $R CMD build  --no-build-vignettes tmp/lolog
   $R CMD check --as-cran lolog_1.0.tar.gz
+  rm -rf tmp
   exit
 fi
 

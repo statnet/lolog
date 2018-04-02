@@ -44,6 +44,88 @@ lologPackageSkeleton <- function(path = ".") {
   file.copy(p, path, recursive = TRUE)
 }
 
+
+#
+# evaluates the formula to get all terms, which can then be used to construct a model
+#
+.prepModelTerms <- function(formula) {
+  if (is.null(formula))
+    return(NULL)
+  form <- formula
+  env <- environment(formula)
+  
+  # Parse out vertex ordering (if it exists)
+  vertexOrder <- integer()
+  
+  if (!is.symbol(formula[[3]]) &&
+      as.character(formula[[3]][[1]]) == "|") {
+    tmp <- formula[[3]][[3]]
+    vertexOrder <- eval(tmp, envir = env)
+    if (any(is.na(vertexOrder)))
+      stop("vertex order can not have any NA values")
+    if (!is.numeric(vertexOrder))
+      stop("vertex order must be numeric")
+    form[[3]] <- formula[[3]][[2]]
+  }
+  
+  # parse out model terms
+  tmp <- form[[3]]
+  lastTerm <- FALSE
+  stats <- list()
+  offsets <- list()
+  while (!lastTerm) {
+    ls <- length(stats)
+    lo <- length(offsets)
+    term <- if (is.symbol(tmp)) {
+      lastTerm <- TRUE
+      term <- tmp
+    } else if (as.character(tmp[[1]]) == "+") {
+      tmp[[3]]
+    } else{
+      lastTerm <- TRUE
+      tmp
+    }
+    
+    name <-
+      if (is.symbol(term))
+        as.character(term)
+    else
+      as.character(term[[1]])
+    args <- NULL
+    if (name == "offset" || name == "constraint") {
+      term <- term[[2]]
+      name <-
+        if (is.symbol(term))
+          as.character(term)
+      else
+        as.character(term[[1]])
+      if (length(term) > 1) {
+        term[[1]] <- as.name("list")
+        args <- eval(term, envir = env)
+      } else{
+        args <- list()
+      }
+      offsets[[lo + 1]] <- args
+      names(offsets)[lo + 1] <- name
+    } else{
+      if (length(term) > 1) {
+        term[[1]] <- as.name("list")
+        args <- eval(term, envir = env)
+      } else{
+        args <- list()
+      }
+      stats[[ls + 1]] <- args
+      names(stats)[ls + 1] <- name
+    }
+    if (!lastTerm)
+      tmp <- tmp[[2]]
+  }
+  
+  list(stats = stats,
+       offsets = offsets,
+       vertexOrder = vertexOrder)
+}
+
 # Used to indicate a required parameter
 .required <- function() {
   r <- NA

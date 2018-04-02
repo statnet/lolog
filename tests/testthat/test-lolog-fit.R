@@ -85,8 +85,8 @@ test_that("lolog_fit_parallel", {
     cluster = cluster,
     verbose = FALSE
   )
-  expect_true(all(fit$theta > c(-1.65, 0)) &
-                all(fit$theta < c(-1.55, .2)))
+  expect_true(all(fit$theta > c(-1.8, -.1)) &
+                all(fit$theta < c(-1.4, .2)))
   parallel::stopCluster(cluster)
 })
 
