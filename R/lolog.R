@@ -118,14 +118,14 @@
 #' fit2 <- lolog(flomarriage ~ edges + nodeCov("wealth") + star(2) + triangles, verbose=FALSE)
 #' summary(fit2)
 #'
+#' \dontrun{
+#'
 #' # An order dependent model
 #' fit3 <- lolog(flomarriage ~ edges + nodeCov("wealth") + preferentialAttachment(),
 #'               flomarriage ~ star(2:3), verbose=FALSE)
 #' summary(fit3)
-#'
+#' 
 #' # Try something a bit more real
-#' \dontrun{
-#'
 #' data(ukFaculty)
 #' fituk <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC") + triangles + star(2))
 #' summary(fituk)
@@ -436,7 +436,8 @@ print.lolog <- function(x, ...) {
 #' @method summary lolog
 #' @examples
 #' data(ukFaculty)
-#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"), nReplicates=1L, dyadInclusionRate=1)
+#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"), 
+#'                         nReplicates=1L, dyadInclusionRate=1)
 #' summary(fit)
 #' @method summary lolog
 summary.lolog <- function(object, ...) {
