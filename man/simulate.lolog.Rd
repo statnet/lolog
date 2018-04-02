@@ -8,7 +8,7 @@
   ...)
 }
 \arguments{
-\item{object}{The lolog object}
+\item{object}{A `lolog` object.}
 
 \item{nsim}{The number of simulated networks}
 

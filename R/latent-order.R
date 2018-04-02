@@ -113,7 +113,8 @@ createLatentOrderLikelihood <- function(formula, theta = NULL) {
 #'
 #' @examples
 #' data(ukFaculty)
-#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"),nReplicates=1L, dyadInclusionRate=1)
+#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"),
+#'                        nReplicates=1L, dyadInclusionRate=1)
 #' summary(fit)
 #'
 #'
@@ -193,7 +194,7 @@ print.lologVariationalFit <- function(x, ...) {
 }
 
 
-#' Print of a lolog object
+#' Print a `lolog` object
 #' @param x the object
 #' @param ... additional parameters (unused)
 #' @method print lolog
@@ -203,7 +204,7 @@ print.lolog <- function(x, ...) {
 }
 
 
-#' Summary of a lolog object
+#' Summary of a `lolog` object
 #' @param object the object
 #' @param ... additional parameters (unused)
 #' @method summary lolog
@@ -232,11 +233,11 @@ summary.lolog <- function(object, ...) {
 }
 
 
-#' Fits a LOLOG model via Mote Carlo Generalized Method of Moments
+#' Fits a LOLOG model via Monte Carlo Generalized Method of Moments
 #'
 #'
 #' @description
-#' \code{lolog} is used to fit Latent Order LOGistic Graph (LOLOG) models. LOLOG models are
+#' \code{lolog} is used to fit Latent Order Logistic Graph (LOLOG) models. LOLOG models are
 #' motivated by the idea of network growth where the network begins empty, and edge variables
 #' are sequentially 'added' to the network with an either unobserved, or partially observed
 #' order \eqn{s}. Conditional upon the inclusion order, the probability of an edge has a
@@ -244,13 +245,16 @@ summary.lolog <- function(object, ...) {
 #'
 #'
 #' @param formula A lolog formula for the sufficient statistics (see details).
-#' @param auxFormula A lolog formula of statistics to use for moment matching
+#' @param auxFormula A lolog formula of statistics to use for moment matching.
 #' @param theta Initial parameters values. Estimated via \code{\link{lologVariational}} if NULL.
-#' @param nsamp The number of sample neteworks to draw at each iteration
-#' @param includeOrderIndependent If true, all order independent terms in formula are used for moment matching.
-#' @param weights The type of weights to use in the GMM objective. Either 'full' for the inverse of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.
+#' @param nsamp The number of sample neteworks to draw at each iteration.
+#' @param includeOrderIndependent If TRUE, all order independent terms in formula are used for 
+#' moment matching.
+#' @param weights The type of weights to use in the GMM objective. Either 'full' for the inverse 
+#' of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.
 #' @param tol The Hotteling's T^2 p-value tolerance for convergance for the transformed moment conditions.
-#' @param nHalfSteps The maximum number of half steps to take when the objective is not improved in an interation.
+#' @param nHalfSteps The maximum number of half steps to take when the objective is not improved 
+#' in an interation.
 #' @param maxIter The maximum number of iterations.
 #' @param minIter The minimum number of iterations.
 #' @param startingStepSize The starting dampening of the parameter update.
@@ -302,12 +306,12 @@ summary.lolog <- function(object, ...) {
 #'
 #' If the model contains any order dependent statistics, additional moment constraints
 #' must be specified in \code{auxFormula}. Ideally these should be chosen to capture
-#' the features modeled by the order dependent statistic. For example, \code{preferentialAttachment}
+#' the features modeled by the order dependent statistics. For example, \code{preferentialAttachment}
 #' models the degree structure, so we might choose two-stars as a moment constraint.
 #'
 #'  \code{lolog(net ~ edges + preferentialAttachment(), net ~ star(2))}
 #'
-#' will fit a Barabasi-Albert model with the # of edges and # of two-stars as moment constraints.
+#' will fit a Barabasi-Albert model with the number of edges and number of two-stars as moment constraints.
 #'
 #'
 #' @return An object of class 'lolog'. If the model is dyad independent, the returned object will
@@ -618,7 +622,7 @@ lolog <- function(formula,
 #' Generates BinaryNetworks from a fit lolog object
 #'
 #'
-#' @param object The lolog object
+#' @param object A `lolog` object.
 #' @param nsim The number of simulated networks
 #' @param seed Either NULL or an integer that will be used in a call to set.seed before simulating
 #' @param convert convert to a network object#'

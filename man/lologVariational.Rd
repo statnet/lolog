@@ -56,8 +56,8 @@ estimates is calculated using the methods of Westling (2015).
 }
 \examples{
 data(ukFaculty)
-fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"), 
-                        nReplicates=1L, dyadInclusionRate=1)
+fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"),
+                       nReplicates=1L, dyadInclusionRate=1)
 summary(fit)
 
 

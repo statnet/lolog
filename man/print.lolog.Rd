@@ -2,7 +2,7 @@
 % Please edit documentation in R/latent-order.R
 \name{print.lolog}
 \alias{print.lolog}
-\title{Print of a lolog object}
+\title{Print a `lolog` object}
 \usage{
 \method{print}{lolog}(x, ...)
 }
@@ -12,5 +12,5 @@
 \item{...}{additional parameters (unused)}
 }
 \description{
-Print of a lolog object
+Print a `lolog` object
 }

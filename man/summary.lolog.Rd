@@ -2,7 +2,7 @@
 % Please edit documentation in R/latent-order.R
 \name{summary.lolog}
 \alias{summary.lolog}
-\title{Summary of a lolog object}
+\title{Summary of a `lolog` object}
 \usage{
 \method{summary}{lolog}(object, ...)
 }
@@ -12,11 +12,10 @@
 \item{...}{additional parameters (unused)}
 }
 \description{
-Summary of a lolog object
+Summary of a `lolog` object
 }
 \examples{
 data(ukFaculty)
-fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"),
-                        nReplicates=1L, dyadInclusionRate=1)
+fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"), nReplicates=1L, dyadInclusionRate=1)
 summary(fit)
 }

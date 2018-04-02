@@ -2,7 +2,7 @@
 % Please edit documentation in R/latent-order.R
 \name{lolog}
 \alias{lolog}
-\title{Fits a LOLOG model via Mote Carlo Generalized Method of Moments}
+\title{Fits a LOLOG model via Monte Carlo Generalized Method of Moments}
 \usage{
 lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
   includeOrderIndependent = TRUE, weights = "full", tol = 0.1,
@@ -12,19 +12,22 @@ lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
 \arguments{
 \item{formula}{A lolog formula for the sufficient statistics (see details).}
 
-\item{auxFormula}{A lolog formula of statistics to use for moment matching}
+\item{auxFormula}{A lolog formula of statistics to use for moment matching.}
 
 \item{theta}{Initial parameters values. Estimated via \code{\link{lologVariational}} if NULL.}
 
-\item{nsamp}{The number of sample neteworks to draw at each iteration}
+\item{nsamp}{The number of sample neteworks to draw at each iteration.}
 
-\item{includeOrderIndependent}{If true, all order independent terms in formula are used for moment matching.}
+\item{includeOrderIndependent}{If TRUE, all order independent terms in formula are used for 
+moment matching.}
 
-\item{weights}{The type of weights to use in the GMM objective. Either 'full' for the inverse of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.}
+\item{weights}{The type of weights to use in the GMM objective. Either 'full' for the inverse 
+of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.}
 
 \item{tol}{The Hotteling's T^2 p-value tolerance for convergance for the transformed moment conditions.}
 
-\item{nHalfSteps}{The maximum number of half steps to take when the objective is not improved in an interation.}
+\item{nHalfSteps}{The maximum number of half steps to take when the objective is not improved 
+in an interation.}
 
 \item{maxIter}{The maximum number of iterations.}
 
@@ -58,7 +61,7 @@ lologGmm objects contain:
 \item{likelihoodModel}{An object of class *LatentOrderLikelihood at the fit parameters}
 }
 \description{
-\code{lolog} is used to fit Latent Order LOGistic Graph (LOLOG) models. LOLOG models are
+\code{lolog} is used to fit Latent Order Logistic Graph (LOLOG) models. LOLOG models are
 motivated by the idea of network growth where the network begins empty, and edge variables
 are sequentially 'added' to the network with an either unobserved, or partially observed
 order \eqn{s}. Conditional upon the inclusion order, the probability of an edge has a
@@ -107,12 +110,12 @@ that 10
 
 If the model contains any order dependent statistics, additional moment constraints
 must be specified in \code{auxFormula}. Ideally these should be chosen to capture
-the features modeled by the order dependent statistic. For example, \code{preferentialAttachment}
+the features modeled by the order dependent statistics. For example, \code{preferentialAttachment}
 models the degree structure, so we might choose two-stars as a moment constraint.
 
  \code{lolog(net ~ edges + preferentialAttachment(), net ~ star(2))}
 
-will fit a Barabasi-Albert model with the # of edges and # of two-stars as moment constraints.
+will fit a Barabasi-Albert model with the number of edges and number of two-stars as moment constraints.
 }
 \examples{
 library(network)
