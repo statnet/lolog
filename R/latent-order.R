@@ -48,22 +48,21 @@ createLatentOrderLikelihood <- function(formula, theta = NULL) {
 }
 
 
-.createLatentOrderLikelihoodFromTerms <-
-  function(terms, net, theta = NULL) {
-    net <- as.BinaryNet(net)
-    model <- .makeCppModelFromTerms(terms, net, theta)
-    clss <- class(net)
-    networkEngine <- substring(clss, 6, nchar(clss) - 3)
-    LikType <-
-      eval(parse(
-        text = paste("lolog::", networkEngine, "LatentOrderLikelihood", sep = "")
-      ))
-    lik <- new(LikType, model)
-    if (!is.null(theta)) {
-      lik$setThetas(theta)
-    }
-    lik
+.createLatentOrderLikelihoodFromTerms <- function(terms, net, theta = NULL) {
+  net <- as.BinaryNet(net)
+  model <- .makeCppModelFromTerms(terms, net, theta)
+  clss <- class(net)
+  networkEngine <- substring(clss, 6, nchar(clss) - 3)
+  LikType <-
+    eval(parse(
+      text = paste("lolog::", networkEngine, "LatentOrderLikelihood", sep = "")
+    ))
+  lik <- new(LikType, model)
+  if (!is.null(theta)) {
+    lik$setThetas(theta)
   }
+  lik
+}
 
 
 #' Fits a latent ordered network model using Monte Carlo variational inference
@@ -594,14 +593,14 @@ lolog <- function(formula,
       vprint(algoState, vl=2)
     }
     
-
+    
     #Hotelling's T^2 test
     hotT <-
       momentCondition %*% solve(var(transformedDiffs) / nrow(transformedDiffs)) %*% momentCondition
     pvalue <- pchisq(hotT, df = length(theta), lower.tail = FALSE)
     
     vcat("Hotelling's T2 p-value: ", pvalue, "\n")
-
+    
     if (pvalue > tol && iter >= minIter) {
       break
     } else if (iter < maxIter) {
@@ -676,16 +675,30 @@ lolog <- function(formula,
 #'
 #' @method simulate lolog
 simulate.lolog <- function(object, nsim = 1, seed = NULL, convert = FALSE, ...) {
-    if (!is.null(seed))
-      set.seed(seed)
-    l <- list()
-    for (i in 1:nsim) {
-      l[[i]] <- object$likelihoodModel$generateNetwork()$network
-      if (convert)
-        l[[i]] <- as.network(l[[i]])
-    }
-    l
+  if (!is.null(seed))
+    set.seed(seed)
+  l <- list()
+  for (i in 1:nsim) {
+    l[[i]] <- object$likelihoodModel$generateNetwork()$network
+    if (convert)
+      l[[i]] <- as.network(l[[i]])
   }
+  l
+}
+
+
+#' Extracts estimated model coefficients.
+#' 
+#' @param object A `lolog` object.
+#' @examples
+#' # Extract parameter estimates as a numeric vector:
+#' data(ukFaculty)
+#' fit <- lolog(ukFaculty ~ edges)
+#' coef(fit)
+#' @method coef lolog
+coef.lolog <- function(object, ...){
+  object$theta
+}
 
 
 #' Conduct goodness of fit diagnostics
@@ -821,58 +834,57 @@ print.gofit <- function(x, ...) {
 #' plot(gind)
 #' plot(gind, type="box")
 #' @method plot gofit
-plot.gofit <-
-  function(x,
+plot.gofit <- function(x,
            y,
            type = c("line", "box"),
            normalize = FALSE,
            lineAlpha = .06,
            lineSize = 1,
            ...) {
-    type <- match.arg(type)
-    stats <- x$stats
-    ostats <- x$ostats
-    nms <- names(ostats)
-    colnames(stats) <- nms
-    ylab <- "Statistic"
-    if (normalize) {
-      stats <- apply(sweep(stats, 2, ostats), 2, function(a) {
-        if (sd(a) < .Machine$double.eps)
-          return(rep(NA, length(a)))
-        a / sd(a)
-      })
-      ostats <- rep(0, length(ostats))
-      ylab <- "Normalized Statistic"
-    }
-    
-    if (type == "box") {
-      boxplot(stats, ylab = ylab, ...)
-      points(ostats, col = "red", pch = 16)
-      return(NULL)
-    } else{
-      Var2 <- value <- Var1 <- xx <- yy <- gg <- NULL #For R CMD check
-      mstats <- reshape2::melt(stats)
-      o <- data.frame(xx = nms, yy = ostats, gg = "observed")
-      gg <- ggplot2::ggplot(data = mstats) +
-        ggplot2::geom_line(
-          ggplot2::aes(x = Var2, y = value, group = Var1),
-          alpha = lineAlpha,
-          size = lineSize,
-          ...
-        ) +
-        ggplot2::geom_line(
-          ggplot2::aes(x = xx, y = yy, group = gg),
-          data = o,
-          color = "red",
-          size = lineSize,
-          ...
-        ) +
-        ggplot2::theme_bw() + ggplot2::ylab(ylab) + ggplot2::xlab("")  +
-        ggplot2::theme(
-          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
-          panel.grid.major.x = ggplot2::element_blank(),
-          panel.grid.minor.x = ggplot2::element_blank()
-        )
-      return(gg)
-    }
+  type <- match.arg(type)
+  stats <- x$stats
+  ostats <- x$ostats
+  nms <- names(ostats)
+  colnames(stats) <- nms
+  ylab <- "Statistic"
+  if (normalize) {
+    stats <- apply(sweep(stats, 2, ostats), 2, function(a) {
+      if (sd(a) < .Machine$double.eps)
+        return(rep(NA, length(a)))
+      a / sd(a)
+    })
+    ostats <- rep(0, length(ostats))
+    ylab <- "Normalized Statistic"
   }
+  
+  if (type == "box") {
+    boxplot(stats, ylab = ylab, ...)
+    points(ostats, col = "red", pch = 16)
+    return(NULL)
+  } else{
+    Var2 <- value <- Var1 <- xx <- yy <- gg <- NULL #For R CMD check
+    mstats <- reshape2::melt(stats)
+    o <- data.frame(xx = nms, yy = ostats, gg = "observed")
+    gg <- ggplot2::ggplot(data = mstats) +
+      ggplot2::geom_line(
+        ggplot2::aes(x = Var2, y = value, group = Var1),
+        alpha = lineAlpha,
+        size = lineSize,
+        ...
+      ) +
+      ggplot2::geom_line(
+        ggplot2::aes(x = xx, y = yy, group = gg),
+        data = o,
+        color = "red",
+        size = lineSize,
+        ...
+      ) +
+      ggplot2::theme_bw() + ggplot2::ylab(ylab) + ggplot2::xlab("")  +
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+        panel.grid.major.x = ggplot2::element_blank(),
+        panel.grid.minor.x = ggplot2::element_blank()
+      )
+    return(gg)
+  }
+}
