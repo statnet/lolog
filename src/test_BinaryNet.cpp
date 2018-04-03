@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 
-#include "BinaryNet.h"
-#include "tests.h"
+#include <BinaryNet.h>
+#include <tests.h>
 
 namespace lolog{
 namespace tests{

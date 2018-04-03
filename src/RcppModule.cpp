@@ -2,9 +2,9 @@
 #ifndef INSIDE
 
 #include <Rcpp.h>
-#include "BinaryNet.h"
-#include "tests.h"
-#include "LatentOrderLikelihood.h"
+#include <BinaryNet.h>
+#include <tests.h>
+#include <LatentOrderLikelihood.h>
 
 /*
  * Handles all functions and methods exported to R.

@@ -1,10 +1,10 @@
-#include "StatController.h"
-#include "Stat.h"
-#include "Stats.h"
-#include "Offset.h"
-#include "Offsets.h"
-#include "Constraint.h"
-#include "Constraints.h"
+#include <StatController.h>
+#include <Stat.h>
+#include <Stats.h>
+#include <Offset.h>
+#include <Offsets.h>
+#include <Constraint.h>
+#include <Constraints.h>
 namespace lolog{
 
 
