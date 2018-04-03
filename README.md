@@ -37,7 +37,11 @@ summary(fitind)
 
 For a more detailed desciption of what can be done with lolog, [see the package vignette](inst/doc/lolog-introduction.pdf)
 
-## Development using Eclipse
+## Development
+
+[Development Practices and Policies for Contributers](../../wiki/How-to-Contribute:-Git-Practices)
+
+### Using Eclipse
 
 This package is set up as an Eclipse project, and the C++ code can be compiled and run without reinstalling the package. To set up in your eclipse IDE, select import project -> General -> Existing Projects into Workspace and select the lolog directory.
 
