@@ -71,8 +71,8 @@ protected:
 		//get ordered indices of ranks
 		for(int i=0;i<y.size();i++)
 			vertexOrder[i] = i;
-		std::sort(  std::begin(vertexOrder),
-		                std::end(vertexOrder), IdxCompare(y));
+		std::sort(  vertexOrder.begin(),
+		                vertexOrder.end(), IdxCompare(y));
 
 		//for(int i=0;i<vertexOrder.size();i++){
 		//	std::cout << vertexOrder.at(i) << " " << order->at(vertexOrder.at(i)) << "\n";
