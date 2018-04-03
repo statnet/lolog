@@ -211,7 +211,6 @@ void changeStatTest(std::string statName){
 
 
 void testStats(){
-	testContext = "Statistics";
 
 	RUN_TEST(changeStatTest<Directed>("NodeMatch"));
 	RUN_TEST(changeStatTest<Directed>("Degree"));

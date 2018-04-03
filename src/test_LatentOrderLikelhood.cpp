@@ -163,7 +163,6 @@ void rnker() {
 }
 
 void testLatent() {
-	testContext = "TestLatent";
 	RUN_TEST(lt<Undirected>());
 	RUN_TEST(lt<Directed>());
 	RUN_TEST(rnker());

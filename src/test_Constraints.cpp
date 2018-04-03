@@ -40,7 +40,6 @@ void testBoundedDegree(){
 
 
 void testConstraints(){
-	testContext = "Constraints";
 	RUN_TEST(testBoundedDegree<Undirected>());
 }
 
