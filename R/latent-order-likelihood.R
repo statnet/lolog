@@ -28,7 +28,7 @@
 #' 
 #' # Earlier nodes have higher degrees
 #' library(ggplot2)
-#' qplot(order, degrees, alpha=I(.25)) + geom_smooth()
+#' qplot(order, degrees, alpha=I(.25)) + geom_smooth(method="loess")
 #' 
 createLatentOrderLikelihood <- function(formula, theta = NULL) {
   env <- environment(formula)
