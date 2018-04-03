@@ -9,8 +9,13 @@
 namespace lolog{
 namespace tests{
 
-extern std::string testContext;
 
+extern std::string testContext;
+extern std::map< std::string, void(*)()> testFunctions;
+
+void addTestFunction(std::string name, void(*test)() );
+
+void registerLologTests();
 
 
 /*

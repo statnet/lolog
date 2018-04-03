@@ -36,11 +36,11 @@ void netTest(){
 }
 
 void testBinaryNet(){
-	testContext = "BinaryNet";
 	RUN_TEST(netTest<Directed>());
 	RUN_TEST(netTest<Undirected>())
 
 }
+
 
 
 
