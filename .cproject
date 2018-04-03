@@ -21,6 +21,7 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.2019055749" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.c.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.1217307252" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.474014806" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inst/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/Library/Frameworks/R.framework/Resources/library/Rcpp/include"/>
 									<listOptionValue builtIn="false" value="/Library/Frameworks/R.framework/Resources/library/BH/include"/>
 									<listOptionValue builtIn="false" value="/Library/Frameworks/R.framework/Resources/library/RInside/include"/>
@@ -33,6 +34,7 @@
 								<option id="gnu.cpp.compiler.option.optimization.level.1719309821" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.1354322454" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.180282569" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/inst/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/Library/Frameworks/R.framework/Resources/include"/>
 									<listOptionValue builtIn="false" value="/Library/Frameworks/R.framework/Resources/library/BH/include"/>
 									<listOptionValue builtIn="false" value="/Library/Frameworks/R.framework/Resources/library/Rcpp/include"/>

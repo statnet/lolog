@@ -1,16 +1,16 @@
-#include "test_Constraints.h"
+#include <test_Constraints.h>
 
 #include <Rcpp.h>
 
-#include "BinaryNet.h"
-#include "Stat.h"
-#include "Stats.h"
-#include "Offsets.h"
-#include "Constraint.h"
-#include "Constraints.h"
-#include "Model.h"
-#include "VarAttrib.h"
-#include "tests.h"
+#include <BinaryNet.h>
+#include <Stat.h>
+#include <Stats.h>
+#include <Offsets.h>
+#include <Constraint.h>
+#include <Constraints.h>
+#include <Model.h>
+#include <VarAttrib.h>
+#include <tests.h>
 namespace lolog {
 
 namespace tests{

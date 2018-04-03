@@ -1,9 +1,9 @@
-#include "tests.h"
+#include <tests.h>
 #include <Rcpp/iostream/Rstreambuf.h>
-#include "test_BinaryNet.h"
-#include "test_Constraints.h"
-#include "test_LatentOrderLikelihood.h"
-#include "test_Stats.h"
+#include <test_BinaryNet.h>
+#include <test_Constraints.h>
+#include <test_LatentOrderLikelihood.h>
+#include <test_Stats.h>
 
 namespace lolog{
 namespace tests{

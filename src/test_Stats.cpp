@@ -1,11 +1,11 @@
 #include <Rcpp.h>
-#include "BinaryNet.h"
-#include "Stat.h"
-#include "Stats.h"
-#include "Constraint.h"
-#include "Model.h"
-#include "VarAttrib.h"
-#include "tests.h"
+#include <BinaryNet.h>
+#include <Stat.h>
+#include <Stats.h>
+#include <Constraint.h>
+#include <Model.h>
+#include <VarAttrib.h>
+#include <tests.h>
 
 namespace lolog{
 
