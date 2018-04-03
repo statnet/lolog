@@ -2,6 +2,7 @@
 
 
 library(lolog)
+library(BH)
 library(testthat)
 
 context("inline tests")
