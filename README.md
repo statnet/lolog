@@ -17,11 +17,19 @@ For good measure, the suggested packages too
 install.packages(c("testthat","inline","knitr","rmarkdown","ergm"))
 ```
 
-To install the latest development version from github run the following (you'll need a sh shell and git):
+To install the latest development version from the private github repo run:
+```
+devtools::install_github("statnet/lolog", auth_token="<my_github_acess_token>")
+```
+If you don't have a personal access token, you can create one in your profile page.
+
+
+Alternatively you can manually clone the repo and install with:
 
 ```
-git clone https://github.com/fellstat/lolog.git
-sh lolog/mkdist
+git clone https://github.com/statnet/lolog.git
+R CMD build lolog
+R CMD INSTALL lolog_*.tar.gz
 ```
 
 ## Using the package
@@ -48,7 +56,6 @@ This package is set up as an Eclipse project, and the C++ code can be compiled a
 This project was set up following the methods outlined in:
 
 <http://blog.fellstat.com/?p=170>
-
 
 
 

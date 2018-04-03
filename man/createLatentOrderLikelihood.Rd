@@ -33,6 +33,6 @@ order <- banet[["__order__"]] # The vertex inclusion order
 
 # Earlier nodes have higher degrees
 library(ggplot2)
-qplot(order, degrees, alpha=I(.25)) + geom_smooth()
+qplot(order, degrees, alpha=I(.25)) + geom_smooth(method="loess")
 
 }
