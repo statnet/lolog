@@ -9,23 +9,22 @@ context("inline tests")
 test_that("Inline", {
   # This creates a function in C++ to create an empty network of size n
   # and expose it to R.
-  src <- "
-  lolog::BinaryNet<lolog::Directed> makeEmptyNetwork(const int n){
-    Rcpp::IntegerMatrix tmp(0,2);
-    lolog::BinaryNet<lolog::Directed> net(tmp, n);
-    return net;
-  }
-  "
-  Rcpp::registerPlugin("lolog",inlineLologPlugin)
-  emptyNetwork <- cppFunction(src,plugin="lolog")
-  net <- emptyNetwork(10L)
-  expect_true(all(!net[1:10,1:10]))
+  #src <- "
+  #lolog::BinaryNet<lolog::Directed> makeEmptyNetwork(const int n){
+  #  Rcpp::IntegerMatrix tmp(0,2);
+  #  lolog::BinaryNet<lolog::Directed> net(tmp, n);
+  #  return net;
+  #}
+  #"
+  #Rcpp::registerPlugin("lolog",inlineLologPlugin)
+  #emptyNetwork <- cppFunction(src,plugin="lolog")
+  #net <- emptyNetwork(10L)
+  #expect_true(all(!net[1:10,1:10]))
   
   
   # Test inline statistic registration
   src <- '
-  // [[Rcpp::depends(lolog)]]
-  // [[Rcpp::depends(BH)]]
+  // [[Rcpp::depends(lolog, BH)]]
   #include <lolog.h>
   using namespace lolog;
 
