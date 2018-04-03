@@ -23,7 +23,6 @@ Suggests:
     inline,
     knitr,
     rmarkdown,
-    mgcv,
     ergm,
     BH
 RcppModules: lolog
