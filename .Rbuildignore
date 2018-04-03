@@ -1,0 +1,12 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.travis\.yml$
+^README\.Rmd$
+^cran-comments\.md$
+^NEWS\.md$
+^\.cproject$
+^\.project$
+^mkdist$
+^Debug/
+^lolog.Rproj$
+^.*\.o$
