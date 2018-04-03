@@ -9,6 +9,7 @@
 #include <Rcpp.h>
 #include <assert.h>
 #include <vector>
+#include <iterator>
 
 namespace lolog{
 
