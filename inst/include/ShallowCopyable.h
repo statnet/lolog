@@ -10,30 +10,30 @@ using namespace Rcpp;
 
 class ShallowCopyable{
 public:
-	virtual ~ShallowCopyable(){};
+    virtual ~ShallowCopyable(){};
 
-	/*
-	 *
-	 */
-	virtual ShallowCopyable* vShallowCopyUnsafe() const = 0;
+    /*
+     *
+     */
+    virtual ShallowCopyable* vShallowCopyUnsafe() const = 0;
 
-	template<class T>
-	boost::shared_ptr<T> vShallowCopy() const{
-		ShallowCopyable* p = this->vShallowCopyUnsafe();
-		if(T* p2 = dynamic_cast< T* >(p)){
-			return boost::shared_ptr<T>(p2);
-		}
-		Rf_error("ShallowCopyable::vShallowCopy: bad type");
-	}
+    template<class T>
+    boost::shared_ptr<T> vShallowCopy() const{
+        ShallowCopyable* p = this->vShallowCopyUnsafe();
+        if(T* p2 = dynamic_cast< T* >(p)){
+            return boost::shared_ptr<T>(p2);
+        }
+        Rf_error("ShallowCopyable::vShallowCopy: bad type");
+    }
 
-	template<class T>
-	XPtr<T> vShallowCopyXPtr() const{
-		ShallowCopyable* p = this->vShallowCopyUnsafe();
-		if(T* p2 = dynamic_cast< T* >(p)){
-			return XPtr<T>(p2);
-		}
-		Rf_error("ShallowCopyable::vShallowCopyXPtr: bad type");
-	}
+    template<class T>
+    XPtr<T> vShallowCopyXPtr() const{
+        ShallowCopyable* p = this->vShallowCopyUnsafe();
+        if(T* p2 = dynamic_cast< T* >(p)){
+            return XPtr<T>(p2);
+        }
+        Rf_error("ShallowCopyable::vShallowCopyXPtr: bad type");
+    }
 
 };
 
