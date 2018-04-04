@@ -89,15 +89,7 @@ public:
 	}
     
 	void calculate(const BinaryNet<Engine>& net){
-		std::vector<double> v(1,net.nEdges());
-		this->stats=v;
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1){
-			//this starts theta at a reasonable value assuming erdos-renyi
-			double ne = net.nEdges();
-			double nd = net.maxEdges();
-			this->thetas = std::vector<double>(1,log(ne) - log(nd - ne));
-		}
+		this->initSingle(net.nEdges());
 	}
 
 	void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
@@ -145,9 +137,7 @@ public:
 		direction = p.parseNextDirection("direction", IN);
 		p.end();
 
-		this->lastStats = std::vector<double>(starDegrees.size(),0.0);
-		this->stats=std::vector<double>(starDegrees.size(),0.0);
-		this->thetas = std::vector<double>(starDegrees.size(),0.0);
+		this->init(starDegrees.size());
 	}
 
 
@@ -315,12 +305,7 @@ public:
 
 
 	void calculate(const BinaryNet<Engine>& net){
-
-		std::vector<double> v(1,0.0);
-		this->stats = v;
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1)
-			this->thetas = v;
+		this->initSingle(0.0);
 		double sumTri = 0.0;
 
 		boost::shared_ptr<std::vector< std::pair<int,int> > > edges = net.edgelist();
@@ -406,11 +391,7 @@ public:
 	void calculate(const BinaryNet<Engine>& net){
 		int nstats = 1;
 
-		std::vector<double> v(1,0.0);
-		this->stats = v;
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1)
-			this->thetas = v;
+		this->init(nstats);
 		triangles = twostars = 0.0;
 		boost::shared_ptr<std::vector< std::pair<int,int> > > edges = net.edgelist();
 
@@ -527,11 +508,7 @@ public:
 	void calculate(const BinaryNet<Engine>& net){
 		int nstats = 1;
 
-		std::vector<double> v(1,0.0);
-		this->stats = v;
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1)
-			this->thetas = v;
+		this->init(nstats);
 		triads = nPosTriads = 0.0;
 		boost::shared_ptr<std::vector< std::pair<int,int> > > edges = net.edgelist();
 
@@ -616,7 +593,7 @@ public:
 	}
 
 	void calculate(const BinaryNet<Engine>& net){
-		this->lastStats = std::vector<double>(1,0.0);
+		this->init(1);
 		if(!net.isDirected())
 			Rf_error("Mutual only make sense for directed networks");
 
@@ -711,10 +688,7 @@ public:
 		//nlevels = net.discreteVariableAttributes(variableIndex).labels().size();
 		//nstats = nlevels*nlevels;
 		nstats = 1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size() != nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		boost::shared_ptr< std::vector< std::pair<int,int> > > edges = net.edgelist();
 		for(int i=0;i<edges->size();i++){
 			from = (*edges)[i].first;
@@ -874,10 +848,7 @@ public:
 		levels = net.discreteVariableAttributes(varIndex).labels();
 		nlevels = levels.size();
 		nstats = nlevels * (nlevels + 1) / 2;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size() != nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		boost::shared_ptr< std::vector< std::pair<int,int> > > edges = net.edgelist();
 		for(int i=0;i<edges->size();i++){
 			from = (*edges)[i].first;
@@ -982,10 +953,7 @@ public:
     
 	void calculate(const BinaryNet<Engine>& net){
 		int nstats = degrees.size();
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		double n = net.size();
 		for(int i=0;i<n;i++){
 			for(int j=0;j<nstats;j++){
@@ -1108,10 +1076,7 @@ public:
 	void calculate(const BinaryNet<Engine>& net){
 		int nstats = 1;
 
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		nEdges = net.nEdges();
 		crossProd = 0.0;
 		boost::shared_ptr<std::vector< std::pair<int,int> > > edges = net.edgelist();
@@ -1268,10 +1233,7 @@ public:
 			::Rf_error("nodal attribute not found in network");
 		varIndex = variableIndex;
 		int nstats = 1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		this->stats[0] = 0;
 		for(int i=0;i<net.size();i++){
 			double val = getValue(net,i);
@@ -1446,10 +1408,7 @@ public:
 	}
 
 	virtual void calculate(const BinaryNet<Engine>& net){
-		this->stats = std::vector<double>(1,0.0);
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1)
-			this->thetas = std::vector<double>(1,0.0);
+		this->init(1);
 		double result = 0.0;
 		sharedValues = std::vector< boost::container::flat_map<int,int> >();
 		for(int i = 0 ; i<net.size();i++)
@@ -1577,10 +1536,7 @@ public:
     virtual void calculate(const BinaryNet<Engine>& net){
         oneexpa = 1.0 - exp(-alpha);
         expalpha = exp(alpha);
-        this->stats = std::vector<double>(1,0.0);
-        this->lastStats = std::vector<double>(1,0.0);
-        if(this->thetas.size()!=1)
-            this->thetas = std::vector<double>(1,0.0);
+        this->init(1);
         double result = 0.0;
         if (!net.isDirected()) {
             for(int i=0;i<net.size();i++){
@@ -1696,10 +1652,7 @@ public:
     }
     
     virtual void calculate(const BinaryNet<Engine>& net){
-        this->stats = std::vector<double>(1,0.0);
-        this->lastStats = std::vector<double>(1,0.0);
-        if(this->thetas.size()!=1)
-            this->thetas = std::vector<double>(1,0.0);
+        this->init(1);
         
         //for each node, how many neighbors does its neighbor have? Where end index is greater than starting index, to avoid duplicates
         
@@ -1879,10 +1832,7 @@ public:
     
     virtual void calculate(const BinaryNet<Engine>& net){
         int nstats = esps.size();
-        this->stats = std::vector<double>(nstats,0.0);
-        this->lastStats = std::vector<double>(nstats,0.0);
-        if(this->thetas.size()!=nstats)
-            this->thetas = std::vector<double>(nstats,0.0);
+        this->init(nstats);
         
         boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
         
@@ -2027,10 +1977,7 @@ public:
 		}
 
 		int nstats = distCuts.size();
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 
 		boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
 		for(int i=0;i<el->size();i++){
@@ -2134,10 +2081,7 @@ public:
 				::Rf_error("dist: variable not found in network");
 
 		int nstats = 1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 
 
 		boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
@@ -2232,10 +2176,7 @@ public:
 				::Rf_error("dist: variable not found in network");
 
 		int nstats = 1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 
 
 		boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
@@ -2302,12 +2243,7 @@ public:
 	}
 
 	void calculate(const BinaryNet<Engine>& net){
-		std::vector<double> v(1, 0.0); //should be NA
-		this->stats=v;
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1){
-			this->thetas = std::vector<double>(1,0.0);
-		}
+		this->init(1);
 	}
 
 	void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
@@ -2369,11 +2305,7 @@ public:
 
 
 	void calculate(const BinaryNet<Engine>& net){
-
-		std::vector<double> v(1,0.0);
-		this->stats = v;
-		this->lastStats = std::vector<double>(1,0.0);
-		this->stats[0] = 0.0;
+		this->init(1);
 	}
 
 
@@ -2509,11 +2441,7 @@ public:
 			::Rf_error("nodal attribute not found in network");
 		varIndex = variableIndex;
 		int nstats = 1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
-		this->stats[0] = 0;
+		this->init(nstats);
         boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
 
         for(int i=0;i<el->size();i++){
@@ -2635,10 +2563,7 @@ public:
 		varIndex = variableIndex;
 		int nlevels = net.discreteVariableAttributes(variableIndex).labels().size();
 		nstats = nlevels-1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		double n = net.size();
 		double deg = 0.0;
 		for(int i=0;i<n;i++){

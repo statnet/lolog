@@ -344,6 +344,10 @@ public:
 		return "baseOffset";
 	}
 
+	void init(int size){
+		lastStats = stats = std::vector<double>(size,0.0);
+	}
+
 	/*!
 	 * calculate the statistic based on the supplied network
 	 *
