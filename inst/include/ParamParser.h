@@ -12,7 +12,25 @@
 
 namespace lolog {
 
-
+/**
+ * For use with constraints/offsets/stats. Helper in parsing parameters passed down from R in a list.
+ *
+ * Parsing rules:
+ * 1. Unnamed passed parameters are matched positionally until a named parameter is reached.
+ * 2. All names must match exactly.
+ * 3. No unknown items are allowed in passed parameters.
+ *
+ * Usage:
+ * //create a parser
+ * p = ParamParser("statName", passedParams);
+ *
+ * //one by one pull out the stats parameter values
+ * int a = p.parseNext<int>("firstParamName") // a required int parameter
+ * std::string b = p.parseNext("secondParameter", "default") // a string parameter with a default value
+ *
+ * p.end() // throws an error if there are any passed parameters that have not been extracted.
+ *
+ */
 class ParamParser {
 	std::string name;
 	Rcpp::List params;
@@ -22,15 +40,19 @@ protected:
 	template<class T>
 	T parseNext(std::string paramName, T defaultValue, bool allowDefault){
 		T ret(defaultValue);
-
 		int s = params.size();
 		if(s <= nUnnamedParsed){
-			::Rf_error(("Error in " + name + ": To few parameters.").c_str());
+			if(!allowDefault)
+				::Rf_error(("Error in " + name + ": To few parameters.").c_str());
 			return ret;
 		}
 		std::string pName;
-		CharacterVector names = params.names();
-		pName = names.at(nUnnamedParsed);
+		CharacterVector names;
+		if(!::Rf_isNull(params.names())){
+			names = params.names();
+			pName = names.at(nUnnamedParsed);
+		}else
+			pName = "";
 		if(pName == ""){
 			try{
 				ret = Rcpp::as<T>(params.at(nUnnamedParsed));
@@ -66,7 +88,7 @@ public:
 
 	ParamParser(std::string funcName) : name(funcName), totalParsed(0), nUnnamedParsed(0), params(){};
 
-	ParamParser(std::string funcName, Rcpp::List funcParams) : name(funcName), totalParsed(0), nUnnamedParsed(0), params(funcParams){};
+	ParamParser(std::string funcName, Rcpp::List passedParamValues) : name(funcName), totalParsed(0), nUnnamedParsed(0), params(passedParamValues){};
 
 	virtual ~ParamParser(){};
 
@@ -78,6 +100,35 @@ public:
 	template<class T>
 	T parseNext(std::string paramName){
 		return parseNext(paramName, T(), false);
+	}
+
+	EdgeDirection parseNextDirection(std::string paramName, EdgeDirection defaultValue){
+		std::string defaultDir = defaultValue == UNDIRECTED ? "undirected" : (defaultValue == IN ? "in" : "out");
+		std::string par = parseNext(paramName, defaultDir, true);
+
+		if(par == "in")
+			return IN;
+		if(par == "out")
+			return OUT;
+		if(par == "undirected")
+			return UNDIRECTED;
+
+		::Rf_error(("Error in " + name + ":  Required parameter " + paramName + " must be 'in', 'out', or 'undirected'").c_str());
+		return UNDIRECTED;
+	}
+
+	EdgeDirection parseNextDirection(std::string paramName){
+		std::string par = parseNext(paramName, "", false);
+
+		if(par == "in")
+			return IN;
+		if(par == "out")
+			return OUT;
+		if(par == "undirected")
+			return UNDIRECTED;
+
+		::Rf_error(("Error in " + name + ":  Required parameter " + paramName + " must be 'in', 'out', or 'undirected'").c_str());
+		return UNDIRECTED;
 	}
 
 	void end(){

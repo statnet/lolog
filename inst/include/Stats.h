@@ -2,6 +2,8 @@
 #define STATS_H_
 
 #include "Stat.h"
+#include "ParamParser.h"
+
 #include <map>
 #include <vector>
 #include <utility>
@@ -138,23 +140,11 @@ public:
 	 * \param params 	a list
 	 */
 	Star(List params){
-		try{
-			starDegrees = as< std::vector<int> >(params(0));
-		}catch(...){
-			::Rf_error("Star requires a single integer vector as a parameter");
-		}
+		ParamParser p(name(), params);
+		starDegrees = p.parseNext< std::vector<int> >("k");
+		direction = p.parseNextDirection("direction", IN);
+		p.end();
 
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = IN;
-		}
 		this->lastStats = std::vector<double>(starDegrees.size(),0.0);
 		this->stats=std::vector<double>(starDegrees.size(),0.0);
 		this->thetas = std::vector<double>(starDegrees.size(),0.0);
@@ -690,11 +680,9 @@ public:
 
 	NodeMatch(List params){
 		nstats=nlevels=varIndex = -1;
-		try{
-			variableName = as< std::string >(params[0]);
-		}catch(...){
-			::Rf_error("NodeMatch requires a nodal variable name");
-		}
+		ParamParser p(name(), params);
+		variableName = p.parseNext< std::string >("name");
+		p.end();
 	}
 
 
@@ -835,11 +823,9 @@ public:
 
 	NodeMix(List params){
 		nstats=nlevels=varIndex = -1;
-		try{
-			variableName = as< std::string >(params[0]);
-		}catch(...){
-			::Rf_error("NodeMatch requires a nodal variable name");
-		}
+		ParamParser p(name(), params);
+		variableName = p.parseNext< std::string >("name");
+		p.end();
 	}
 
 
@@ -967,30 +953,11 @@ public:
 	 * 					of degrees
 	 */
 	Degree(List params){
-		try{
-			degrees = as< std::vector<int> >(params(0));
-		}catch(...){
-			::Rf_error("error");
-		}
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==0)
-				direction = UNDIRECTED;
-			else if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
-		try{
-			int tmp = as< int >(params(2));
-			lessThanOrEqual = tmp;
-		}catch(...){
-			lessThanOrEqual = false;
-		}
+		ParamParser p(name(), params);
+		degrees = p.parseNext< std::vector<int> >("d");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		lessThanOrEqual = p.parseNext("lessThanOrEqual", false);
+		p.end();
 	}
 
 
@@ -1252,25 +1219,12 @@ public:
 	NodeCov(List params){
 		varIndex = 0;
 		isDiscrete=false;
-		try{
-			variableName = as< std::string >(params(0));
-		}catch(...){
-			::Rf_error("NodeCov requires a nodal variable name");
-		}
 
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==0)
-				direction = UNDIRECTED;
-			else if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
+		ParamParser p(name(), params);
+		variableName = p.parseNext< std::string >("name");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
+
 	}
 
 	std::string name(){
@@ -1416,13 +1370,11 @@ public:
 	virtual ~Gwesp(){};
 
 	Gwesp(List params) : sharedValues(), lastFrom(0), lastTo(0){
-		try{
-			alpha = as< double >(params(0));
-			oneexpa = 1.0 - exp(-alpha);
-			expa = exp(alpha);
-		}catch(...){
-			::Rf_error("gwesp requires an alpha");
-		}
+		ParamParser p(name(), params);
+		alpha = p.parseNext< double >("alpha");
+		p.end();
+		oneexpa = 1.0 - exp(-alpha);
+		expa = exp(alpha);
 	}
 
 	std::string name(){
@@ -1600,25 +1552,10 @@ public:
     virtual ~GwDegree(){};
     
     GwDegree(List params) : oneexpa(0), expalpha(0){
-        try{
-            alpha = as< double >(params(0));
-        }catch(...){
-            ::Rf_error("gwdegree requires an alpha");
-        }
-        
-        try{
-            int tmp = as< int >(params(1));
-			if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
-        
-        
+		ParamParser p(name(), params);
+		alpha = p.parseNext< double >("alpha");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
     }
     
     std::string name(){
@@ -1710,11 +1647,9 @@ public:
     virtual ~Gwdsp(){};
     
     Gwdsp(List params){
-        try{
-            alpha = as< double >(params(0));
-        }catch(...){
-            ::Rf_error("gwdsp requires an alpha");
-        }
+		ParamParser p(name(), params);
+		alpha = p.parseNext< double >("alpha");
+		p.end();
     }
     
     std::string name(){
@@ -1889,24 +1824,10 @@ public:
      */
     
     Esp(List params){
-        try{
-            esps = as< std::vector<int> >(params(0));
-        }catch(...){
-            ::Rf_error("Submit a valid vector of counts for esp stats");
-        }
-        try{
-            int tmp = as< int >(params(1));
-            if(tmp==0)
-                direction = UNDIRECTED;
-            else if(tmp==1)
-                direction = IN;
-            else if(tmp==2)
-                direction = OUT;
-            else
-                ::Rf_error("invalid direction");
-        }catch(...){
-            direction = UNDIRECTED;
-        }
+		ParamParser p(name(), params);
+		esps = p.parseNext< std::vector<int> >("d");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
     }
     
     std::string name(){
@@ -2045,22 +1966,11 @@ public:
 	virtual ~GeoDist(){};
 
 	GeoDist(List params) : latIndex(-1), longIndex(-1){
-		try{
-			longVarName = as< std::string >(params(0));
-		}catch(...){
-			::Rf_error("The first parameter of geoDist should be the longitude variable");
-		}
-		try{
-			latVarName = as< std::string >(params(1));
-		}catch(...){
-			::Rf_error("The second parameter of geoDist should be the latitude variable");
-		}
-		try{
-			distCuts = as< std::vector<double> >(params(2));
-		}catch(...){
-			distCuts = std::vector<double>();
-			distCuts.push_back(41000.0);
-		}
+		ParamParser p(name(), params);
+		longVarName = p.parseNext< std::string >("long");
+		latVarName = p.parseNext< std::string >("lat");
+		distCuts = p.parseNext("distCuts", std::vector<double>(1, 41000.0));
+		p.end();
 	}
 
 	std::string name(){
@@ -2184,24 +2094,10 @@ public:
 	virtual ~Dist(){};
 
 	Dist(List params){
-		try{
-			varNames = as< std::vector<std::string> >(params(0));
-		}catch(...){
-			::Rf_error("The first parameter of geoDist should be the longitude variable");
-		}
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==0)
-				direction = UNDIRECTED;
-			else if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
+		ParamParser p(name(), params);
+		varNames = p.parseNext< std::vector<std::string> >("varNames");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
 	}
 
 	std::string name(){
@@ -2293,16 +2189,10 @@ public:
 	virtual ~AbsDiff(){};
 
 	AbsDiff(List params){
-		try{
-			varNames = as< std::vector<std::string> >(params(0));
-		}catch(...){
-			::Rf_error("The first parameter of absDiff must be a character vector");
-		}
-		try{
-			power = as< double >(params(1));
-		}catch(...){
-			power = 1.0;
-		}
+		ParamParser p(name(), params);
+		varNames = p.parseNext< std::vector<std::string> >("varNames");
+		power = p.parseNext("power", 1.0);
+		p.end();
 	}
 
 	std::string name(){
@@ -2396,14 +2286,9 @@ public:
 	 * constructor. params is unused
 	 */
 	PreferentialAttachment(List params){
-		try{
-			k = as< double >(params(0));
-			if(k <= 0.0)
-				::Rf_error("PreferentialAttachment: k must be greater than 0");
-		}catch(...){
-			k = 1.0;
-			//::Rf_error("PreferentialAttachment requires an k");
-		}
+		ParamParser p(name(), params);
+		k = p.parseNext("k", 1.0);
+		p.end();
 	}
 
 
@@ -2465,14 +2350,10 @@ public:
 		std::vector<double> t(1,0.0);
 		this->stats=v;
 		this->thetas = t;
-		try{
-			k = as< double >(params(0));
-			if(k <= 0.0)
-				::Rf_error("SharedNbrs: k must be greater than 0");
-		}catch(...){
-			k = 1.0;
-			//::Rf_error("PreferentialAttachment requires an k");
-		}
+
+		ParamParser p(name(), params);
+		k = p.parseNext("k", 1.0);
+		p.end();
 	}
 
 	std::string name(){
@@ -2579,25 +2460,12 @@ public:
 	NodeLogMaxCov(List params){
 		varIndex = 0;
 		isDiscrete=false;
-		try{
-			variableName = as< std::string >(params(0));
-		}catch(...){
-			::Rf_error("NodeCov requires a nodal variable name");
-		}
 
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==0)
-				direction = UNDIRECTED;
-			else if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
+		ParamParser p(name(), params);
+		variableName = p.parseNext< std::string >("name");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
+
 	}
 
 	std::string name(){
@@ -2717,25 +2585,11 @@ public:
 
 	NodeFactor(List params){
 		varIndex = nstats = 0;
-		try{
-			variableName = as< std::string >(params(0));
-		}catch(...){
-			::Rf_error("NodeCount requires a nodal variable name");
-		}
 
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==0)
-				direction = UNDIRECTED;
-			else if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
+		ParamParser p(name(), params);
+		variableName = p.parseNext< std::string >("name");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
 	}
 
 	std::string name(){

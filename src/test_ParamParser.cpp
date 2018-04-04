@@ -11,8 +11,6 @@ void testParsing(){
 	CharacterVector v = params.names();
 	std::string val;
 	val = v.at(0);
-    Language call3("print", val);
-    call3.eval();
     ParamParser p  = ParamParser("test", params);
 
     int first = p.parseNext("ll", 3);

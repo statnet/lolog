@@ -114,7 +114,7 @@ void changeStatTest(std::string statName){
     	tmp.push_back(3);
     	Rcpp::List l;
     	l.push_back(tmp);
-    	l.push_back(0+IN);
+    	l.push_back("in");
     	stat = boost::shared_ptr< Stat<Engine, Star<Engine> > >(
     	    			new Stat<Engine, Star<Engine> >(l));
     }else if(statName == "NodeCov"){

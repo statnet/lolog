@@ -14,14 +14,14 @@ LOLOG Model Terms
 \emph{Edges:} This term adds one network statistic equal to the number of edges 
 (i.e. nonzero values) in the network. }
 
-\item{\code{ star(k, direction=1L)  } (order-independent) (directed)  (undirected)}{ 
+\item{\code{ star(k, direction="in")  } (order-independent) (directed)  (undirected)}{ 
 The \code{k} argument is a vector of distinct integers. 
 This term adds one network statistic to the model for each element in \code{k}. 
 The \eqn{i}th such statistic counts the number of distinct \code{k[i]}-stars in the network, 
 where a \eqn{k}-star is defined to be a node \eqn{N} and a set of \eqn{k} different nodes 
 \eqn{\{O_1, \dots, O_k\}} such that the ties \eqn{\{N, O_i\}} exist for \eqn{i=1, \dots, k}. 
-For directed networks, direction indicates whether the count is of in-stars (direction=1L) 
-or out-stars (direction=2L)}
+For directed networks, direction indicates whether the count is of in-stars (direction="in") 
+or out-stars (direction="out")}
 
 \item{\code{triangles()} (order-independent) (directed)  (undirected)}{ 
 This term adds one statistic to the model equal to the number of triangles
@@ -58,16 +58,16 @@ both exist.
 For categorical network nodal variable 'name,' adds one statistic for each combination of levels of the
 variable equal to the count of edges between those levels.
   }
-\item{\code{ degree(d, direction=0L, lessThanOrEqual=FALSE) } (order-independent)  (directed)  
+\item{\code{ degree(d, direction="undirected", lessThanOrEqual=FALSE) } (order-independent)  (directed)  
 (undirected)}{ 
 The \code{d} argument is a vector of distinct integers. This term adds one
 network statistic to the model for each element in \code{d}; the \eqn{i}th
 such statistic equals the number of nodes in the network of degree
 \code{d[i]}, i.e. with exactly \code{d[i]} edges. 
 
-For directed networks if direction=0L
-degree is counted as the sum of the in and out degrees of a node. If direction=1L then in-degrees are
-used and direction=2L indicates out-degrees.
+For directed networks if direction="undirected"
+degree is counted as the sum of the in and out degrees of a node. If direction="in" then in-degrees are
+used and direction="out" indicates out-degrees.
 
 If lessThanOrEqual=TRUE, then the count is the number of nodes with degree less than or equal to d.
   }
@@ -93,13 +93,13 @@ distribution with decay parameter
 \code{alpha} parameter, which should be non-negative.
   }
 
-\item{\code{ gwdegree(alpha, direction=0L) }  (order-independent)  (directed)  (undirected)}{ 
+\item{\code{ gwdegree(alpha, direction="undirected") }  (order-independent)  (directed)  (undirected)}{ 
 This term adds one network statistic to the model equal to the weighted
 degree distribution with decay controlled by the \code{decay} parameter.
 The \code{alpha} parameter is the same as theta_s in equation (14) in Hunter (2007).
 
-For directed networks if direction=0L degree is counted as the sum of the in and 
-out degrees of a node. If direction=1L then in-degrees are used ans direction=2L 
+For directed networks if direction="undirected" degree is counted as the sum of the in and 
+out degrees of a node. If direction="in" then in-degrees are used ans direction="out" 
 indicates out-degrees.
 
  }
@@ -172,7 +172,7 @@ growth process.
  
  
  
-\item{\code{ nodeFactor(name, direction=0L) } (order-independent)  (undirected) (directed)}{ 
+\item{\code{ nodeFactor(name, direction="undirected") } (order-independent)  (undirected) (directed)}{ 
 
 The \code{name} argument is a character vector giving
 one or more names of categorical attributes in the network's vertex
@@ -182,8 +182,8 @@ model, one for each of (a subset of) the unique values of the
 given). Each of these statistics gives the number of times a node
 with that attribute or those attributes appears in an edge in the
 network. In particular, for edges whose endpoints both have the same
-attribute values, this value is counted twice.  For directed networks, if direction=1L then in-edges are
-used and direction=2L indicates out-edges.
+attribute values, this value is counted twice.  For directed networks, if direction="in" then in-edges are
+used and direction="out" indicates out-edges.
 
  }
  
