@@ -4,6 +4,7 @@
 #include <test_Constraints.h>
 #include <test_LatentOrderLikelihood.h>
 #include <test_Stats.h>
+#include <test_ParamParser.h>
 
 namespace lolog{
 namespace tests{
@@ -20,6 +21,7 @@ void registerLologTests(){
 	addTestFunction("testStats", testStats);
 	addTestFunction("testConstraints", testConstraints);
 	addTestFunction("testLatent", testLatent);
+	addTestFunction("testParamParser", testParamParser);
 }
 
 
