@@ -2,6 +2,8 @@
 #define STATS_H_
 
 #include "Stat.h"
+#include "ParamParser.h"
+
 #include <map>
 #include <vector>
 #include <utility>
@@ -87,15 +89,7 @@ public:
 	}
     
 	void calculate(const BinaryNet<Engine>& net){
-		std::vector<double> v(1,net.nEdges());
-		this->stats=v;
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1){
-			//this starts theta at a reasonable value assuming erdos-renyi
-			double ne = net.nEdges();
-			double nd = net.maxEdges();
-			this->thetas = std::vector<double>(1,log(ne) - log(nd - ne));
-		}
+		this->initSingle(net.nEdges());
 	}
 
 	void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
@@ -138,26 +132,12 @@ public:
 	 * \param params 	a list
 	 */
 	Star(List params){
-		try{
-			starDegrees = as< std::vector<int> >(params(0));
-		}catch(...){
-			::Rf_error("Star requires a single integer vector as a parameter");
-		}
+		ParamParser p(name(), params);
+		starDegrees = p.parseNext< std::vector<int> >("k");
+		direction = p.parseNextDirection("direction", IN);
+		p.end();
 
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = IN;
-		}
-		this->lastStats = std::vector<double>(starDegrees.size(),0.0);
-		this->stats=std::vector<double>(starDegrees.size(),0.0);
-		this->thetas = std::vector<double>(starDegrees.size(),0.0);
+		this->init(starDegrees.size());
 	}
 
 
@@ -325,12 +305,7 @@ public:
 
 
 	void calculate(const BinaryNet<Engine>& net){
-
-		std::vector<double> v(1,0.0);
-		this->stats = v;
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1)
-			this->thetas = v;
+		this->initSingle(0.0);
 		double sumTri = 0.0;
 
 		boost::shared_ptr<std::vector< std::pair<int,int> > > edges = net.edgelist();
@@ -416,11 +391,7 @@ public:
 	void calculate(const BinaryNet<Engine>& net){
 		int nstats = 1;
 
-		std::vector<double> v(1,0.0);
-		this->stats = v;
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1)
-			this->thetas = v;
+		this->init(nstats);
 		triangles = twostars = 0.0;
 		boost::shared_ptr<std::vector< std::pair<int,int> > > edges = net.edgelist();
 
@@ -537,11 +508,7 @@ public:
 	void calculate(const BinaryNet<Engine>& net){
 		int nstats = 1;
 
-		std::vector<double> v(1,0.0);
-		this->stats = v;
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1)
-			this->thetas = v;
+		this->init(nstats);
 		triads = nPosTriads = 0.0;
 		boost::shared_ptr<std::vector< std::pair<int,int> > > edges = net.edgelist();
 
@@ -626,7 +593,7 @@ public:
 	}
 
 	void calculate(const BinaryNet<Engine>& net){
-		this->lastStats = std::vector<double>(1,0.0);
+		this->init(1);
 		if(!net.isDirected())
 			Rf_error("Mutual only make sense for directed networks");
 
@@ -690,11 +657,9 @@ public:
 
 	NodeMatch(List params){
 		nstats=nlevels=varIndex = -1;
-		try{
-			variableName = as< std::string >(params[0]);
-		}catch(...){
-			::Rf_error("NodeMatch requires a nodal variable name");
-		}
+		ParamParser p(name(), params);
+		variableName = p.parseNext< std::string >("name");
+		p.end();
 	}
 
 
@@ -723,10 +688,7 @@ public:
 		//nlevels = net.discreteVariableAttributes(variableIndex).labels().size();
 		//nstats = nlevels*nlevels;
 		nstats = 1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size() != nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		boost::shared_ptr< std::vector< std::pair<int,int> > > edges = net.edgelist();
 		for(int i=0;i<edges->size();i++){
 			from = (*edges)[i].first;
@@ -835,11 +797,9 @@ public:
 
 	NodeMix(List params){
 		nstats=nlevels=varIndex = -1;
-		try{
-			variableName = as< std::string >(params[0]);
-		}catch(...){
-			::Rf_error("NodeMatch requires a nodal variable name");
-		}
+		ParamParser p(name(), params);
+		variableName = p.parseNext< std::string >("name");
+		p.end();
 	}
 
 
@@ -888,10 +848,7 @@ public:
 		levels = net.discreteVariableAttributes(varIndex).labels();
 		nlevels = levels.size();
 		nstats = nlevels * (nlevels + 1) / 2;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size() != nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		boost::shared_ptr< std::vector< std::pair<int,int> > > edges = net.edgelist();
 		for(int i=0;i<edges->size();i++){
 			from = (*edges)[i].first;
@@ -967,30 +924,11 @@ public:
 	 * 					of degrees
 	 */
 	Degree(List params){
-		try{
-			degrees = as< std::vector<int> >(params(0));
-		}catch(...){
-			::Rf_error("error");
-		}
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==0)
-				direction = UNDIRECTED;
-			else if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
-		try{
-			int tmp = as< int >(params(2));
-			lessThanOrEqual = tmp;
-		}catch(...){
-			lessThanOrEqual = false;
-		}
+		ParamParser p(name(), params);
+		degrees = p.parseNext< std::vector<int> >("d");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		lessThanOrEqual = p.parseNext("lessThanOrEqual", false);
+		p.end();
 	}
 
 
@@ -1015,10 +953,7 @@ public:
     
 	void calculate(const BinaryNet<Engine>& net){
 		int nstats = degrees.size();
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		double n = net.size();
 		for(int i=0;i<n;i++){
 			for(int j=0;j<nstats;j++){
@@ -1141,10 +1076,7 @@ public:
 	void calculate(const BinaryNet<Engine>& net){
 		int nstats = 1;
 
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		nEdges = net.nEdges();
 		crossProd = 0.0;
 		boost::shared_ptr<std::vector< std::pair<int,int> > > edges = net.edgelist();
@@ -1252,25 +1184,12 @@ public:
 	NodeCov(List params){
 		varIndex = 0;
 		isDiscrete=false;
-		try{
-			variableName = as< std::string >(params(0));
-		}catch(...){
-			::Rf_error("NodeCov requires a nodal variable name");
-		}
 
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==0)
-				direction = UNDIRECTED;
-			else if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
+		ParamParser p(name(), params);
+		variableName = p.parseNext< std::string >("name");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
+
 	}
 
 	std::string name(){
@@ -1314,10 +1233,7 @@ public:
 			::Rf_error("nodal attribute not found in network");
 		varIndex = variableIndex;
 		int nstats = 1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		this->stats[0] = 0;
 		for(int i=0;i<net.size();i++){
 			double val = getValue(net,i);
@@ -1416,13 +1332,11 @@ public:
 	virtual ~Gwesp(){};
 
 	Gwesp(List params) : sharedValues(), lastFrom(0), lastTo(0){
-		try{
-			alpha = as< double >(params(0));
-			oneexpa = 1.0 - exp(-alpha);
-			expa = exp(alpha);
-		}catch(...){
-			::Rf_error("gwesp requires an alpha");
-		}
+		ParamParser p(name(), params);
+		alpha = p.parseNext< double >("alpha");
+		p.end();
+		oneexpa = 1.0 - exp(-alpha);
+		expa = exp(alpha);
 	}
 
 	std::string name(){
@@ -1494,10 +1408,7 @@ public:
 	}
 
 	virtual void calculate(const BinaryNet<Engine>& net){
-		this->stats = std::vector<double>(1,0.0);
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1)
-			this->thetas = std::vector<double>(1,0.0);
+		this->init(1);
 		double result = 0.0;
 		sharedValues = std::vector< boost::container::flat_map<int,int> >();
 		for(int i = 0 ; i<net.size();i++)
@@ -1600,25 +1511,10 @@ public:
     virtual ~GwDegree(){};
     
     GwDegree(List params) : oneexpa(0), expalpha(0){
-        try{
-            alpha = as< double >(params(0));
-        }catch(...){
-            ::Rf_error("gwdegree requires an alpha");
-        }
-        
-        try{
-            int tmp = as< int >(params(1));
-			if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
-        
-        
+		ParamParser p(name(), params);
+		alpha = p.parseNext< double >("alpha");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
     }
     
     std::string name(){
@@ -1640,10 +1536,7 @@ public:
     virtual void calculate(const BinaryNet<Engine>& net){
         oneexpa = 1.0 - exp(-alpha);
         expalpha = exp(alpha);
-        this->stats = std::vector<double>(1,0.0);
-        this->lastStats = std::vector<double>(1,0.0);
-        if(this->thetas.size()!=1)
-            this->thetas = std::vector<double>(1,0.0);
+        this->init(1);
         double result = 0.0;
         if (!net.isDirected()) {
             for(int i=0;i<net.size();i++){
@@ -1710,11 +1603,9 @@ public:
     virtual ~Gwdsp(){};
     
     Gwdsp(List params){
-        try{
-            alpha = as< double >(params(0));
-        }catch(...){
-            ::Rf_error("gwdsp requires an alpha");
-        }
+		ParamParser p(name(), params);
+		alpha = p.parseNext< double >("alpha");
+		p.end();
     }
     
     std::string name(){
@@ -1761,10 +1652,7 @@ public:
     }
     
     virtual void calculate(const BinaryNet<Engine>& net){
-        this->stats = std::vector<double>(1,0.0);
-        this->lastStats = std::vector<double>(1,0.0);
-        if(this->thetas.size()!=1)
-            this->thetas = std::vector<double>(1,0.0);
+        this->init(1);
         
         //for each node, how many neighbors does its neighbor have? Where end index is greater than starting index, to avoid duplicates
         
@@ -1889,24 +1777,10 @@ public:
      */
     
     Esp(List params){
-        try{
-            esps = as< std::vector<int> >(params(0));
-        }catch(...){
-            ::Rf_error("Submit a valid vector of counts for esp stats");
-        }
-        try{
-            int tmp = as< int >(params(1));
-            if(tmp==0)
-                direction = UNDIRECTED;
-            else if(tmp==1)
-                direction = IN;
-            else if(tmp==2)
-                direction = OUT;
-            else
-                ::Rf_error("invalid direction");
-        }catch(...){
-            direction = UNDIRECTED;
-        }
+		ParamParser p(name(), params);
+		esps = p.parseNext< std::vector<int> >("d");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
     }
     
     std::string name(){
@@ -1958,10 +1832,7 @@ public:
     
     virtual void calculate(const BinaryNet<Engine>& net){
         int nstats = esps.size();
-        this->stats = std::vector<double>(nstats,0.0);
-        this->lastStats = std::vector<double>(nstats,0.0);
-        if(this->thetas.size()!=nstats)
-            this->thetas = std::vector<double>(nstats,0.0);
+        this->init(nstats);
         
         boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
         
@@ -2045,22 +1916,11 @@ public:
 	virtual ~GeoDist(){};
 
 	GeoDist(List params) : latIndex(-1), longIndex(-1){
-		try{
-			longVarName = as< std::string >(params(0));
-		}catch(...){
-			::Rf_error("The first parameter of geoDist should be the longitude variable");
-		}
-		try{
-			latVarName = as< std::string >(params(1));
-		}catch(...){
-			::Rf_error("The second parameter of geoDist should be the latitude variable");
-		}
-		try{
-			distCuts = as< std::vector<double> >(params(2));
-		}catch(...){
-			distCuts = std::vector<double>();
-			distCuts.push_back(41000.0);
-		}
+		ParamParser p(name(), params);
+		longVarName = p.parseNext< std::string >("long");
+		latVarName = p.parseNext< std::string >("lat");
+		distCuts = p.parseNext("distCuts", std::vector<double>(1, 41000.0));
+		p.end();
 	}
 
 	std::string name(){
@@ -2117,10 +1977,7 @@ public:
 		}
 
 		int nstats = distCuts.size();
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 
 		boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
 		for(int i=0;i<el->size();i++){
@@ -2184,24 +2041,10 @@ public:
 	virtual ~Dist(){};
 
 	Dist(List params){
-		try{
-			varNames = as< std::vector<std::string> >(params(0));
-		}catch(...){
-			::Rf_error("The first parameter of geoDist should be the longitude variable");
-		}
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==0)
-				direction = UNDIRECTED;
-			else if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
+		ParamParser p(name(), params);
+		varNames = p.parseNext< std::vector<std::string> >("varNames");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
 	}
 
 	std::string name(){
@@ -2238,10 +2081,7 @@ public:
 				::Rf_error("dist: variable not found in network");
 
 		int nstats = 1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 
 
 		boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
@@ -2293,16 +2133,10 @@ public:
 	virtual ~AbsDiff(){};
 
 	AbsDiff(List params){
-		try{
-			varNames = as< std::vector<std::string> >(params(0));
-		}catch(...){
-			::Rf_error("The first parameter of absDiff must be a character vector");
-		}
-		try{
-			power = as< double >(params(1));
-		}catch(...){
-			power = 1.0;
-		}
+		ParamParser p(name(), params);
+		varNames = p.parseNext< std::vector<std::string> >("varNames");
+		power = p.parseNext("power", 1.0);
+		p.end();
 	}
 
 	std::string name(){
@@ -2342,10 +2176,7 @@ public:
 				::Rf_error("dist: variable not found in network");
 
 		int nstats = 1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 
 
 		boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
@@ -2396,14 +2227,9 @@ public:
 	 * constructor. params is unused
 	 */
 	PreferentialAttachment(List params){
-		try{
-			k = as< double >(params(0));
-			if(k <= 0.0)
-				::Rf_error("PreferentialAttachment: k must be greater than 0");
-		}catch(...){
-			k = 1.0;
-			//::Rf_error("PreferentialAttachment requires an k");
-		}
+		ParamParser p(name(), params);
+		k = p.parseNext("k", 1.0);
+		p.end();
 	}
 
 
@@ -2417,12 +2243,7 @@ public:
 	}
 
 	void calculate(const BinaryNet<Engine>& net){
-		std::vector<double> v(1, 0.0); //should be NA
-		this->stats=v;
-		this->lastStats = std::vector<double>(1,0.0);
-		if(this->thetas.size()!=1){
-			this->thetas = std::vector<double>(1,0.0);
-		}
+		this->init(1);
 	}
 
 	void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
@@ -2465,14 +2286,10 @@ public:
 		std::vector<double> t(1,0.0);
 		this->stats=v;
 		this->thetas = t;
-		try{
-			k = as< double >(params(0));
-			if(k <= 0.0)
-				::Rf_error("SharedNbrs: k must be greater than 0");
-		}catch(...){
-			k = 1.0;
-			//::Rf_error("PreferentialAttachment requires an k");
-		}
+
+		ParamParser p(name(), params);
+		k = p.parseNext("k", 1.0);
+		p.end();
 	}
 
 	std::string name(){
@@ -2488,11 +2305,7 @@ public:
 
 
 	void calculate(const BinaryNet<Engine>& net){
-
-		std::vector<double> v(1,0.0);
-		this->stats = v;
-		this->lastStats = std::vector<double>(1,0.0);
-		this->stats[0] = 0.0;
+		this->init(1);
 	}
 
 
@@ -2579,25 +2392,12 @@ public:
 	NodeLogMaxCov(List params){
 		varIndex = 0;
 		isDiscrete=false;
-		try{
-			variableName = as< std::string >(params(0));
-		}catch(...){
-			::Rf_error("NodeCov requires a nodal variable name");
-		}
 
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==0)
-				direction = UNDIRECTED;
-			else if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
+		ParamParser p(name(), params);
+		variableName = p.parseNext< std::string >("name");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
+
 	}
 
 	std::string name(){
@@ -2641,11 +2441,7 @@ public:
 			::Rf_error("nodal attribute not found in network");
 		varIndex = variableIndex;
 		int nstats = 1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
-		this->stats[0] = 0;
+		this->init(nstats);
         boost::shared_ptr< std::vector<std::pair<int,int> > > el = net.edgelist();
 
         for(int i=0;i<el->size();i++){
@@ -2717,25 +2513,11 @@ public:
 
 	NodeFactor(List params){
 		varIndex = nstats = 0;
-		try{
-			variableName = as< std::string >(params(0));
-		}catch(...){
-			::Rf_error("NodeCount requires a nodal variable name");
-		}
 
-		try{
-			int tmp = as< int >(params(1));
-			if(tmp==0)
-				direction = UNDIRECTED;
-			else if(tmp==1)
-				direction = IN;
-			else if(tmp==2)
-				direction = OUT;
-			else
-				::Rf_error("invalid direction");
-		}catch(...){
-			direction = UNDIRECTED;
-		}
+		ParamParser p(name(), params);
+		variableName = p.parseNext< std::string >("name");
+		direction = p.parseNextDirection("direction", UNDIRECTED);
+		p.end();
 	}
 
 	std::string name(){
@@ -2781,10 +2563,7 @@ public:
 		varIndex = variableIndex;
 		int nlevels = net.discreteVariableAttributes(variableIndex).labels().size();
 		nstats = nlevels-1;
-		this->stats = std::vector<double>(nstats,0.0);
-		this->lastStats = std::vector<double>(nstats,0.0);
-		if(this->thetas.size()!=nstats)
-			this->thetas = std::vector<double>(nstats,0.0);
+		this->init(nstats);
 		double n = net.size();
 		double deg = 0.0;
 		for(int i=0;i<n;i++){

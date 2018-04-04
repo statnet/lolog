@@ -9,6 +9,7 @@ test_that("Stats", {
   
   data(ukFaculty)
   data(florentine)
+  data(lazega)
   es <- summary(ukFaculty ~ nodefactor("GroupC",4))
   lss <- calculateStatistics(ukFaculty ~ nodeFactor("GroupC"))
   expect_true(all(es == lss))
@@ -27,4 +28,13 @@ test_that("Stats", {
   lss <- calculateStatistics(flomarriage ~ absDiff("wealth",3))
   expect_true(all(es == lss))
   
+  lss <- calculateStatistics(lazega ~ degree(0:10) + esp(0:10))
+  expect_equivalent(lss, c(2, 3, 2, 4, 2, 4, 4, 1, 1, 5, 1, 5, 16, 29, 17, 23, 
+                           11, 10, 4, 0, 0, 0))
+  
+  lss <- calculateStatistics(ukFaculty ~ degree(direction="in", d=0:10) + degree(0:10, direction="out"))
+  expect_equivalent(lss, c(0, 1, 3, 0, 5, 4, 10, 7, 7, 11, 5, 1, 3, 5, 7, 6, 
+                           4, 9, 4, 4, 1, 5))
+  
   })
+  

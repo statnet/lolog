@@ -446,7 +446,19 @@ public:
 
 	virtual ~BaseStat(){}
 
+	/*!
+	 * zeros and resizes stats and last stats. zeros and resizes theta if it is of the wrong dimension.
+	 */
+	void init(int size){
+		this->lastStats = this->stats = std::vector<double>(size,0.0);
+		if(this->thetas.size() != size)
+			this->thetas = std::vector<double>(size,0.0);
+	}
 
+	void initSingle(double statValue){
+		init(1);
+		this->stats[0] = statValue;
+	}
 
 	/*!
 	 * set the model parameter values

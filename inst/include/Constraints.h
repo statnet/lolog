@@ -2,6 +2,7 @@
 #define CONSTRAINTS_H_
 
 #include "Constraint.h"
+#include "ParamParser.h"
 
 namespace lolog{
 
@@ -28,21 +29,10 @@ public:
 	}
 
 	BoundedDegree(List params) : dist(0.0), lastDist(0.0){
-		if(params.size()<2){
-			::Rf_error("BoundedDegree: two parameters required");
-			return;
-		}
-		try{
-			lower = as< int >(params[0]);
-		}catch(...){
-			::Rf_error("BoundedDegree: Invalid lower bound");
-		}
-		try{
-			upper = as< int >(params[1]);
-		}catch(...){
-			::Rf_error("BoundedDegree: Invalid upper bound");
-		}
-
+		ParamParser p(name(), params);
+		lower = p.parseNext<int>("lower");
+		upper = p.parseNext<int>("upper");
+		p.end();
 	}
 
 	std::string name(){
