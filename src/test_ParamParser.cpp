@@ -7,10 +7,10 @@ namespace lolog{
 namespace tests{
 
 void testParsing(){
-	Rcpp:List params = Rcpp::List::create(1, Rcpp::Named("a")=2, Rcpp::Named("b") = "ss");
-	CharacterVector v = params.names();
-	std::string val;
-	val = v.at(0);
+    Rcpp:List params = Rcpp::List::create(1, Rcpp::Named("a")=2, Rcpp::Named("b") = "ss");
+    CharacterVector v = params.names();
+    std::string val;
+    val = v.at(0);
     ParamParser p  = ParamParser("test", params);
 
     int first = p.parseNext("ll", 3);
@@ -31,7 +31,7 @@ void testParsing(){
 
 
 void testParamParser(){
-	RUN_TEST(testParsing());
+    RUN_TEST(testParsing());
 }
 
 }

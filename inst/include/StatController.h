@@ -27,62 +27,62 @@ namespace lolog{
 template<class Engine>
 class StatController {
 private:
-	typedef boost::shared_ptr< AbstractStat<Engine> > StatPtr;
-	typedef boost::shared_ptr< std::map< std::string, StatPtr > > StatMapPtr;
-	typedef boost::shared_ptr< AbstractOffset<Engine> > OffsetPtr;
-	typedef boost::shared_ptr< std::map< std::string, OffsetPtr > > OffsetMapPtr;
+    typedef boost::shared_ptr< AbstractStat<Engine> > StatPtr;
+    typedef boost::shared_ptr< std::map< std::string, StatPtr > > StatMapPtr;
+    typedef boost::shared_ptr< AbstractOffset<Engine> > OffsetPtr;
+    typedef boost::shared_ptr< std::map< std::string, OffsetPtr > > OffsetMapPtr;
 protected:
-	static StatMapPtr statMapPtr;
-	static OffsetMapPtr offsetMapPtr;
+    static StatMapPtr statMapPtr;
+    static OffsetMapPtr offsetMapPtr;
 public:
-	StatController(){}
-	~StatController(){}
-	static void init(){
-		if(!statMapPtr)
-			statMapPtr = StatMapPtr(new std::map< std::string, StatPtr >);
-		if(!offsetMapPtr)
-			offsetMapPtr = OffsetMapPtr(new std::map< std::string, OffsetPtr >);
-	}
-	static void addStat(StatPtr pS){
-		init();
-		statMapPtr->insert(std::make_pair(pS->vName(),pS));
-	}
-	static void addOffset(OffsetPtr pS){
-		init();
-		offsetMapPtr->insert(std::make_pair(pS->vName(),pS));
-	}
+    StatController(){}
+    ~StatController(){}
+    static void init(){
+        if(!statMapPtr)
+            statMapPtr = StatMapPtr(new std::map< std::string, StatPtr >);
+        if(!offsetMapPtr)
+            offsetMapPtr = OffsetMapPtr(new std::map< std::string, OffsetPtr >);
+    }
+    static void addStat(StatPtr pS){
+        init();
+        statMapPtr->insert(std::make_pair(pS->vName(),pS));
+    }
+    static void addOffset(OffsetPtr pS){
+        init();
+        offsetMapPtr->insert(std::make_pair(pS->vName(),pS));
+    }
 
-	static AbstractStat<Engine>* getStat(std::string name, Rcpp::List params){
-		StatPtr pS;
-		try{
-			pS = statMapPtr->at(name);
+    static AbstractStat<Engine>* getStat(std::string name, Rcpp::List params){
+        StatPtr pS;
+        try{
+            pS = statMapPtr->at(name);
 
-		}catch(...){
-			Rf_error((std::string("Unknown statistic: ") + name).c_str());
-			return NULL;
-		}
-		if(pS==NULL){
-			Rf_error((std::string("Unknown statistic: ") + name).c_str());
-			return NULL;
-		}
-		return pS->vCreateUnsafe(params);
-	}
+        }catch(...){
+            Rf_error((std::string("Unknown statistic: ") + name).c_str());
+            return NULL;
+        }
+        if(pS==NULL){
+            Rf_error((std::string("Unknown statistic: ") + name).c_str());
+            return NULL;
+        }
+        return pS->vCreateUnsafe(params);
+    }
 
-	static AbstractOffset<Engine>* getOffset(std::string name, Rcpp::List params){
-		OffsetPtr pS;
-		try{
-			pS = offsetMapPtr->at(name);
+    static AbstractOffset<Engine>* getOffset(std::string name, Rcpp::List params){
+        OffsetPtr pS;
+        try{
+            pS = offsetMapPtr->at(name);
 
-		}catch(...){
-			Rf_error((std::string("Unknown offset: ") + name).c_str());
-			return NULL;
-		}
-		if(pS==NULL){
-			Rf_error((std::string("Unknown offset: ") + name).c_str());
-			return NULL;
-		}
-		return pS->vCreateUnsafe(params);
-	}
+        }catch(...){
+            Rf_error((std::string("Unknown offset: ") + name).c_str());
+            return NULL;
+        }
+        if(pS==NULL){
+            Rf_error((std::string("Unknown offset: ") + name).c_str());
+            return NULL;
+        }
+        return pS->vCreateUnsafe(params);
+    }
 };
 
 
@@ -91,12 +91,12 @@ public:
 
 template<class Engine>
 void registerStatistic(boost::shared_ptr< AbstractStat<Engine> > ps){
-	StatController<Engine>::addStat(ps);
+    StatController<Engine>::addStat(ps);
 }
 
 template<class Engine>
 void registerOffset(boost::shared_ptr< AbstractOffset<Engine> > ps){
-	StatController<Engine>::addOffset(ps);
+    StatController<Engine>::addOffset(ps);
 }
 
 

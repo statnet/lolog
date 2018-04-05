@@ -31,7 +31,7 @@ RcppExport SEXP _rcpp_module_boot_lolog(){return NULL;}
  * Main entry point when called from outside R (with R embedded via RInside).
  */
 int main(int argc, char *argv[]) {
-	RInside Rins(argc, argv);
+    RInside Rins(argc, argv);
     initStats();
     tests::runLologTests();
     exit(0);

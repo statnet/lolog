@@ -18,15 +18,15 @@ namespace tests{
 
 template<class Engine>
 void testBoundedDegree(){
-	GetRNGstate();
-	IntegerMatrix tmp(0,2);
-	BinaryNet<Engine> net(tmp,30);
-	boost::shared_ptr< AbstractStat<Engine> > ed(new Stat<Engine, Edges<Engine> >());
+    GetRNGstate();
+    IntegerMatrix tmp(0,2);
+    BinaryNet<Engine> net(tmp,30);
+    boost::shared_ptr< AbstractStat<Engine> > ed(new Stat<Engine, Edges<Engine> >());
     Rcpp::List ll;
     ll.push_back(2);
     ll.push_back(10);
     boost::shared_ptr< AbstractOffset<Engine> > off(
-        		new Constraint<Engine,BoundedDegree<Engine> >(ll));
+            new Constraint<Engine,BoundedDegree<Engine> >(ll));
     Model<Engine> model(net);
     model.addStatPtr(ed);
     model.addOffsetPtr(off);
@@ -40,7 +40,7 @@ void testBoundedDegree(){
 
 
 void testConstraints(){
-	RUN_TEST(testBoundedDegree<Undirected>());
+    RUN_TEST(testBoundedDegree<Undirected>());
 }
 
 }
