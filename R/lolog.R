@@ -150,6 +150,16 @@ lolog <- function(formula,
                   verbose = TRUE) {
   vcat <- function(..., vl=1){ if(verbose >= vl) cat(...) }
   vprint <- function(..., vl=1){ if(verbose >= vl) print(...) }
+  panelHist <- function(x, ...)
+  {
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(usr[1:2], 0, 1.5) )
+    h <- hist(x[-length(x)], plot = FALSE)
+    breaks <- h$breaks; nB <- length(breaks)
+    y <- h$counts; y <- y/max(y)
+    rect(breaks[-nB], 0, breaks[-1], y, col = "grey")
+    abline(v=x[length(x)], col="red", lwd=3)
+  }
   
   #initialize theta via variational inference
   if (is.null(theta)) {
@@ -239,7 +249,7 @@ lolog <- function(formula,
     if (is.null(cluster)) {
       vcat("Drawing", nsamp, "Monte Carlo Samples:\n")
       if(verbose)
-        pb <- utils::txtProgressBar(min = 0, max = nsamp, style = 3)
+        pb <- utils::txtProgressBar(min = 0, max = nsamp, style = ifelse(interactive(),3,1))
       for (i in 1:nsamp) {
         if (verbose)
           utils::setTxtProgressBar(pb, i)
@@ -254,6 +264,7 @@ lolog <- function(formula,
       }
       if(verbose)
         close(pb)
+	vcat("\n")
       if (includeOrderIndependent)
         auxStats <- cbind(stats[, orderIndependent], auxStats)
     } else{
@@ -283,6 +294,7 @@ lolog <- function(formula,
         x$stats))
       estats <- t(sapply(results, function(x)
         x$estats))
+      colnames(stats) <- colnames(estats) <- statNames
       if (!is.null(auxFormula))
         auxStats <- t(sapply(results, function(x)
           x$auxStats))
@@ -290,6 +302,7 @@ lolog <- function(formula,
         auxStats <- NULL
       if (includeOrderIndependent)
         auxStats <- cbind(stats[, orderIndependent], drop(auxStats))
+      colnames(auxStats) <- names(obsStats)
     }
     
     # Calculate gradient of moment conditions
@@ -324,8 +337,11 @@ lolog <- function(formula,
                      solve(t(grad) %*% W %*% grad), silent = TRUE)
                ,"try-error")
     
-    if (verbose >= 3)
-      pairs(stats)
+    if (verbose >= 3){
+      ns <- nrow(stats)
+      pairs(rbind(stats, obsModelStats), pch='.', cex=c(rep(1, ns), 10),
+	    col=c(rep("black", ns), "red"), diag.panel = panelHist)
+    }
     
     # If inverse failed, or the objective has increased singificantly, initiate half stepping
     if (hsCount < nHalfSteps &&
@@ -560,16 +576,16 @@ plot.lologGmm <- function(x, type=c("histograms", "target","model"), ...) {
     stats <- x$auxStats
     ns <- nrow(stats)
     stats <- rbind(stats, x$targetStats)
-    pch <- c(rep(1, ns), 16)
-    cex <- c(rep(1, ns), 2)
+    pch <- '.'
+    cex <- c(rep(1, ns), 10)
     col <- c(rep("black", ns), "red")
     pairs(stats, pch=pch, cex=cex, col=col, ...)
   }else if(type == "model"){
     stats <- x$stats
     ns <- nrow(stats)
     stats <- rbind(stats, x$obsModelStats)
-    pch <- c(rep(1, ns), 16)
-    cex <- c(rep(1, ns), 2)
+    pch <- '.'
+    cex <- c(rep(1, ns), 10)
     col <- c(rep("black", ns), "red")
     pairs(stats, pch=pch, cex=cex, col=col, diag.panel = panelHist, ...)    
   }else if(type == "histograms"){
