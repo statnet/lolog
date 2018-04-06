@@ -1131,9 +1131,6 @@ public:
         disMeta = dm;
     }
 
-    Directed* clone() const{
-        return new Directed(*this,true);
-    }
 
     static std::string engineName(){
         return "Directed";
@@ -1812,9 +1809,6 @@ public:
         disMeta = dm;
     }
 
-    Undirected* clone() const{
-        return new Undirected(*this,true);
-    }
 
     static std::string engineName(){
         return "Undirected";
