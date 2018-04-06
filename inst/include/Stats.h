@@ -1853,7 +1853,7 @@ public:
         esps = p.parseNext< std::vector<int> >("d");
         type = p.parseNext("type", 2);
         if(type < 1 || type > 4)
-            ::Rf__error("ESP: type must be 1,2,3, or 4");
+            ::Rf_error("ESP: type must be 1,2,3, or 4");
         p.end();
     }
 
@@ -1867,6 +1867,8 @@ public:
         for(int i=0;i<esps.size();i++){
             int e = esps[i];
             std::string nm = "esp."+asString(e);
+            if(type != 2)
+                nm = asString(type) + "-" + nm;
             statnames.push_back(nm);
         }
         return statnames;
