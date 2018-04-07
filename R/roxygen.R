@@ -198,14 +198,21 @@ NULL
 #' 
 #'  }
 #'  
-#' \item{\code{ esp(d) } (order-independent)  (directed)  (undirected)}{ 
+#' \item{\code{ esp(d, type=2) } (order-independent)  (directed)  (undirected)}{ 
 #' 
 #' This term adds one network
 #' statistic to the model for each element in \code{d} where the \eqn{i}th such
 #' statistic equals the number of \emph{edges} (rather than dyads) in the
 #' network with exactly \code{d[i]} shared partners. This term can be used with
-#' directed and undirected networks. For directed networks the count is over
-#' cycles of the form: node --> nbr1 --> nbr2 --> node.
+#' directed and undirected networks. For directed networks the count depends on type: 
+#'
+#' type = 1     :   from -> to -> nbr -> from
+#'
+#' type = 2     :   from -> to <- nbr <- from (homogeneous)
+#'
+#' type = 3     :   either type 1 or 2
+#'
+#' type = 4     :   all combinations of from -> to <-> nbr <-> from
 #' 
 #'  }
 #'  

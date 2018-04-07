@@ -9,6 +9,8 @@ using namespace Rcpp;
 
 
 class ShallowCopyable{
+
+
 public:
     virtual ~ShallowCopyable(){};
 

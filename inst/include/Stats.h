@@ -5,19 +5,39 @@
 #include "ParamParser.h"
 
 #include <map>
+#include <set>
 #include <vector>
 #include <utility>
 #include <boost/container/flat_map.hpp>
 namespace lolog{
 
 
+/*!
+ * Counts shared neighbors of two nodes.
+ * type = 1     :   from -> to -> nbr -> from
+ * type = 2     :   from -> to <- nbr <- from (homogeneous)
+ * type = 3     :   either type 1 or 2
+ * type = 4     :   all combinations
+ */
 template<class Engine>
 int sharedNbrs(const BinaryNet<Engine>& net, int from, int to){
+     return sharedNbrs(net, from, to, 4);
+}
+
+
+/*!
+ * Counts shared neighbors of two nodes. type == 4
+ */
+template<class Engine>
+int sharedNbrs(const BinaryNet<Engine>& net, int from, int to, int type){
     if(net.isDirected()){
-        return directedSharedNbrs(net, from, to);
+        if(type == 4)
+            return allDirectedSharedNbrs(net, from, to);
+        return directedSharedNbrs(net, from, to, type);
     }
     return undirectedSharedNbrs(net, from, to);
 }
+
 
 
 template<class Engine>
@@ -42,7 +62,7 @@ int undirectedSharedNbrs(const BinaryNet<Engine>& net, int from, int to){
 }
 
 template<class Engine>
-int directedSharedNbrs(const BinaryNet<Engine>& net, int from, int to){
+int allDirectedSharedNbrs(const BinaryNet<Engine>& net, int from, int to){
     typedef typename BinaryNet<Engine>::NeighborIterator NeighborIterator;
     NeighborIterator ifit = net.inBegin(from);
     NeighborIterator ifend = net.inEnd(from);
@@ -60,6 +80,58 @@ int directedSharedNbrs(const BinaryNet<Engine>& net, int from, int to){
         ofit++;
     }
     return shared;
+}
+
+
+/*!
+ * type = 1     :   from -> to -> nbr -> from
+ * type = 2     :   from -> to <- nbr <- from (homogeneous)
+ * type = 3     :   either type 1 or 2
+ */
+template<class Engine>
+int directedSharedNbrs(const BinaryNet<Engine>& net, int from, int to, int type){
+    typedef typename BinaryNet<Engine>::NeighborIterator NeighborIterator;
+    NeighborIterator fit, fend, tit, tend;
+
+    int sn = 0;
+    if(type == 1 || type == 3){
+        fit = net.inBegin(from);
+        fend = net.inEnd(from);
+        tit = net.outBegin(to);
+        tend = net.outEnd(to);
+        while(fit != fend && tit != tend){
+            if(*tit == *fit){
+                sn++;
+                tit++;
+                fit++;
+            }else if(*tit < *fit)
+                tit++;
+            else
+                fit++;
+        }
+    }
+    if(type == 2 || type == 3){
+        fit = net.outBegin(from);
+        fend = net.outEnd(from);
+        tit = net.inBegin(to);
+        tend = net.inEnd(to);
+        while(fit != fend && tit != tend){
+            if(*tit == *fit){
+                if(type == 3){
+                    bool counted = net.hasEdge(to, *tit) && net.hasEdge(*tit, from);
+                    if(!counted)
+                        sn++;
+                }else
+                    sn++;
+                tit++;
+                fit++;
+            }else if(*tit < *fit)
+                tit++;
+            else
+                fit++;
+        }
+    }
+    return sn;
 }
 
 
@@ -1755,20 +1827,20 @@ class Esp : public BaseStat< Engine > {
     //first part of code based on the code for Degree
 protected:
     typedef typename BinaryNet<Engine>::NeighborIterator NeighborIterator;
-    EdgeDirection direction;
     std::vector<int> esps;
+    int type;
 
 public:
 
     Esp(){
-        direction = UNDIRECTED;
+        type = 2;
     }
 
     virtual ~Esp(){}; //stick with vcalculate?
 
     Esp(std::vector<int> esps1){
-        direction = UNDIRECTED;
         esps = esps1;
+        type = 2;
     }
 
 
@@ -1779,7 +1851,9 @@ public:
     Esp(List params){
         ParamParser p(name(), params);
         esps = p.parseNext< std::vector<int> >("d");
-        direction = p.parseNextDirection("direction", UNDIRECTED);
+        type = p.parseNext("type", 2);
+        if(type < 1 || type > 4)
+            ::Rf_error("ESP: type must be 1,2,3, or 4");
         p.end();
     }
 
@@ -1793,41 +1867,11 @@ public:
         for(int i=0;i<esps.size();i++){
             int e = esps[i];
             std::string nm = "esp."+asString(e);
+            if(type != 2)
+                nm = asString(type) + "-" + nm;
             statnames.push_back(nm);
         }
         return statnames;
-    }
-
-
-
-    //counts the number of shared neighbors between f and t.
-    //in directed networks this only counts | t --> f --> neighbor --> t | cycles.
-    int sharedNbrs(const BinaryNet<Engine>& net, int f, int t){
-        NeighborIterator fit, fend, tit, tend;
-        if(!net.isDirected()){
-            fit = net.begin(f);
-            fend = net.end(f);
-            tit = net.begin(t);
-            tend = net.end(t);
-        }else{
-            fit = net.inBegin(f);
-            fend = net.inEnd(f);
-            tit = net.outBegin(t);
-            tend = net.outEnd(t);
-        }
-
-        int sn = 0;
-        while(fit != fend && tit != tend){
-            if(*tit == *fit){
-                sn++;
-                tit++;
-                fit++;
-            }else if(*tit < *fit)
-                tit++;
-            else
-                fit++;
-        }
-        return sn;
     }
 
     virtual void calculate(const BinaryNet<Engine>& net){
@@ -1839,7 +1883,7 @@ public:
         for(int i=0;i<el->size();i++){
             int from = el->at(i).first;
             int to = el->at(i).second;
-            int espi = sharedNbrs(net, from, to);
+            int espi = sharedNbrs(net, from, to, type);
             for(int j=0;j<nstats;j++){
                 this->stats[j] += espi==esps[j];
             }
@@ -1850,41 +1894,110 @@ public:
     void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
         BaseOffset<Engine>::resetLastStats();
         int nstats = esps.size();
-        int espi = sharedNbrs(net, from, to);
+        int espi = sharedNbrs(net, from, to, type);
         double change = 2.0 * (!net.hasEdge(from,to) - 0.5);
         for(int j=0;j<nstats;j++){ //main edge change from-to
             this->stats[j] += change*(espi==esps[j]);
         }
-        NeighborIterator fit, fend, tit, tend;
-        if(!net.isDirected()){
-            fit = net.begin(from);
-            fend = net.end(from);
-            tit = net.begin(to);
-            tend = net.end(to);
+        if(type == 1 || !net.isDirected()){
+            NeighborIterator fit, fend, tit, tend;
+            if(!net.isDirected()){
+                fit = net.begin(from);
+                fend = net.end(from);
+                tit = net.begin(to);
+                tend = net.end(to);
+            }else{
+                fit = net.inBegin(from);
+                fend = net.inEnd(from);
+                tit = net.outBegin(to);
+                tend = net.outEnd(to);
+            }
+            while(fit != fend && tit != tend){
+                if(*tit == *fit){ //it's a shared neighbor
+                    int fnsn = sharedNbrs(net, *fit, from,  type);
+                    for(int j=0;j<nstats;j++){ // side edge change +/-1
+                        this->stats[j] += (fnsn+change)==esps[j];
+                        this->stats[j] -= fnsn==esps[j];
+                    }
+                    int tnsn = sharedNbrs(net, to, *fit, type);
+                    for(int j=0;j<nstats;j++){ // side edge change +/-1
+                        this->stats[j] += (tnsn+change)==esps[j];
+                        this->stats[j] -= tnsn==esps[j];
+                    }
+                    tit++;
+                    fit++;
+                }else if(*tit < *fit)
+                    tit++;
+                else
+                    fit++;
+            }
         }else{
-            fit = net.inBegin(from);
-            fend = net.inEnd(from);
-            tit = net.outBegin(to);
-            tend = net.outEnd(to);
-        }
-        while(fit != fend && tit != tend){
-            if(*tit == *fit){ //it's a shared neighbor
-                int fnsn = sharedNbrs(net,from,*fit);
-                for(int j=0;j<nstats;j++){ // side edge change +/-1
-                    this->stats[j] += (fnsn+change)==esps[j];
-                    this->stats[j] -= fnsn==esps[j];
+            // A bit brute force. Will work with any definition of shared nbr
+
+            BinaryNet<Engine>* pnet = const_cast< BinaryNet<Engine>* > (&net);
+            std::set<int> nbrs;
+
+
+            nbrs.insert(net.inBegin(to), net.inEnd(to));
+            for(std::set<int>::iterator it = nbrs.begin(); it != nbrs.end(); it++){
+                if(net.hasEdge(from, *it) || net.hasEdge(*it, from)){
+                    int curShared = sharedNbrs(net, *it, to,  type);
+                    pnet->toggle(from, to);
+                    int newShared = sharedNbrs(net, *it, to,  type);
+                    pnet->toggle(from, to);
+                    for(int j=0;j<nstats;j++){ // side edge change +/-1
+                        this->stats[j] += newShared==esps[j];
+                        this->stats[j] -= curShared==esps[j];
+                    }
                 }
-                int tnsn = sharedNbrs(net,*fit,to);
-                for(int j=0;j<nstats;j++){ // side edge change +/-1
-                    this->stats[j] += (tnsn+change)==esps[j];
-                    this->stats[j] -= tnsn==esps[j];
+            }
+            nbrs.clear();
+
+            nbrs.insert(net.inBegin(from), net.inEnd(from));
+            for(std::set<int>::iterator it = nbrs.begin(); it != nbrs.end(); it++){
+                if(net.hasEdge(to, *it) || net.hasEdge(*it, to)){
+                    int curShared = sharedNbrs(net, *it, from,  type);
+                    pnet->toggle(from, to);
+                    int newShared = sharedNbrs(net, *it, from,  type);
+                    pnet->toggle(from, to);
+                    for(int j=0;j<nstats;j++){ // side edge change +/-1
+                        this->stats[j] += newShared==esps[j];
+                        this->stats[j] -= curShared==esps[j];
+                    }
                 }
-                tit++;
-                fit++;
-            }else if(*tit < *fit)
-                tit++;
-            else
-                fit++;
+            }
+            nbrs.clear();
+
+            nbrs.insert(net.outBegin(to), net.outEnd(to));
+            for(std::set<int>::iterator it = nbrs.begin(); it != nbrs.end(); it++){
+                if(net.hasEdge(from, *it) || net.hasEdge(*it, from)){
+                    int curShared = sharedNbrs(net, to, *it,  type);
+                    pnet->toggle(from, to);
+                    int newShared = sharedNbrs(net, to, *it, type);
+                    pnet->toggle(from, to);
+                    for(int j=0;j<nstats;j++){ // side edge change +/-1
+                        this->stats[j] += newShared==esps[j];
+                        this->stats[j] -= curShared==esps[j];
+                    }
+                }
+            }
+            nbrs.clear();
+
+            nbrs.insert(net.outBegin(from), net.outEnd(from));
+            for(std::set<int>::iterator it = nbrs.begin(); it != nbrs.end(); it++){
+                if(net.hasEdge(to, *it) || net.hasEdge(*it, to)){
+                    int curShared = sharedNbrs(net, from, *it,  type);
+                    pnet->toggle(from, to);
+                    int newShared = sharedNbrs(net, from, *it,  type);
+                    pnet->toggle(from, to);
+                    for(int j=0;j<nstats;j++){ // side edge change +/-1
+                        this->stats[j] += newShared==esps[j];
+                        this->stats[j] -= curShared==esps[j];
+                    }
+                }
+            }
+            nbrs.clear();
+
         }
 
     }

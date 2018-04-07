@@ -220,6 +220,7 @@ void testStats(){
     RUN_TEST(changeStatTest<Directed>("Gwesp"));
     RUN_TEST(changeStatTest<Directed>("Gwdegree"));
     RUN_TEST(changeStatTest<Directed>("Triangles"));
+    RUN_TEST(changeStatTest<Directed>("Esp"));
     RUN_TEST(changeStatTest<Directed>("NodeFactor"));
 
     RUN_TEST(changeStatTest<Undirected>("Triangles"));

@@ -28,7 +28,7 @@ test_that("Stats", {
   lss <- calculateStatistics(flomarriage ~ absDiff("wealth",3))
   expect_true(all(es == lss))
   
-  lss <- calculateStatistics(lazega ~ degree(0:10) + esp(0:10))
+  lss <- calculateStatistics(lazega ~ degree(0:10) + esp(0:10, 1))
   expect_equivalent(lss, c(2, 3, 2, 4, 2, 4, 4, 1, 1, 5, 1, 5, 16, 29, 17, 23, 
                            11, 10, 4, 0, 0, 0))
   
