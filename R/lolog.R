@@ -13,16 +13,16 @@
 #' @param formula A lolog formula for the sufficient statistics (see details).
 #' @param auxFormula A lolog formula of statistics to use for moment matching.
 #' @param theta Initial parameters values. Estimated via \code{\link{lologVariational}} if NULL.
-#' @param nsamp The number of sample neteworks to draw at each iteration.
+#' @param nsamp The number of sample networks to draw at each iteration.
 #' @param includeOrderIndependent If TRUE, all order independent terms in formula are used for 
 #' moment matching.
 #' @param targetStats A vector of network statistics to use as the target for the moment equations.
 #' If \code{NULL}, the observed statistics for the network are used.
 #' @param weights The type of weights to use in the GMM objective. Either 'full' for the inverse 
-#' of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.
-#' @param tol The Hotteling's T^2 p-value tolerance for convergance for the transformed moment conditions.
+#' of the full covariance matrix or 'diagonal' for the inverse of the diagonal of the covariance matrix.
+#' @param tol The Hotelling's T^2 p-value tolerance for convergence for the transformed moment conditions.
 #' @param nHalfSteps The maximum number of half steps to take when the objective is not improved 
-#' in an interation.
+#' in an iteration.
 #' @param maxIter The maximum number of iterations.
 #' @param minIter The minimum number of iterations.
 #' @param startingStepSize The starting dampening of the parameter update.
@@ -66,7 +66,7 @@
 #' Ties are allowed. Vertices with higher order values will always be included later. Those with the same
 #' values will be included in a random order in each simulated network.
 #'
-#' offsets and constraints are specified by wrapping them with either \code{offset()} or \code{contraint()},
+#' offsets and constraints are specified by wrapping them with either \code{offset()} or \code{constraint()},
 #' for example, the following specifies an Erdos-Renyi model with the constraint that degrees must be less
 #' that 10
 #'
@@ -84,7 +84,7 @@
 #'
 #' @return An object of class 'lolog'. If the model is dyad independent, the returned object will
 #' also be of class "lologVariational" (see \code{\link{lologVariational}}, otherwise it will
-#' also be a "lologGmm" obejct.
+#' also be a "lologGmm" object.
 #'
 #' lologGmm objects contain:
 #'
@@ -150,6 +150,16 @@ lolog <- function(formula,
                   verbose = TRUE) {
   vcat <- function(..., vl=1){ if(verbose >= vl) cat(...) }
   vprint <- function(..., vl=1){ if(verbose >= vl) print(...) }
+  panelHist <- function(x, ...)
+  {
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(usr[1:2], 0, 1.5) )
+    h <- hist(x[-length(x)], plot = FALSE)
+    breaks <- h$breaks; nB <- length(breaks)
+    y <- h$counts; y <- y/max(y)
+    rect(breaks[-nB], 0, breaks[-1], y, col = "grey")
+    abline(v=x[length(x)], col="red", lwd=3)
+  }
   
   #initialize theta via variational inference
   if (is.null(theta)) {
@@ -239,7 +249,7 @@ lolog <- function(formula,
     if (is.null(cluster)) {
       vcat("Drawing", nsamp, "Monte Carlo Samples:\n")
       if(verbose)
-        pb <- utils::txtProgressBar(min = 0, max = nsamp, style = 3)
+        pb <- utils::txtProgressBar(min = 0, max = nsamp, style = ifelse(interactive(),3,1))
       for (i in 1:nsamp) {
         if (verbose)
           utils::setTxtProgressBar(pb, i)
@@ -254,6 +264,7 @@ lolog <- function(formula,
       }
       if(verbose)
         close(pb)
+	vcat("\n")
       if (includeOrderIndependent)
         auxStats <- cbind(stats[, orderIndependent], auxStats)
     } else{
@@ -283,6 +294,7 @@ lolog <- function(formula,
         x$stats))
       estats <- t(sapply(results, function(x)
         x$estats))
+      colnames(stats) <- colnames(estats) <- statNames
       if (!is.null(auxFormula))
         auxStats <- t(sapply(results, function(x)
           x$auxStats))
@@ -290,6 +302,7 @@ lolog <- function(formula,
         auxStats <- NULL
       if (includeOrderIndependent)
         auxStats <- cbind(stats[, orderIndependent], drop(auxStats))
+      colnames(auxStats) <- names(obsStats)
     }
     
     # Calculate gradient of moment conditions
@@ -306,7 +319,7 @@ lolog <- function(formula,
     else
       W <- solve(var(auxStats))
     
-    # Calcuate moment conditions and stat/observed stat differences transformed by W.
+    # Calculate moment conditions and stat/observed stat differences transformed by W.
     mh <- colMeans(auxStats)
     diffs <- -sweep(auxStats, 2, targetStats)
     transformedDiffs <- t(t(grad) %*% W %*% t(diffs))
@@ -324,10 +337,14 @@ lolog <- function(formula,
                      solve(t(grad) %*% W %*% grad), silent = TRUE)
                ,"try-error")
     
-    if (verbose >= 3)
-      pairs(stats)
+    if (verbose >= 3){
+      ns <- nrow(stats)
+      pairs(rbind(stats, obsModelStats), pch='.', cex=c(rep(1, ns), 10),
+	    col=c(rep("black", ns), "red"), diag.panel = panelHist,
+            main=paste("Iteration",iter),cex.main=0.9)
+    }
     
-    # If inverse failed, or the objective has increased singificantly, initiate half stepping
+    # If inverse failed, or the objective has increased significantly, initiate half stepping
     if (hsCount < nHalfSteps &&
         !is.null(lastTheta) && (invFailed || objCrit > .3)) {
       vcat("Half Step Back\n")
@@ -369,7 +386,7 @@ lolog <- function(formula,
       momentCondition %*% solve(var(transformedDiffs) / nrow(transformedDiffs)) %*% momentCondition
     pvalue <- pchisq(hotT, df = length(theta), lower.tail = FALSE)
     
-    vcat("Hotelling's T2 p-value: ", pvalue, "\n")
+    vcat("Hotelling's T2 p-value: ", format.pval(pvalue,digits=5,eps=1e-5), "\n")
     
     if (pvalue > tol && iter >= minIter) {
       break
@@ -388,7 +405,7 @@ lolog <- function(formula,
     t(grad) %*% W %*% omega %*% t(W) %*% grad %*%
     solve(t(grad) %*% t(W) %*% grad)
   
-  # Some formating of return items
+  # Some formatting of return items
   lastTheta <- drop(lastTheta)
   rownames(grad) <- colnames(auxStats) <- names(obsStats)
   rownames(vcov) <- colnames(vcov) <- colnames(grad) <- 
@@ -515,16 +532,20 @@ coef.lolog <- function(object, ...){
 
 #' Conduct Monte Carlo diagnostics on a lolog model fit
 #' 
-#' This function prints diagnostic information and creates simple diagnostic
+#' This function creates simple diagnostic
 #' plots for MC sampled statistics produced from a lolog fit.
 #' 
-#' A pair of plots are produced for each statistical trace of the sampled
-#' output statistic values on the left and density estimate for each variable
-#' in the Monte Carlo samples on the right.  Diagnostics printed to the console include
-#' correlations and convergence diagnostics.
+#' Plots are produced that represents the distributions of the 
+#' output sampled statistic values or the target statistics values.
+#' The values of the observed target statistics for the networks are
+#' also represented for comparison with the sampled statistics.
 #'
 #' @param x A model fit object to be diagnosed.
-#' @param type The type of diagnostic plot
+#' @param type The type of diagnostic plot. "histograms", the default, produces histograms of the sampled
+#' output statistic values with the observed statistics represented by vertical lines. "target" produces a pairs plot of the 
+#' target output statistic values with the pairs of observed target statistics represented by red squares.
+#' output statistic values with the observed statistics represented by vertical lines. "model" produces a pairs plot of the 
+#' sampled output statistic values with the pairs of observed statistics represented by red squares.
 #' @param ... Additional parameters. Passed to \link{geom_histogram} if type="histogram" 
 #' and \link{pairs} otherwise.
 #' 
@@ -560,16 +581,16 @@ plot.lologGmm <- function(x, type=c("histograms", "target","model"), ...) {
     stats <- x$auxStats
     ns <- nrow(stats)
     stats <- rbind(stats, x$targetStats)
-    pch <- c(rep(1, ns), 16)
-    cex <- c(rep(1, ns), 2)
+    pch <- '.'
+    cex <- c(rep(1, ns), 10)
     col <- c(rep("black", ns), "red")
     pairs(stats, pch=pch, cex=cex, col=col, ...)
   }else if(type == "model"){
     stats <- x$stats
     ns <- nrow(stats)
     stats <- rbind(stats, x$obsModelStats)
-    pch <- c(rep(1, ns), 16)
-    cex <- c(rep(1, ns), 2)
+    pch <- '.'
+    cex <- c(rep(1, ns), 10)
     col <- c(rep("black", ns), "red")
     pairs(stats, pch=pch, cex=cex, col=col, diag.panel = panelHist, ...)    
   }else if(type == "histograms"){
