@@ -17,7 +17,7 @@ lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
 
 \item{theta}{Initial parameters values. Estimated via \code{\link{lologVariational}} if NULL.}
 
-\item{nsamp}{The number of sample neteworks to draw at each iteration.}
+\item{nsamp}{The number of sample networks to draw at each iteration.}
 
 \item{includeOrderIndependent}{If TRUE, all order independent terms in formula are used for 
 moment matching.}
@@ -26,12 +26,12 @@ moment matching.}
 If \code{NULL}, the observed statistics for the network are used.}
 
 \item{weights}{The type of weights to use in the GMM objective. Either 'full' for the inverse 
-of the full covariance matrix or 'diagnoal' for the inverse of the diagonal of the covariance matrix.}
+of the full covariance matrix or 'diagonal' for the inverse of the diagonal of the covariance matrix.}
 
-\item{tol}{The Hotteling's T^2 p-value tolerance for convergance for the transformed moment conditions.}
+\item{tol}{The Hotelling's T^2 p-value tolerance for convergence for the transformed moment conditions.}
 
 \item{nHalfSteps}{The maximum number of half steps to take when the objective is not improved 
-in an interation.}
+in an iteration.}
 
 \item{maxIter}{The maximum number of iterations.}
 
@@ -48,7 +48,7 @@ in an interation.}
 \value{
 An object of class 'lolog'. If the model is dyad independent, the returned object will
 also be of class "lologVariational" (see \code{\link{lologVariational}}, otherwise it will
-also be a "lologGmm" obejct.
+also be a "lologGmm" object.
 
 lologGmm objects contain:
 
@@ -108,7 +108,7 @@ placing an ordering variable on the right hand side of the '|' operator, as in
 Ties are allowed. Vertices with higher order values will always be included later. Those with the same
 values will be included in a random order in each simulated network.
 
-offsets and constraints are specified by wrapping them with either \code{offset()} or \code{contraint()},
+offsets and constraints are specified by wrapping them with either \code{offset()} or \code{constraint()},
 for example, the following specifies an Erdos-Renyi model with the constraint that degrees must be less
 that 10
 
