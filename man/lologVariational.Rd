@@ -10,7 +10,7 @@ lologVariational(formula, nReplicates = 5L, dyadInclusionRate = NULL,
 \arguments{
 \item{formula}{A lolog formula. See \code{link{lolog}}}
 
-\item{nReplicates}{An integer controling how many dyad ordering to perform.}
+\item{nReplicates}{An integer controlling how many dyad ordering to perform.}
 
 \item{dyadInclusionRate}{Controls what proportion of dyads in each ordering should be dropped.}
 
@@ -28,7 +28,7 @@ items:
 \item{allDyadIndependent}{Logical indicating model dyad independence}
 \item{likelihoodModel}{An object of class *LatentOrderLikelihood at the fit parameters}
 \item{outcome}{The outcome vector for the logistic regression}
-\item{predictors}{The change statistic predictor matrix for the logistic rergession}
+\item{predictors}{The change statistic predictor matrix for the logistic regression}
 }
 \description{
 Fits a latent ordered network model using Monte Carlo variational inference
@@ -43,7 +43,7 @@ exactly maximum likelihood inference. The objective function is
 \deqn{E_{p(s)}\bigg(\log p(y| S, \theta) \bigg)}
 
 This can be approximated by drawing samples from p(s) to approximate the expectation. The
-number of samples is controlled by the nReplaices parameter. The memory required is on the
+number of samples is controlled by the nReplicates parameter. The memory required is on the
 order of nReplicates * (# of dyads). For large networks this can be impractical, so
 adjusting dyadInclusionRate allows one to down sample the # of dyads in each replicate.
 

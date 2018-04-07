@@ -9,20 +9,24 @@
 \arguments{
 \item{x}{A model fit object to be diagnosed.}
 
-\item{type}{The type of diagnostic plot}
+\item{type}{The type of diagnostic plot. "histograms", the default, produces histograms of the sampled
+output statistic values with the observed statistics represented by vertical lines. "target" produces a pairs plot of the 
+target output statistic values with the pairs of observed target statistics represented by red squares.
+output statistic values with the observed statistics represented by vertical lines. "model" produces a pairs plot of the 
+sampled output statistic values with the pairs of observed statistics represented by red squares.}
 
 \item{...}{Additional parameters. Passed to \link{geom_histogram} if type="histogram" 
 and \link{pairs} otherwise.}
 }
 \description{
-This function prints diagnostic information and creates simple diagnostic
+This function creates simple diagnostic
 plots for MC sampled statistics produced from a lolog fit.
 }
 \details{
-A pair of plots are produced for each statistical trace of the sampled
-output statistic values on the left and density estimate for each variable
-in the Monte Carlo samples on the right.  Diagnostics printed to the console include
-correlations and convergence diagnostics.
+Plots are produced that represents the distributions of the 
+output sampled statistic values or the target statistics values.
+The values of the observed target statistics for the networks are
+also represented for comparison with the sampled statistics.
 }
 \examples{
 library(network)
