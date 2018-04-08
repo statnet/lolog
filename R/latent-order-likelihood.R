@@ -9,7 +9,7 @@
 #'
 #'
 #' @return
-#' An Rcpp object representing the likeilhood model
+#' An Rcpp object representing the likelihood model
 #'
 #'
 #' @examples

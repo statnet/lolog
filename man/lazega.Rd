@@ -3,7 +3,7 @@
 \docType{data}
 \name{lazega}
 \alias{lazega}
-\title{Collaboration Realtionships Amoung Partners at a New England Law Firm}
+\title{Collaboration Relationships Among Partners at a New England Law Firm}
 \source{
 See \url{http://elazega.fr/?page_id=609} and \url{https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm}
 }

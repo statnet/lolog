@@ -2,7 +2,7 @@
 #' Conduct goodness of fit diagnostics
 #'
 #'
-#' @param object the object to evaulate
+#' @param object the object to evaluate
 #' @param ... additional parameters
 #'
 #'
@@ -16,7 +16,7 @@ gofit <- function(object, ...) {
 #' Goodness of Fit Diagnostics for a LOLOG fit
 #'
 #'
-#' @param object the object to evaulate
+#' @param object the object to evaluate
 #' @param formula A formula specifying the statistics on which to evaluate the fit
 #' @param nsim The number of simulated statistics
 #' @param ... additional parameters
@@ -115,8 +115,8 @@ print.gofit <- function(x, ...) {
 #' @param x the gofit object
 #' @param y unused
 #' @param type type of plot, boxplot or lineplot
-#' @param normalize If true, netwrok statistics are normalized by subtracting off the observed statistics and scaling by the standard deviation.
-#' @param lineAlpha The transparancy of the simulated statistics lines
+#' @param normalize If true, network statistics are normalized by subtracting off the observed statistics and scaling by the standard deviation.
+#' @param lineAlpha The transparency of the simulated statistics lines
 #' @param lineSize The width of the lines
 #' @param ... passed to either boxplot or geom_line
 #'

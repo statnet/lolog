@@ -12,7 +12,7 @@ createLatentOrderLikelihood(formula, theta = NULL)
 \item{theta}{Parameter values.}
 }
 \value{
-An Rcpp object representing the likeilhood model
+An Rcpp object representing the likelihood model
 }
 \description{
 Creates a probability model for a latent ordered network model

@@ -150,16 +150,6 @@ lolog <- function(formula,
                   verbose = TRUE) {
   vcat <- function(..., vl=1){ if(verbose >= vl) cat(...) }
   vprint <- function(..., vl=1){ if(verbose >= vl) print(...) }
-  panelHist <- function(x, ...)
-  {
-    usr <- par("usr"); on.exit(par(usr))
-    par(usr = c(usr[1:2], 0, 1.5) )
-    h <- hist(x[-length(x)], plot = FALSE)
-    breaks <- h$breaks; nB <- length(breaks)
-    y <- h$counts; y <- y/max(y)
-    rect(breaks[-nB], 0, breaks[-1], y, col = "grey")
-    abline(v=x[length(x)], col="red", lwd=3)
-  }
   
   #initialize theta via variational inference
   if (is.null(theta)) {
@@ -340,7 +330,7 @@ lolog <- function(formula,
     if (verbose >= 3){
       ns <- nrow(stats)
       pairs(rbind(stats, obsModelStats), pch='.', cex=c(rep(1, ns), 10),
-	    col=c(rep("black", ns), "red"), diag.panel = panelHist,
+	    col=c(rep("black", ns), "red"), diag.panel = .panelHist,
             main=paste("Iteration",iter),cex.main=0.9)
     }
     
@@ -535,7 +525,7 @@ coef.lolog <- function(object, ...){
 #' This function creates simple diagnostic
 #' plots for MC sampled statistics produced from a lolog fit.
 #' 
-#' Plots are produced that represents the distributions of the 
+#' Plots are produced that represent the distributions of the 
 #' output sampled statistic values or the target statistics values.
 #' The values of the observed target statistics for the networks are
 #' also represented for comparison with the sampled statistics.
@@ -566,17 +556,6 @@ coef.lolog <- function(object, ...){
 plot.lologGmm <- function(x, type=c("histograms", "target","model"), ...) {
   type <- match.arg(type, c("histograms", "target","model"))
   
-  panelHist <- function(x, ...)
-  {
-    usr <- par("usr"); on.exit(par(usr))
-    par(usr = c(usr[1:2], 0, 1.5) )
-    h <- hist(x[-length(x)], plot = FALSE)
-    breaks <- h$breaks; nB <- length(breaks)
-    y <- h$counts; y <- y/max(y)
-    rect(breaks[-nB], 0, breaks[-1], y, col = "grey")
-    abline(v=x[length(x)], col="red", lwd=3)
-  }
-  
   if(type == "target"){
     stats <- x$auxStats
     ns <- nrow(stats)
@@ -592,7 +571,7 @@ plot.lologGmm <- function(x, type=c("histograms", "target","model"), ...) {
     pch <- '.'
     cex <- c(rep(1, ns), 10)
     col <- c(rep("black", ns), "red")
-    pairs(stats, pch=pch, cex=cex, col=col, diag.panel = panelHist, ...)    
+    pairs(stats, pch=pch, cex=cex, col=col, diag.panel = .panelHist, ...)    
   }else if(type == "histograms"){
     stats <- x$auxStats
     obs <- x$targetStats

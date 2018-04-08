@@ -63,7 +63,7 @@ NULL
 #' @keywords datasets
 NULL
 
-#' Collaboration Realtionships Amoung Partners at a New England Law Firm
+#' Collaboration Relationships Among Partners at a New England Law Firm
 #' 
 #' This data set comes from a network study of corporate law partnership that was 
 #' carried out in a Northeastern US corporate law firm, referred to as SG&R, 1988-1991 
