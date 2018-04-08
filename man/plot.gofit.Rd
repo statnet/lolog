@@ -14,9 +14,9 @@
 
 \item{type}{type of plot, boxplot or lineplot}
 
-\item{normalize}{If true, netwrok statistics are normalized by subtracting off the observed statistics and scaling by the standard deviation.}
+\item{normalize}{If true, network statistics are normalized by subtracting off the observed statistics and scaling by the standard deviation.}
 
-\item{lineAlpha}{The transparancy of the simulated statistics lines}
+\item{lineAlpha}{The transparency of the simulated statistics lines}
 
 \item{lineSize}{The width of the lines}
 

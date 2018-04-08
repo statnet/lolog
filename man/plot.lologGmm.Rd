@@ -23,7 +23,7 @@ This function creates simple diagnostic
 plots for MC sampled statistics produced from a lolog fit.
 }
 \details{
-Plots are produced that represents the distributions of the 
+Plots are produced that represent the distributions of the 
 output sampled statistic values or the target statistics values.
 The values of the observed target statistics for the networks are
 also represented for comparison with the sampled statistics.

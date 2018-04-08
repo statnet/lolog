@@ -7,7 +7,7 @@
 \method{gofit}{lolog}(object, formula, nsim = 100, ...)
 }
 \arguments{
-\item{object}{the object to evaulate}
+\item{object}{the object to evaluate}
 
 \item{formula}{A formula specifying the statistics on which to evaluate the fit}
 

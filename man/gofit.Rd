@@ -7,7 +7,7 @@
 gofit(object, ...)
 }
 \arguments{
-\item{object}{the object to evaulate}
+\item{object}{the object to evaluate}
 
 \item{...}{additional parameters}
 }
