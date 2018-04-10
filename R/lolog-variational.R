@@ -93,6 +93,7 @@ lologVariational <- function(formula,
   logFit <-
     glm(outcome ~ as.matrix(predictors) - 1, family = binomial())
   theta <- logFit$coefficients
+  lolik$setThetas(theta)
   names(theta) <- names(lolik$getModel()$statistics())
   result <- list(
     method = "variational",

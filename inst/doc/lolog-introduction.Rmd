@@ -1,5 +1,5 @@
 ---
-title: "An Introduction to Latent Order LOGistic (LOLOG) Network Models"
+title: "An Introduction to Latent Order Logistic (LOLOG) Network Models"
 author: "The Statnet Development Team"
 date: "`r Sys.Date()`"
 output: rmarkdown::pdf_document
@@ -17,6 +17,31 @@ knitr::opts_chunk$set(
   dpi=120
 )
 ```
+
+
+## Introduction to LOLOG
+
+Latent Order Logistic (LOLOG) models are a general framework for generative statistical modeling of graph datasets motivated by the principal of network growth. This class of models is fully general and terms modeling different important network features can be mixed and matched to provide a rich generative
+description of complex networks.
+
+Networks tend to evolve over time. This evolution can take the form of the addition or deletion of a tie from the network, or the addition or deletion of a vertex. To motivate our model we consider a growth process, where each edge variable is sequentially considered for edge creation, and edges are not deleted.
+
+In particular the ``lolog`` package uses a vertex ordering process for the motivating data generating process of the graph. For some networks, it may be reasonable to posit that vertices entered the network in some order that may or may not be random, and upon entering the network, edge variables connecting them to vertices already in the network are considered in a completely random order. The probability that an ordering of edge variables ($s$) occurs is defined as $p(s)$. The probability of a tie, given the network grown up to a time-point is modeled as a logistic regression
+$$
+\textrm{logit}\big(p(y_{s_t}=1 | \eta, y^{t-1}, s_{ \leq t})\big) = \theta \cdot c(y_{s_t}=1 | y^{t-1}, s_{ \leq t})
+$$
+where $s_{\leq t}$ is the growth order of the network up to time $t$, $y^{t-1}$ is the state of the graph at time $t-1$. $c(y_{s_t} | y^{t-1}, s_{ \leq t})$ is a vector representing the change in some graph statistics from time $t-1$ to $t$ if an edge is present, and $\theta$ is a vector of parameters.
+
+The full likelihood of an observed graph $y$ and order $s$ is then just the product of these logistic likelihoods
+$$
+p(y|s,\theta) = \prod_{t=1}^{n_d}p(y_{s_t}=1 | \eta, y^{t-1}, s_{ \leq t}),
+$$
+and the marginal likelihood of an observed graph is just the sum over all possible orderings
+$$
+p(y | \theta) = \sum_s p(y | s,\theta) p(s)
+$$
+
+Since the ordering of edge variable creation is rarely fully observed, the goal of this package is to perform graph inference on this marginal likelihood. This is done via Method of Moments, Generalized Method of Moments, or variational inference. The following document will show how this is operationalized within the ``lolog`` package.
 
 ## Getting Started
 

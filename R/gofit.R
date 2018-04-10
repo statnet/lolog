@@ -155,10 +155,15 @@ plot.gofit <- function(x,
     ylab <- "Normalized Statistic"
   }
   
+  if(ncol(stats) == 1 && type == "line"){
+    message("Note: Cannot create line plot with only one statistic. Falling back to boxplot")
+    type <- "box"
+  }
+  
   if (type == "box") {
     boxplot(stats, ylab = ylab, ...)
     points(ostats, col = "red", pch = 16)
-    return(NULL)
+    return(invisible(NULL))
   } else{
     Var2 <- value <- Var1 <- xx <- yy <- gg <- NULL #For R CMD check
     mstats <- reshape2::melt(stats)
