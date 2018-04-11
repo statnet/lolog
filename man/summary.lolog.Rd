@@ -15,8 +15,8 @@
 Summary of a `lolog` object
 }
 \examples{
-data(ukFaculty)
-fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"), 
-                        nReplicates=1L, dyadInclusionRate=1)
+data(lazega)
+fit <- lologVariational(lazega ~ edges() + nodeMatch("office") + triangles, 
+                        nReplicates=50L, dyadInclusionRate=1)
 summary(fit)
 }

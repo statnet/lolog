@@ -446,9 +446,9 @@ print.lolog <- function(x, ...) {
 #' @param ... additional parameters (unused)
 #' @method summary lolog
 #' @examples
-#' data(ukFaculty)
-#' fit <- lologVariational(ukFaculty ~ edges() + nodeMatch("GroupC"), 
-#'                         nReplicates=1L, dyadInclusionRate=1)
+#' data(lazega)
+#' fit <- lologVariational(lazega ~ edges() + nodeMatch("office") + triangles, 
+#'                         nReplicates=50L, dyadInclusionRate=1)
 #' summary(fit)
 #' @method summary lolog
 summary.lolog <- function(object, ...) {
