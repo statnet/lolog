@@ -22,8 +22,12 @@ gofit <- function(object, ...) {
 #' @param ... additional parameters
 #'
 #' @examples
-#'
+#' library(network)
 #' data(ukFaculty)
+#' 
+#' # Delete vertices missing group
+#' delete.vertices(ukFaculty, which(is.na(ukFaculty %v% "Group")))
+#' 
 #' # A dyad independent model
 #' fitind <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC"))
 #' summary(fitind)
@@ -42,7 +46,7 @@ gofit <- function(object, ...) {
 #'
 #' #include triangles and 2-stars (in and out)
 #' fitdep <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC") + 
-#'                 triangles + star(2, direction=1L) + star(2, direction=2L), nsamp=1500)
+#'                 triangles + star(2, direction="in") + star(2, direction="out"), nsamp=1500)
 #' summary(fitdep)
 #'
 #' # Check gof on (in + out) degree distribution (good!)
@@ -122,7 +126,12 @@ print.gofit <- function(x, ...) {
 #'
 #'
 #' @examples
+#' library(network)
 #' data(ukFaculty)
+#' 
+#' # Delete vertices missing group
+#' delete.vertices(ukFaculty, which(is.na(ukFaculty %v% "Group")))
+#' 
 #' # A dyad independent model
 #' fitind <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC"))
 #' summary(fitind)

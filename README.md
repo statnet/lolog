@@ -1,7 +1,7 @@
 # Latent Order Logistic (LOLOG) Graph Models
 
 LOLOG is a general framework for generative statistical modeling of graph datasets motivated by
-the principal of network growth. This class of models is fully general and terms modeling
+the principle of network growth. This class of models is fully general and terms modeling
 different important network features can be mixed and matched to provide a rich generative
 description of complex networks.
 
@@ -40,6 +40,9 @@ R CMD INSTALL lolog_*.tar.gz
 ```
 library(lolog)
 data(ukFaculty)
+
+# Delete 2 vertices missing group
+delete.vertices(ukFaculty, which(is.na(ukFaculty %v% "Group")))
 
 # A dyad independent model
 fitind <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC"))

@@ -15,7 +15,8 @@ data(ukFaculty)
 \description{
 The personal friendship network of a faculty of a UK university, 
 consisting of 81 vertices (individuals) and 817 directed and weighted connections. 
-The school affiliation of each individual is stored as a vertex attribute.
+The school affiliation of each individual is stored as a vertex attribute. The survey
+contained missing data for the school of two individuals.
 }
 \section{Licenses and Citation}{
  When publishing results obtained using this

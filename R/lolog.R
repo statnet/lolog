@@ -127,6 +127,10 @@
 #' 
 #' # Try something a bit more real
 #' data(ukFaculty)
+#' 
+#' # Delete vertices missing group
+#' delete.vertices(ukFaculty, which(is.na(ukFaculty %v% "Group")))
+#' 
 #' fituk <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC") + triangles + star(2))
 #' summary(fituk)
 #' plot(fituk$net, vertex.col= ukFaculty %v% "Group" + 2)

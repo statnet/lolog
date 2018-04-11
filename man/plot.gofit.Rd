@@ -26,7 +26,12 @@
 Plots a gofit object
 }
 \examples{
+library(network)
 data(ukFaculty)
+
+# Delete vertices missing group
+delete.vertices(ukFaculty, which(is.na(ukFaculty \%v\% "Group")))
+
 # A dyad independent model
 fitind <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC"))
 summary(fitind)

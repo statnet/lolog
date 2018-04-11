@@ -10,6 +10,12 @@ test_that("Stats", {
   data(ukFaculty)
   data(florentine)
   data(lazega)
+  
+  Group <- ukFaculty %v% "Group"
+  Group[is.na(Group)] <- 4
+  ukFaculty %v% "Group" <- Group
+  ukFaculty %v% "GroupC" <- as.character(Group)
+  
   es <- summary(ukFaculty ~ nodefactor("GroupC",4))
   lss <- calculateStatistics(ukFaculty ~ nodeFactor("GroupC"))
   expect_true(all(es == lss))
