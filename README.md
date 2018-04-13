@@ -6,9 +6,26 @@ different important network features can be mixed and matched to provide a rich 
 description of complex networks.
 
 
+## Resources
+
+* The mathematical details are outlined in a **[technical paper](http://arxiv.org/abs/1804.04583)**.
+* For a more detailed description of what can be done with the ``lolog`` package, **[see the introductory vignette](inst/doc/lolog-introduction.pdf)**.
+* An application of LOLOG modeling to a UK Faculty data set with comparisons to an ERGM fit can be found **[here](inst/doc/lolog-ergm.pdf)**.
+
 ## Installation
 
-Make sure you have the dependencies installed
+### The Easy Way
+
+To install the latest development version from the private github repo run:
+```
+devtools::install_github("statnet/lolog", auth_token="<my_github_acess_token>")
+```
+If you don't have a personal access token, you can create one in your profile page.
+
+### The Slightly Less Easy Way
+
+Alternatively you can manually clone the repo and install. First, make sure you have 
+the dependencies installed:
 
 ```
 install.packages(c("network","ggplot2","reshape2","Rcpp"))
@@ -20,22 +37,14 @@ For good measure, the suggested packages too
 install.packages(c("testthat","inline","knitr","rmarkdown","ergm"))
 ```
 
-To install the latest development version from the private github repo run:
-```
-devtools::install_github("statnet/lolog", auth_token="<my_github_acess_token>")
-```
-If you don't have a personal access token, you can create one in your profile page.
-
-
-Alternatively you can manually clone the repo and install with:
-
+Then from the command line run:
 ```
 git clone https://github.com/statnet/lolog.git
 R CMD build lolog
 R CMD INSTALL lolog_*.tar.gz
 ```
 
-## Using the package
+## Using The Package
 
 ```
 library(lolog)
@@ -49,9 +58,6 @@ fitind <- lolog(ukFaculty ~ edges() + nodeMatch("GroupC") + nodeCov("GroupC"))
 summary(fitind)
 ```
 
-For a more detailed description of what can be done with LOLOG models, [see the introductory vignette](inst/doc/lolog-introduction.pdf).
-
-An application of LOLOG modeling to a UK Faculty data set with comparisons to an ERGM fit can be found [here](inst/doc/lolog-ergm.pdf).
 
 ## Development
 
