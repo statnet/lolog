@@ -258,7 +258,7 @@ lolog <- function(formula,
       }
       if(verbose)
         close(pb)
-	vcat("\n")
+      vcat("\n")
       if (includeOrderIndependent)
         auxStats <- cbind(stats[, orderIndependent], auxStats)
     } else{

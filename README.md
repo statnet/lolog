@@ -48,6 +48,7 @@ R CMD INSTALL lolog_*.tar.gz
 
 ```
 library(lolog)
+library(network)
 data(ukFaculty)
 
 # Delete 2 vertices missing group
