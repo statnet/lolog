@@ -23,7 +23,6 @@ To install the latest development version from the github repo run:
 
 devtools::install_github("statnet/lolog")
 ```
-If you don't have a personal access token, you can create one in your profile page.
 
 ### The Slightly Less Easy Way
 
