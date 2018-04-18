@@ -18,6 +18,9 @@ description of complex networks.
 
 To install the latest development version from the github repo run:
 ```
+# If devtools is not installed:
+# install.packages("devtools")
+
 devtools::install_github("statnet/lolog")
 ```
 If you don't have a personal access token, you can create one in your profile page.
