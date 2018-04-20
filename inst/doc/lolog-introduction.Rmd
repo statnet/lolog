@@ -295,6 +295,7 @@ Key terms still to be added are:
 - ctriple
 - ttriple
 - triadcensus
+- geodesic distances
 - ?
 
 ### Coding New Terms

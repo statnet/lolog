@@ -2,7 +2,7 @@
 % Please edit documentation in R/binary-net.R
 \name{as.network.Rcpp_DirectedNet}
 \alias{as.network.Rcpp_DirectedNet}
-\title{Convert and DirectedNet to a network object}
+\title{Convert a DirectedNet to a network object}
 \usage{
 \method{as.network}{Rcpp_DirectedNet}(x, ...)
 }
@@ -15,7 +15,7 @@
 A network object
 }
 \description{
-Convert and DirectedNet to a network object
+Convert a DirectedNet to a network object
 }
 \examples{
 el <- matrix(c(1,2),ncol=2)

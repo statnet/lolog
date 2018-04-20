@@ -2714,7 +2714,80 @@ public:
 typedef Stat<Directed, NodeFactor<Directed> > DirectedNodeFactor;
 typedef Stat<Undirected, NodeFactor<Undirected> > UndirectedNodeFactor;
 
+/**
+* An example lolog statistic, defined as the sum of dcov over the values that have edges
+*/
+template<class Engine>
+class EdgeCov : public BaseStat< Engine > {
+protected:
+    NumericMatrix dcov; //the dyadic matrix
+public:
+    
+    //Constructor
+    EdgeCov(){}
+    
+    //Parse parameters
+    EdgeCov(List params){
+      ParamParser p(name(), params);
+      dcov = p.parseNext< NumericMatrix >("x");
+      p.end();
+    }
+    
+    //The name 
+    std::string name(){return "edgeCov";}
+    
+    std::vector<std::string> statNames(){
+      std::vector<std::string> statnames(1,"edgeCov");
+      return statnames;
+    }
+    
+    //Calculate the statistic
+    virtual void calculate(const BinaryNet<Engine>& net){
+        if(dcov.nrow() != net.size() | dcov.ncol() != net.size()){
+          ::Rf_error("EdgeCov error: the dyadic covariate matrix should have the same dimensions as the adjacency matrix.");
+        }
+        std::vector<double> v(1,0);
+        this->stats=v;
+        this->lastStats = std::vector<double>(1,0.0);
+        if(this->thetas.size()!=1)
+            this->thetas = v;
+        if(net.isDirected()){
+         for(int i=0;i<net.size();i++){
+          for(int j=0;j<net.size();j++){
+            this->stats[0] += net.hasEdge(i,j)*dcov(i,j);
+          }
+         }
+        }else{
+         for(int i=1;i<net.size();i++){
+          for(int j=0;j<i;j++){
+            this->stats[0] += net.hasEdge(i,j)*dcov(i,j);
+          }
+         }
+        }
+    }
+    
+    //Update the statistic given a dyad toggle
+    virtual void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
+      BaseOffset<Engine>::resetLastStats();
+      bool addingEdge = !net.hasEdge(from,to);
+      double change = 2.0 * (!net.hasEdge(from,to) - 0.5);
+      this->stats[0] += change * dcov(from,to);
+    }
+    
+    //Declare that this statistic is order independent
+    bool isOrderIndependent(){
+      return true;
+    }
+    
+    //Declare that this statistic is dyad independent
+    bool isDyadIndependent(){
+      return true;
+    }
+    
+};
 
+typedef Stat<Undirected, EdgeCov<Undirected> > UndirectedEdgeCov;
+typedef Stat<Directed, EdgeCov<Directed> > DirectedEdgeCov;
 
 #include <Rcpp.h>
 

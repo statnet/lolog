@@ -8,7 +8,7 @@ as.network <- function(x, ...) {
   UseMethod("as.network")
 }
 
-#' Convert and UndirectedNet to a network object
+#' Convert a UndirectedNet to a network object
 #' @param x the object
 #' @param ... unused
 #' @return A network object
@@ -57,7 +57,7 @@ as.network.Rcpp_UndirectedNet <- function(x, ...) {
   nw
 }
 
-#' Convert and DirectedNet to a network object
+#' Convert a DirectedNet to a network object
 #' @param x the object
 #' @param ... unused
 #' @return A network object
@@ -137,7 +137,7 @@ plot.Rcpp_UndirectedNet <- function(x, ...) {
   plot(x, ...)
 }
 
-#' Convert and network to either an UndirectedNet or DirectedNet object
+#' Convert a network to either an UndirectedNet or DirectedNet object
 #' @param x the object
 #' @param ... unused
 #' @return either an Rcpp_UndirectedNet or Rcpp_DirectedNet object

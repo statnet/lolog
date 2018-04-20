@@ -2,7 +2,7 @@
 % Please edit documentation in R/binary-net.R
 \name{as.BinaryNet}
 \alias{as.BinaryNet}
-\title{Convert and network to either an UndirectedNet or DirectedNet object}
+\title{Convert a network to either an UndirectedNet or DirectedNet object}
 \usage{
 as.BinaryNet(x, ...)
 }
@@ -15,7 +15,7 @@ as.BinaryNet(x, ...)
 either an Rcpp_UndirectedNet or Rcpp_DirectedNet object
 }
 \description{
-Convert and network to either an UndirectedNet or DirectedNet object
+Convert a network to either an UndirectedNet or DirectedNet object
 }
 \examples{
 data(ukFaculty)

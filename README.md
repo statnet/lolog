@@ -23,6 +23,7 @@ To install the latest development version from the github repo run:
 
 devtools::install_github("statnet/lolog")
 ```
+If this is your first R source package that you have installed, you’ll also need a set of development tools. On Windows, download and install [Rtools]( https://cran.r-project.org/bin/windows/Rtools/), and ``devtools`` takes care of the rest. On a Mac, install the [Xcode command line tools]( https://developer.apple.com/downloads). On Linux, install the R development package, usually called ``r-devel`` or ``r-base-dev``. For details see [Package Development Prerequisites](https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites).
 
 ### The Slightly Less Easy Way
 

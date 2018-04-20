@@ -50,6 +50,7 @@ void initStats(){
     registerStatistic( DirStatPtr( new DirectedEsp() ) );
     registerStatistic( DirStatPtr( new DirectedNodeFactor() ) );
     registerStatistic( DirStatPtr( new DirectedAbsDiff() ) );
+    registerStatistic( DirStatPtr( new DirectedEdgeCov() ) );
     ////////			Offsets				/////////
 
     //Make registration available outside lolog compilation unit
@@ -81,6 +82,7 @@ void initStats(){
     registerStatistic( UndirStatPtr( new UndirectedSharedNbrs() ) );
     registerStatistic( UndirStatPtr( new UndirectedNodeFactor() ) );
     registerStatistic( UndirStatPtr( new UndirectedAbsDiff() ) );
+    registerStatistic( UndirStatPtr( new UndirectedEdgeCov() ) );
 
     ////////			Offsets				/////////
     registerOffset( UndirOffsetPtr( new UndirectedBoundedDegreeConstraint() ) );

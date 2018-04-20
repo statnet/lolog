@@ -26,6 +26,11 @@ test_that("Stats", {
   expect_true(all(es == lss))
   
   
+  wabsdiff<-outer(flomarriage %v% "wealth", flomarriage %v% "wealth",function(x,y){abs(x-y)})
+  es <- summary(flomarriage ~ edgecov(wabsdiff))
+  lss <- calculateStatistics(flomarriage ~ edgeCov(wabsdiff))
+  expect_true(all(es == lss))
+  
   es <- summary(flomarriage ~ absdiff("wealth"))
   lss <- calculateStatistics(flomarriage ~ absDiff("wealth"))
   expect_true(all(es == lss))
