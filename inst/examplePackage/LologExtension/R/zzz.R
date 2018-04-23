@@ -1,7 +1,7 @@
 .onLoad <- function(libname, pkgname){
 	# Run registerMinDegree in MinDegree.cpp to allow
 	# MinDegree to be used in formula
-	.Call("registerMinDegree", PACKAGE = 'LologExtension')
+  registerMinDegree()
 }
 
 # #You can now use the new MinDegree term e.g.:

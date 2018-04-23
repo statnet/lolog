@@ -1,6 +1,6 @@
 // [[Rcpp::depends(lolog)]]
 #include "lolog_hello_world.h"
-#include "lolog.h"
+#include <lolog.h>
 
 //' An basic example of a function in C++ using lolog
 //' @return a list of a character vector, a numeric vector, and an lolog DirectedNet
@@ -17,10 +17,9 @@
 // [[Rcpp::export]]
 Rcpp::List lolog_hello_world(){
     using namespace Rcpp;
-    using namespace lolog;
     
     IntegerMatrix tmp(0,2);
-    DirectedNet net(tmp,20); 
+    lolog::DirectedNet net(tmp,20); 
     CharacterVector x = CharacterVector::create( "foo", "bar" )  ;
     NumericVector y   = NumericVector::create( 0.0, 1.0 ) ;
     List z            = List::create( x, y, wrap(net) ) ;
