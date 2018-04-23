@@ -15,12 +15,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-
-RcppExport SEXP registerMinDegree();
+// registerMinDegree
+void registerMinDegree();
+RcppExport SEXP _LologExtension_registerMinDegree() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    registerMinDegree();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_LologExtension_lolog_hello_world", (DL_FUNC) &_LologExtension_lolog_hello_world, 0},
-    {"registerMinDegree",                 (DL_FUNC) &registerMinDegree,                 0},
+    {"_LologExtension_registerMinDegree", (DL_FUNC) &_LologExtension_registerMinDegree, 0},
     {NULL, NULL, 0}
 };
 

@@ -17,3 +17,7 @@ lolog_hello_world <- function() {
     .Call('_LologExtension_lolog_hello_world', PACKAGE = 'LologExtension')
 }
 
+registerMinDegree <- function() {
+    invisible(.Call('_LologExtension_registerMinDegree', PACKAGE = 'LologExtension'))
+}
+

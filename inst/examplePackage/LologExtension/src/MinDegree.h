@@ -3,11 +3,12 @@
 
 #include <Rcpp.h>
 
-#include<lolog.h>
-#include<Rcpp.h>
-#include<vector>
-		
-using namespace lolog;
+#include <lolog.h>
+#include <Rcpp.h>
+#include <vector>
+
+namespace lologext{
+
 using namespace Rcpp;
 using namespace std;
 
@@ -17,7 +18,7 @@ using namespace std;
 * with degree greater than or equal to "degree"
 */
 template<class Engine>
-class MinDegree : public BaseStat< Engine > {
+class MinDegree : public lolog::BaseStat< Engine > {
 public:
 	int degree; //the minimum degree
 	
@@ -42,7 +43,7 @@ public:
 	}
 	
 	//Calculate the statistic
-	virtual void calculate(const BinaryNet<Engine>& net){
+	virtual void calculate(const lolog::BinaryNet<Engine>& net){
 		vector<double> v(1,0);
 		this->stats=v;
 		this->lastStats = std::vector<double>(1,0.0);
@@ -54,8 +55,8 @@ public:
 	}
 	
 	//Update the statistic given a dyad toggle
-	virtual void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
-	  BaseOffset<Engine>::resetLastStats();
+	virtual void dyadUpdate(const lolog::BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
+	  lolog::BaseOffset<Engine>::resetLastStats();
 		if(!net.hasEdge(from,to)){
 			if(net.degree(from)==degree-1)
 				this->stats[0]++;
@@ -81,16 +82,15 @@ public:
 	
 };
 
-typedef Stat<Undirected, MinDegree<Undirected> > UndirectedMinDegree;
+typedef lolog::Stat<lolog::Undirected, MinDegree<lolog::Undirected> > UndirectedMinDegree;
 
-/**
-* This function registers the new MinDegree statistic so that
-* it can be used in lolog formula.
-*
-* RcppExport means this function can be called from R using
-* .C("registerMinDegree")
-* see: .onLoad in zzz.R
-*/
-RcppExport void registerMinDegree();
+
+
+
+}
+
+
+
+void registerMinDegree();
 
 #endif
