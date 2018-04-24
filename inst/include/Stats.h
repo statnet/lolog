@@ -2721,6 +2721,7 @@ template<class Engine>
 class EdgeCov : public BaseStat< Engine > {
 protected:
     NumericMatrix dcov; //the dyadic matrix
+    std::string termName; /*!< the name of the term variable */
 public:
     
     //Constructor
@@ -2730,6 +2731,7 @@ public:
     EdgeCov(List params){
       ParamParser p(name(), params);
       dcov = p.parseNext< NumericMatrix >("x");
+      termName = p.parseNext< std::string >("name","");
       p.end();
     }
     
@@ -2737,7 +2739,7 @@ public:
     std::string name(){return "edgeCov";}
     
     std::vector<std::string> statNames(){
-      std::vector<std::string> statnames(1,"edgeCov");
+      std::vector<std::string> statnames(1,"edgeCov."+termName);
       return statnames;
     }
     

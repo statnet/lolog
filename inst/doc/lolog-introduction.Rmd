@@ -180,6 +180,20 @@ summary(flomodel.03)
 Yes, there is a significant positive wealth effect on the probability
 of a tie.
 
+### Does Large Wealth Inequality Matter?
+
+We can test whether edge probabilities are a function of wealth:
+
+```{r}
+wdiff<-outer(flomarriage %v% "wealth", flomarriage %v% "wealth",function(x,y){abs(x-y)>20})
+table(wdiff)
+flomodel.04 <- lolog(flomarriage~edges+nodeCov('wealth')+edgeCov(wdiff,"inequality"))
+summary(flomodel.04)
+```
+
+The inequality in wealth does seem to increase the probability
+of a tie.
+
 ### Reciprocity
 
 Let's try a model or two on:
@@ -275,7 +289,8 @@ This currently produces:
 - `mutual()` (order-independent) (directed)
 - `nodeCov(name)` (dyad-independent)  (order-independent)  (directed)  (undirected) 
 - `nodeMatch(name)` (dyad-independent)  (order-independent)  (directed)  (undirected) 
-- `nodeMix(name)` (dyad-independent)  (order-independent)  (directed)  (undirected) 
+- `nodeMix(name)` (dyad-independent)  (order-independent)  (directed)  (undirected)
+- `edgeCov(x)` (dyad-independent)  (order-independent)  (directed)  (undirected) 
 - `degree(d, direction=0L, lessThanOrEqual=FALSE)` (order-independent)  (directed)  (undirected) 
 - `degreeCrossProd()` (order-independent)  (undirected) 
 - `gwdsp(alpha)` (order-independent)  (directed)  (undirected) 
