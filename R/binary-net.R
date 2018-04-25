@@ -137,21 +137,45 @@ plot.Rcpp_UndirectedNet <- function(x, ...) {
   plot(x, ...)
 }
 
-#' Convert a network to either an UndirectedNet or DirectedNet object
+#' Convert to either an UndirectedNet or DirectedNet object
+#' 
 #' @param x the object
 #' @param ... unused
 #' @return either an Rcpp_UndirectedNet or Rcpp_DirectedNet object
+#' @details 
+#' Converts network objects to BinaryNets. This function also converts
+#' other graph formats, such as igraph and tidygraph, utilizing
+#' intergraph::asNetwork.
 #' @examples
 #' data(ukFaculty)
 #' net <- as.BinaryNet(ukFaculty)
 #' net
 as.BinaryNet <- function(x, ...) {
+  UseMethod("as.BinaryNet")
+}
+
+#' Convert to either an UndirectedNet or DirectedNet object
+#' 
+#' @param x the object
+#' @param ... unused
+#' @return either an Rcpp_UndirectedNet or Rcpp_DirectedNet object
+#' @details 
+#' Converts network objects to BinaryNets. This function also converts
+#' other graph formats, such as igraph and tidygraph, utilizing
+#' intergraph::asNetwork.
+#' @examples
+#' data(ukFaculty)
+#' net <- as.BinaryNet(ukFaculty)
+#' net
+#' @method as.BinaryNet default
+as.BinaryNet.default <- function(x, ...) {
   if (inherits(x, "Rcpp_UndirectedNet"))
     return(x)
   if (inherits(x, "Rcpp_DirectedNet"))
     return(x)
-  if (!inherits(x, "network"))
-    stop("x must be a BinaryNet or network object")
+  if (!inherits(x, "network")){
+    x <- intergraph::asNetwork(x, ...)
+  }
   directed <- is.directed(x)
   el <- as.matrix(x, matrix.type = "edgelist")
   n <- attr(el, "n")

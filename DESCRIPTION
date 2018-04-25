@@ -5,10 +5,9 @@ Title: Latent Order Logistic Graph Models
 LinkingTo: Rcpp, BH
 Type: Package
 LazyLoad: yes
-Author: Ian Fellows
+Author: c(person(c("Ian","E."),"Fellows", role=c("aut","cre"), email="ian@fellstat.com"), person(c("Mark","S."),"Handcock", role="ctb"))
 Description: Estimation of Latent Order Logistic (LOLOG) Models for Networks. LOLOGs are a flexible and fully general class of statistical graph models. This package provides functions for performing MOM, GMM and variational inference. Visual diagnostics and goodness of fit metrics are provided. 
 Version: 1.0
-Date: 2018-03-15
 Depends:
     R (>= 3.0.0),
     methods,
@@ -17,7 +16,8 @@ Imports:
     network, 
     parallel,
     ggplot2,
-    reshape2
+    reshape2,
+    intergraph
 Suggests:
     testthat,
     inline,

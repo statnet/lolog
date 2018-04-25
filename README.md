@@ -31,7 +31,7 @@ Alternatively you can manually clone the repo and install. First, make sure you 
 the dependencies installed:
 
 ```
-install.packages(c("network","ggplot2","reshape2","Rcpp"))
+install.packages(c("network","ggplot2","reshape2","Rcpp","intergraph"))
 ```
 
 For good measure, the suggested packages too

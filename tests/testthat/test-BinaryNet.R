@@ -141,3 +141,15 @@ test_that("UndirectedNet", {
   expect_true(attr(net[["a"]], "lowerBound") == 1)
   expect_true(attr(net[["a"]], "upperBound") == 16)
 })
+
+
+
+
+test_that("igraph Conversions", {
+  g <- igraph::make_full_graph(5)
+  net <- as.BinaryNet(g)
+  expect_true(sum(net[1:5,1:5]) == 20)
+  
+  expect_true(calculateStatistics(g ~ edges()) == 10)
+  
+})

@@ -12,6 +12,12 @@ knitr::opts_chunk$set(
 ## ---- eval=FALSE---------------------------------------------------------
 #  install.packages("lolog")
 
+## ---- eval=FALSE---------------------------------------------------------
+#  # If devtools is not installed:
+#  # install.packages("devtools")
+#  
+#  devtools::install_github("statnet/lolog")
+
 ## ------------------------------------------------------------------------
 library(lolog)
 set.seed(1)
@@ -60,6 +66,12 @@ plot(flomarriage, vertex.cex=wealth/25) # network plot with vertex size
 ## ------------------------------------------------------------------------
 flomodel.03 <- lolog(flomarriage~edges+nodeCov('wealth'))
 summary(flomodel.03)
+
+## ------------------------------------------------------------------------
+wdiff<-outer(flomarriage %v% "wealth", flomarriage %v% "wealth",function(x,y){abs(x-y)>20})
+table(wdiff)
+flomodel.04 <- lolog(flomarriage~edges+nodeCov('wealth')+edgeCov(wdiff,"inequality"))
+summary(flomodel.04)
 
 ## ------------------------------------------------------------------------
 data(samplk) 

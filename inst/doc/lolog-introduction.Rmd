@@ -59,12 +59,15 @@ To install the latest version of the package from CRAN (not yet available):
 install.packages("lolog")
 ```
 
-To install the latest development version from github run the following (you'll need a sh shell and git):
+To install the latest development version from github run the following:
 
-```{sh, eval=FALSE}
-git clone https://github.com/fellstat/lolog.git
-sh lolog/mkdist
+```{r, eval=FALSE}
+# If devtools is not installed:
+# install.packages("devtools")
+
+devtools::install_github("statnet/lolog")
 ```
+If this is your first R source package that you have installed, you’ll also need a set of development tools. On Windows, download and install [Rtools]( https://cran.r-project.org/bin/windows/Rtools/), and ``devtools`` takes care of the rest. On a Mac, install the [Xcode command line tools]( https://developer.apple.com/downloads). On Linux, install the R development package, usually called ``r-devel`` or ``r-base-dev``. For details see [Package Development Prerequisites](https://support.rstudio.com/hc/en-us/articles/200486498-Package-Development-Prerequisites).
 
 ## Statistical Network Modeling: The lolog Command and lolog Object
 
@@ -383,7 +386,7 @@ net[["rnorm"]]
 #print(UndirectedNet)
 ```
 
-All user facing functions in the `lolog` package accept `BinaryNet`s as arguments, and will convert `network` objects to `BinaryNet`s automatically.
+All user facing functions in the `lolog` package accept `BinaryNet`s as arguments, and will convert `network`, `igraph` and `tidygraph` graph objects to `BinaryNet`s automatically.
 
 ## Order Dependent Terms
 

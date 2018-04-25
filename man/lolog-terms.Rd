@@ -79,11 +79,19 @@ If lessThanOrEqual=TRUE, then the count is the number of nodes with degree less 
   }
   
 \item{\code{ nodeCov(name) } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
-The \code{attrname} argument is a character string giving the name of a
+The \code{name} argument is a character string giving the name of a
 numeric attribute in the network's vertex attribute list.
 This term adds a single network statistic to the model equaling the sum of
 \code{name(i)} and \code{name(j)} for all edges \eqn{(i,j)} in the
 network. For categorical variables, levels are coded as 1,..,nlevels`.
+  }
+  
+\item{\code{ edgeCov(x) } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
+The \code{x} argument is a square matrix of covariates, one for each possible edge in the network.
+ This term adds one statistic to the model, equal to the sum
+ of the covariate values for each edge appearing in the network. The
+ \code{edgeCov} term applies to both directed and undirected networks. For
+ undirected networks the covariates are also assumed to be undirected.
   }
   
 \item{\code{gwesp(alpha)}  (order-independent)  (directed)  (undirected)}{ 
