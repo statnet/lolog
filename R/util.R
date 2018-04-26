@@ -127,6 +127,12 @@ lologPackageSkeleton <- function(path = ".") {
 }
 
 
+# Groeneveld & Meeden
+.gmSkewness <- function(x){
+  med <- median(x)
+  (mean(x) - med) / mean(abs(x - med))
+}
+
 # Add nice histogram panels to a pairs plot
 .panelHist <- function(x, ...)
 {

@@ -333,10 +333,11 @@ lolog <- function(formula,
     
     if (verbose >= 3){
       ns <- nrow(stats)
-      pairs(rbind(stats, obsModelStats), pch='.', cex=c(rep(1, ns), 10),
+      pairs(rbind(stats, targetStats), pch='.', cex=c(rep(1, ns), 10),
 	    col=c(rep("black", ns), "red"), diag.panel = .panelHist,
             main=paste("Iteration",iter),cex.main=0.9)
     }
+    vcat("Statistic GM Skewness Coef :", apply(stats,2, .gmSkewness),"\n", vl=2)
     
     # If inverse failed, or the objective has increased significantly, initiate half stepping
     if (hsCount < nHalfSteps &&
@@ -456,7 +457,10 @@ summary.lolog <- function(object, ...) {
   theta <- x$theta
   se <- sqrt(diag(x$vcov))
   pvalue <- 2 * pnorm(abs(theta / se), lower.tail = FALSE)
-  stats <- x$likelihoodModel$getModel()$statistics()
+  if(is.null(x$targetStats))
+    stats <- x$likelihoodModel$getModel()$statistics()
+  else
+    stats <- x$targetStats
   orderInd <- x$likelihoodModel$getModel()$isIndependent(FALSE, TRUE)
   stats[!orderInd] <- NA
   result <-

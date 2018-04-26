@@ -176,6 +176,14 @@ as.BinaryNet.default <- function(x, ...) {
   if (!inherits(x, "network")){
     x <- intergraph::asNetwork(x, ...)
   }
+  
+  if(is.bipartite(x))
+    stop("Bipartite BinaryNets not supported")
+  if(has.loops(x))
+    stop("network object contains loops")
+  if(!is.null(x$gal$multiple) && x$gal$multiple)
+    stop("network object contains multi-edges")
+  
   directed <- is.directed(x)
   el <- as.matrix(x, matrix.type = "edgelist")
   n <- attr(el, "n")
