@@ -4,8 +4,8 @@
 \alias{plot.gofit}
 \title{Plots a gofit object}
 \usage{
-\method{plot}{gofit}(x, y, type = c("line", "box"), normalize = FALSE,
-  lineAlpha = 0.06, lineSize = 1, ...)
+\method{plot}{gofit}(x, y, type = c("line", "box"), scaling = c("none",
+  "std", "sqrt"), lineAlpha = 0.06, lineSize = 1, ...)
 }
 \arguments{
 \item{x}{the gofit object}
@@ -14,7 +14,7 @@
 
 \item{type}{type of plot, boxplot or lineplot}
 
-\item{normalize}{If true, network statistics are normalized by subtracting off the observed statistics and scaling by the standard deviation.}
+\item{scaling}{type of scaling of the network statistics. If "std", network statistics are scaling by subtracting off the observed statistics and scaling by the standard deviation. If "sqrt", network statistics are plotted on the square root scale (The square root is the variance stabilizing transformation for a Poisson random variable). The default is "none", where by the network statistics are not scaled.}
 
 \item{lineAlpha}{The transparency of the simulated statistics lines}
 

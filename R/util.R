@@ -129,7 +129,7 @@ lologPackageSkeleton <- function(path = ".") {
 
 # Groeneveld & Meeden
 .gmSkewness <- function(x){
-  med <- median(x)
+  med <- stats::median(x)
   (mean(x) - med) / mean(abs(x - med))
 }
 

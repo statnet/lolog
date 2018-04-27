@@ -54,7 +54,7 @@ gofit <- function(object, ...) {
 #' gdep
 #' plot(gdep)
 #'
-#' #check gof on esp dsitribution (good!)
+#' #check gof on esp distribution (good!)
 #' gdep <- gofit(fitdep, ukFaculty ~ esp(0:25))
 #' gdep
 #' plot(gdep)
@@ -119,7 +119,7 @@ print.gofit <- function(x, ...) {
 #' @param x the gofit object
 #' @param y unused
 #' @param type type of plot, boxplot or lineplot
-#' @param normalize If true, network statistics are normalized by subtracting off the observed statistics and scaling by the standard deviation.
+#' @param scaling type of scaling of the network statistics. If "std", network statistics are scaling by subtracting off the observed statistics and scaling by the standard deviation. If "sqrt", network statistics are plotted on the square root scale (The square root is the variance stabilizing transformation for a Poisson random variable). The default is "none", where by the network statistics are not scaled. 
 #' @param lineAlpha The transparency of the simulated statistics lines
 #' @param lineSize The width of the lines
 #' @param ... passed to either boxplot or geom_line
@@ -144,7 +144,7 @@ print.gofit <- function(x, ...) {
 plot.gofit <- function(x,
                        y,
                        type = c("line", "box"),
-                       normalize = FALSE,
+                       scaling = c("none","std","sqrt"),
                        lineAlpha = .06,
                        lineSize = 1,
                        ...) {
@@ -153,16 +153,11 @@ plot.gofit <- function(x,
   ostats <- x$ostats
   nms <- names(ostats)
   colnames(stats) <- nms
-  ylab <- "Statistic"
-  if (normalize) {
-    stats <- apply(sweep(stats, 2, ostats), 2, function(a) {
-      if (sd(a) < .Machine$double.eps)
-        return(rep(NA, length(a)))
-      a / sd(a)
-    })
-    ostats <- rep(0, length(ostats))
-    ylab <- "Normalized Statistic"
-  }
+  ylab <- switch(scaling[1],
+   sqrt="Statistic (on a square root scale)",
+   std="Normalized Statistic",
+   "Statistic"
+  )
   
   if(ncol(stats) == 1 && type == "line"){
     message("Note: Cannot create line plot with only one statistic. Falling back to boxplot")
@@ -170,11 +165,55 @@ plot.gofit <- function(x,
   }
   
   if (type == "box") {
-    boxplot(stats, ylab = ylab, ...)
+    stats <- switch(scaling[1],
+     sqrt={
+      ostats <- sqrt(ostats)
+      sqrt(stats)
+     },
+     std={
+      stats <- sweep(stats, 2, ostats)
+      ostats <- rep(0, length(ostats))
+      apply(stats, 2, function(a) {
+        if (sd(a) < .Machine$double.eps)
+          return(rep(NA, length(a)))
+        a / sd(a)
+      })
+     },
+     {
+       stats
+     }
+    )
+    boxplot(stats, ylab = ylab, yaxt='n', ...)
+    ylabs <- switch(scaling[1],
+     sqrt=graphics::axTicks(2)^2,
+     std=graphics::axTicks(2),
+     graphics::axTicks(2)
+    )
+    graphics::axis(side=2, at=graphics::axTicks(2), labels=ylabs)
     points(ostats, col = "red", pch = 16)
     return(invisible(NULL))
   } else{
     Var2 <- value <- Var1 <- xx <- yy <- gg <- NULL #For R CMD check
+    stats <- switch(scaling[1],
+     sqrt={
+      transf <- "sqrt"
+      stats
+     },
+     std={
+      transf <- "identity"
+      stats <- sweep(stats, 2, ostats)
+      ostats <- rep(0, length(ostats))
+      apply(stats, 2, function(a) {
+        if (sd(a) < .Machine$double.eps)
+          return(rep(NA, length(a)))
+        a / sd(a)
+      })
+     },
+     {
+      transf <- "identity"
+      stats
+     }
+    )
     mstats <- reshape2::melt(stats)
     o <- data.frame(xx = nms, yy = ostats, gg = "observed")
     gg <- ggplot2::ggplot(data = mstats) +
@@ -191,6 +230,7 @@ plot.gofit <- function(x,
         size = lineSize,
         ...
       ) +
+      ggplot2::scale_y_continuous(trans = transf)  +
       ggplot2::theme_bw() + ggplot2::ylab(ylab) + ggplot2::xlab("")  +
       ggplot2::theme(
         axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),

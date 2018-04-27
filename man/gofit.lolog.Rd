@@ -51,7 +51,7 @@ gdep <- gofit(fitdep, ukFaculty ~ degree(0:50))
 gdep
 plot(gdep)
 
-#check gof on esp dsitribution (good!)
+#check gof on esp distribution (good!)
 gdep <- gofit(fitdep, ukFaculty ~ esp(0:25))
 gdep
 plot(gdep)

@@ -39,7 +39,7 @@ boost::shared_ptr<T> unwrapRobject(const SEXP& s){
         return xp->template vShallowCopy<T>();
         //return boost::shared_ptr<T>(new T(*xp));
     }
-    Rcpp:Rcout << TYPEOF(s);
+    Rcpp::Rcout << TYPEOF(s);
     ::Rf_error( "unwrapRobject: supplied object is not of correct type." );
 }
 
