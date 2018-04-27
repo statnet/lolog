@@ -152,14 +152,16 @@ Calculates a statistic equal to the sum of the euclidean distances between
 connected nodes on the numeric nodal variables specified in names.
 
 }
-\item{\code{ preferentialAttachment(k=1) } (undirected)}{ 
+\item{\code{ preferentialAttachment(k=1, direction="in") } (directed) (undirected)}{ 
 
 An order dependent preferential attachment term. For each edge, adds
 
 log( (k+degree) / (n * (meanDegree + k)))
 
 where degree is the current degree of the acting node, n is the network size, and meanDegree is
-the mean degree of the network. This depends upon the order in which edges are added.
+the mean degree of the network. This depends upon the order in which edges are added. For directed networks,
+if direction="in" the in-degrees are used. If it is "out" the out degrees are used, otherwise "undirected"
+means that the sum of the in and out degrees are used. 
 
  }
 \item{\code{ sharedNbrs(k=1) } (undirected)}{ 

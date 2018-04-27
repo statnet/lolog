@@ -205,6 +205,8 @@ lolog <- function(formula,
   }else{
     targetStats <- obsStats
   }
+  if(length(targetStats) < length(theta))
+    stop("Too few moment conditions. Specify more in auxFormula.")
   
   stepSize <- startingStepSize
   lastTheta <- NULL
@@ -310,8 +312,13 @@ lolog <- function(formula,
     
     if (weights == "diagonal")
       W <- diag(1 / (diag(var(auxStats))))
-    else
-      W <- solve(var(auxStats))
+    else{
+      tr <- try(W <- solve(var(auxStats)))
+      if(inherits(tr, "try-error")){
+        warning("Singular statistic covariance matrix. Using diagnoal.")
+        W <- diag(1 / (diag(var(auxStats))))
+      }
+    }
     
     # Calculate moment conditions and stat/observed stat differences transformed by W.
     mh <- colMeans(auxStats)
@@ -333,7 +340,8 @@ lolog <- function(formula,
     
     if (verbose >= 3){
       ns <- nrow(stats)
-      pairs(rbind(stats, targetStats), pch='.', cex=c(rep(1, ns), 10),
+      os <- obsModelStats
+      pairs(rbind(stats, os), pch='.', cex=c(rep(1, ns), 10),
 	    col=c(rep("black", ns), "red"), diag.panel = .panelHist,
             main=paste("Iteration",iter),cex.main=0.9)
     }
@@ -457,10 +465,7 @@ summary.lolog <- function(object, ...) {
   theta <- x$theta
   se <- sqrt(diag(x$vcov))
   pvalue <- 2 * pnorm(abs(theta / se), lower.tail = FALSE)
-  if(is.null(x$targetStats))
-    stats <- x$likelihoodModel$getModel()$statistics()
-  else
-    stats <- x$targetStats
+  stats <- x$likelihoodModel$getModel()$statistics()
   orderInd <- x$likelihoodModel$getModel()$isIndependent(FALSE, TRUE)
   stats[!orderInd] <- NA
   result <-
