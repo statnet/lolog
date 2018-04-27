@@ -2330,10 +2330,12 @@ typedef Stat<Undirected, AbsDiff<Undirected> > UndirectedAbsDiff;
  */
 template<class Engine>
 class PreferentialAttachment : public BaseStat<Engine>{
+    EdgeDirection direction;
     double k;
 public:
     PreferentialAttachment(){
         k = 1.0;
+        direction = IN;
     }
 
     /*!
@@ -2342,12 +2344,25 @@ public:
     PreferentialAttachment(List params){
         ParamParser p(name(), params);
         k = p.parseNext("k", 1.0);
+        direction = p.parseNextDirection("direction", IN);
         p.end();
     }
 
 
     std::string name(){
         return "preferentialAttachment";
+    }
+
+    double degree(const BinaryNet<Engine> & net, int i){
+        if(net.isDirected()){
+            if(direction == IN)
+                return net.indegree(i);
+            else if(direction == OUT)
+                return net.outdegree(i);
+            else
+                return net.indegree(i) + net.outdegree(i);
+        }else
+            return net.degree(i);
     }
 
     std::vector<std::string> statNames(){
@@ -2365,7 +2380,7 @@ public:
         double direction = hasEdge ? -1.0 : 1.0;
         double totDegree = (net.nEdges() - hasEdge) * 2.0;
         int alter = order[actorIndex] == from ? to : from;
-        double deg = net.degree(alter) - hasEdge;
+        double deg = degree(net, alter) - hasEdge;
         double netSize = actorIndex + 1.0;
 
         this->stats[0] += direction * log( (k + deg) / (k*netSize + totDegree));

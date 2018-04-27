@@ -84,11 +84,11 @@ protected:
     }
 
 public:
-    ParamParser() : name("ParamParser"), totalParsed(0), nUnnamedParsed(0), params(){};
+    ParamParser() : name("ParamParser"), params(), nUnnamedParsed(0), totalParsed(0){};
 
-    ParamParser(std::string funcName) : name(funcName), totalParsed(0), nUnnamedParsed(0), params(){};
+    ParamParser(std::string funcName) : name(funcName), params(), nUnnamedParsed(0), totalParsed(0){};
 
-    ParamParser(std::string funcName, Rcpp::List passedParamValues) : name(funcName), totalParsed(0), nUnnamedParsed(0), params(passedParamValues){};
+    ParamParser(std::string funcName, Rcpp::List passedParamValues) : name(funcName), params(passedParamValues), nUnnamedParsed(0), totalParsed(0){};
 
     virtual ~ParamParser(){};
 

@@ -55,7 +55,8 @@ test_that("lolog_fit", {
     verbose = FALSE
   )
   expect_true(all(dim(fit$grad) == c(3,2)))
-  
+  expect_equivalent(summary(fit)$theta, fit$theta)
+  plot(fit)
 })
 
 

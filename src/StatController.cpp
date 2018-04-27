@@ -48,6 +48,7 @@ void initStats(){
     registerStatistic( DirStatPtr( new DirectedGwDegree() ) );
     registerStatistic( DirStatPtr( new DirectedGwdsp() ) );
     registerStatistic( DirStatPtr( new DirectedEsp() ) );
+    registerStatistic( DirStatPtr( new DirectedPreferentialAttachment() ) );
     registerStatistic( DirStatPtr( new DirectedNodeFactor() ) );
     registerStatistic( DirStatPtr( new DirectedAbsDiff() ) );
     registerStatistic( DirStatPtr( new DirectedEdgeCov() ) );
