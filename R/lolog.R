@@ -214,10 +214,6 @@ lolog <- function(formula,
   hsCount <- 0
   iter <- 0
   if (!is.null(cluster)) {
-    clusterEvalQ(cluster, {
-      library(lolog)
-      library(network)
-    })
     tmpNet <- lolik$getModel()$getNetwork()$clone()
     tmpNet$emptyGraph()
     network <- as.network(tmpNet)
@@ -226,6 +222,22 @@ lolog <- function(formula,
     clusterExport(cluster, "network", envir = environment())
     clusterExport(cluster, "orderIndependent", envir = environment())
     clusterExport(cluster, "includeOrderIndependent", envir = environment())
+    clusterEvalQ(cluster, {
+      # Load lolog on each node
+      library(lolog)
+      
+      # Pull from package while making R CMD check happy
+      .createLatentOrderLikelihoodFromTerms <- eval(parse(text="lolog:::.createLatentOrderLikelihoodFromTerms"))
+      .makeCppModelFromTerms <- eval(parse(text="lolog:::.makeCppModelFromTerms"))
+      
+      # Assign variables with external pointers
+      enet <- as.BinaryNet(network)
+      lolik2 <-
+        .createLatentOrderLikelihoodFromTerms(terms, enet)
+      if (!is.null(auxTerms))
+        auxModel2 <- .makeCppModelFromTerms(auxTerms, enet)
+      NULL
+    })
   }
   while (iter < maxIter) {
     iter <- iter + 1
@@ -264,17 +276,13 @@ lolog <- function(formula,
       if (includeOrderIndependent)
         auxStats <- cbind(stats[, orderIndependent], auxStats)
     } else{
-      workingNetwork <- as.network(lolik$getModel()$getNetwork())
       worker <- function(i, theta) {
-        network <- as.BinaryNet(network)
-        lolik <-
-          .createLatentOrderLikelihoodFromTerms(terms, network, theta)
-        samp <- lolik$generateNetwork()
+        lolik2$setThetas(theta)
+        samp <- lolik2$generateNetwork()
         if (!is.null(auxTerms)) {
-          auxModel <- .makeCppModelFromTerms(auxTerms, network)
-          auxModel$setNetwork(samp$network)
-          auxModel$calculate()
-          as <- auxModel$statistics()
+          auxModel2$setNetwork(samp$network)
+          auxModel2$calculate()
+          as <- auxModel2$statistics()
         } else{
           as <- numeric()
         }
