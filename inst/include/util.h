@@ -75,7 +75,7 @@ inline double nchoosek(double n,double k){
  * returns the first index where element occurs in vec
  */
 template<class T>
-inline int indexOf(T &element,std::vector<T> vec){
+inline int indexOf(const T &element,const std::vector<T> &vec){
     for(int i=0;i<vec.size();i++){
         if(vec[i]==element)
             return i;
@@ -88,7 +88,7 @@ inline int indexOf(T &element,std::vector<T> vec){
  * Coerse a type into a string
  */
 template<class T>
-std::string asString(T item){
+std::string asString(const T &item){
     std::ostringstream ss;
     ss << item;
     return ss.str();
