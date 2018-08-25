@@ -12,12 +12,9 @@
 namespace lolog{
 
 
+
 /*!
- * Counts shared neighbors of two nodes.
- * type = 1     :   from -> to -> nbr -> from
- * type = 2     :   from -> to <- nbr <- from (homogeneous)
- * type = 3     :   either type 1 or 2
- * type = 4     :   all combinations
+ * Counts shared neighbors of two nodes. type == 4
  */
 template<class Engine>
 int sharedNbrs(const BinaryNet<Engine>& net, int from, int to){
@@ -26,7 +23,11 @@ int sharedNbrs(const BinaryNet<Engine>& net, int from, int to){
 
 
 /*!
- * Counts shared neighbors of two nodes. type == 4
+ * Counts shared neighbors of two nodes.
+ * type = 1     :   from -> to -> nbr -> from
+ * type = 2     :   from -> to <- nbr <- from (homogeneous)
+ * type = 3     :   either type 1 or 2
+ * type = 4     :   all combinations
  */
 template<class Engine>
 int sharedNbrs(const BinaryNet<Engine>& net, int from, int to, int type){
@@ -2805,6 +2806,84 @@ public:
 
 typedef Stat<Undirected, EdgeCov<Undirected> > UndirectedEdgeCov;
 typedef Stat<Directed, EdgeCov<Directed> > DirectedEdgeCov;
+
+
+/*!
+ * twoPath
+ */
+template<class Engine>
+class TwoPath : public BaseStat< Engine > {
+public:
+    TwoPath(){
+        std::vector<double> v(1,0.0);
+        std::vector<double> t(1,0.0);
+        this->stats = v;
+        this->thetas = t;
+    }
+    
+    /*!
+    * constructor. params is unused
+    */
+    TwoPath(List params){
+        std::vector<double> v(1,0.0);
+        std::vector<double> t(1,0.0);
+        this->stats = v;
+        this->thetas = t;
+    }
+    
+    std::string name(){
+        return "twoPath";
+    }
+    std::vector<std::string> statNames(){
+        std::vector<std::string> statnames(1,"twoPath");
+        return statnames;
+    }
+    
+    void calculate(const BinaryNet<Engine>& net){
+        this->init(1);
+        double rec = 0.0;
+        int from, to;
+        boost::shared_ptr< std::vector< std::pair<int,int> > > edges = net.edgelist();
+        if(!net.isDirected()){
+            for(int i=0; i<net.size();i++){
+                double nEd = net.degree(i);
+                rec += nchoosek(nEd, 2.0);
+            }
+        }else{
+            for(int i=0;i<edges->size();i++){
+                from = (*edges)[i].first;
+                to = (*edges)[i].second;
+                rec+=(net.outdegree(to)-net.hasEdge(to,from));
+            }
+        }
+        std::vector<double> v(1,rec);
+        this->stats=v;
+    }
+    
+    void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
+        BaseOffset<Engine>::resetLastStats();
+        bool removingEdge = net.hasEdge(from,to);
+        bool hasReverse = net.hasEdge(to,from);
+        double change;
+        if(!net.isDirected()){
+            change = net.degree(from) + net.degree(to) - 2.0 * removingEdge;
+        }else{
+            change = net.indegree(from) + net.outdegree(to) - 2.0*hasReverse;
+        }
+        if(removingEdge) change = -change;
+        BaseOffset<Engine>::update(change,0);
+    }
+    
+    bool isOrderIndependent(){
+        return true;
+    }
+  
+};
+
+typedef Stat<Directed, TwoPath<Directed> > DirectedTwoPath;
+typedef Stat<Undirected, TwoPath<Undirected> > UndirectedTwoPath;
+
+
 
 #include <Rcpp.h>
 

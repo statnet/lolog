@@ -177,7 +177,7 @@ public:
     List modelFrameGivenOrder(double downsampleRate, std::vector<int> vert_order){
         GetRNGstate();
         long n = model->network()->size();
-        long nStats = model->thetas().size();
+        //long nStats = model->thetas().size();
 
         ModelPtr runningModel = noTieModel->clone();
         runningModel->setNetwork(noTieModel->network()->clone());
@@ -195,8 +195,8 @@ public:
         }
 
         bool sample;
-        bool hasEdge;
-        double lpartition = 0.0;
+        //bool hasEdge;
+        //double lpartition = 0.0;
         for(int i=0; i < n; i++){
             int vertex = workingVertOrder[i];
             this->shuffle(workingVertOrder,i);
@@ -301,7 +301,7 @@ public:
 
         bool directedGraph = runningModel->network()->isDirected();
         double llik = runningModel->logLik();
-        double llikChange, ldenom, probTie;
+        double llikChange, probTie;//, ldenom;
         bool hasEdge = false;
         for(int i=0; i < n; i++){
             int vertex = workingVertOrder[i];

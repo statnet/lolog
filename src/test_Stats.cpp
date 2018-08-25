@@ -158,6 +158,9 @@ void changeStatTest(std::string statName){
         ncpar.push_back(1);
         stat = boost::shared_ptr< Stat<Engine, Esp<Engine> > >(
                 new Stat<Engine, Esp<Engine> >(ncpar));
+    }else if(statName == "TwoPath"){
+      stat = boost::shared_ptr< Stat<Engine, TwoPath<Engine> > >(
+        new Stat<Engine, TwoPath<Engine> >());
     }else
         Rf_error("changeStatTest: unknown stat");
     vector<int> tmp1;
@@ -222,6 +225,7 @@ void testStats(){
     RUN_TEST(changeStatTest<Directed>("Triangles"));
     RUN_TEST(changeStatTest<Directed>("Esp"));
     RUN_TEST(changeStatTest<Directed>("NodeFactor"));
+    RUN_TEST(changeStatTest<Directed>("TwoPath"));
 
     RUN_TEST(changeStatTest<Undirected>("Triangles"));
     RUN_TEST(changeStatTest<Undirected>("Clustering"));
@@ -238,6 +242,7 @@ void testStats(){
     RUN_TEST(changeStatTest<Undirected>("Esp"));
     RUN_TEST(changeStatTest<Undirected>("DegreeCrossProd"));
     RUN_TEST(changeStatTest<Undirected>("NodeFactor"));
+    RUN_TEST(changeStatTest<Undirected>("TwoPath"));
 
 }
 

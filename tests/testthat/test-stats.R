@@ -47,5 +47,13 @@ test_that("Stats", {
   expect_equivalent(lss, c(0, 1, 3, 0, 5, 4, 10, 7, 7, 11, 5, 1, 3, 5, 7, 6, 
                            4, 9, 4, 4, 1, 5))
   
+  es <- summary(ukFaculty ~ twopath())
+  lss <- calculateStatistics(ukFaculty ~ twoPath())
+  expect_true(all(es == lss))
+  
+  es <- summary(lazega ~ twopath())
+  lss <- calculateStatistics(lazega ~ twoPath())
+  expect_true(all(es == lss))
+  
   })
   

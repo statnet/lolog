@@ -152,6 +152,17 @@ NULL
 #' such statistic equals the number of nodes in the network of degree
 #' \code{d[i]}, i.e. with exactly \code{d[i]} edges. 
 #' 
+#' \item{\code{twoPath} (order-independent) (directed)  (undirected)}{
+#'  This term adds one statistic to the model, equal to the number of 2-paths in
+#'  the network. For a directed network this is defined as a pair of edges
+#'  \eqn{(i{\rightarrow}j), (j{\rightarrow}k)}{(i,j), (j,k)}, where \eqn{i} and
+#'  \eqn{j} must be distinct. That is, it is a directed path of length 2 from
+#'  \eqn{i} to \eqn{k} via \eqn{j}. For directed networks a 2-path is also a
+#'   mixed 2-star.
+#'   For undirected networks a twopath is defined as a pair of edges
+#'  \eqn{\{i,j\}, \{j,k\}}. That is, it is an undirected path of length 2 from
+#'  \eqn{i} to \eqn{k} via \eqn{j}, also known as a 2-star.}
+#' 
 #' For directed networks if direction="undirected"
 #' degree is counted as the sum of the in and out degrees of a node. If direction="in" then in-degrees are
 #' used and direction="out" indicates out-degrees.
@@ -173,12 +184,17 @@ NULL
 #' network. For categorical variables, levels are coded as 1,..,nlevels`.
 #'   }
 #'   
-#' \item{\code{ edgeCov(x) } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
+#' \item{\code{ edgeCov(x, name=NULL) } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
 #' The \code{x} argument is a square matrix of covariates, one for each possible edge in the network.
 #'  This term adds one statistic to the model, equal to the sum
 #'  of the covariate values for each edge appearing in the network. The
 #'  \code{edgeCov} term applies to both directed and undirected networks. For
 #'  undirected networks the covariates are also assumed to be undirected.
+#'  If present, the \code{name} argument is a character string providing a
+#'  name for the \code{edgeCov} term. The name will be "edgeCov.<name>". It is
+#'  recommended that all \code{edgeCov} terms be given explicit names. In particular,
+#'  if two unnamed \code{edgeCov} terms are supplied an error will occur (as they will
+#'  have the same default name "edgeCov.".
 #'   }
 #'   
 #' \item{\code{gwesp(alpha)}  (order-independent)  (directed)  (undirected)}{ 
