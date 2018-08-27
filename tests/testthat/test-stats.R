@@ -1,9 +1,9 @@
+context("stat tests")
 
 library(lolog)
 library(testthat)
 library(ergm)
 library(network)
-context("stat tests")
 
 test_that("Stats", {
   

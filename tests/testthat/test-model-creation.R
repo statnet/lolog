@@ -1,8 +1,8 @@
+context("Model Creation")
 library(testthat)
 library(lolog)
 library(ergm)
 
-context("Model Creation")
 
 test_that("terms", {
   data(sampson)

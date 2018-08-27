@@ -2,7 +2,7 @@
 #
 # Author: ianfellows
 ###############################################################################
-
+context("BinaryNet")
 
 library(testthat)
 library(ergm)
@@ -10,7 +10,7 @@ library(lolog)
 library(network)
 library(igraph)
 
-context("BinaryNet")
+
 
 test_that("DirectedNet", {
   data(sampson)

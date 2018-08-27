@@ -1,8 +1,8 @@
+context("Latent Order Likeihood")
+
 library(lolog)
 library(testthat)
 library(ergm)
-
-context("Latent Order Likeihood")
 
 test_that("lolog", {
   data(sampson)

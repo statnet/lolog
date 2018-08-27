@@ -1,11 +1,11 @@
-
+context("inline tests")
 
 
 library(lolog)
 library(BH)
 library(testthat)
 
-context("inline tests")
+
 
 test_that("Inline", {
   # This creates a function in C++ to create an empty network of size n

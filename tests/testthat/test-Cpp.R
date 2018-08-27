@@ -1,10 +1,10 @@
 
-
+context("C++ tests")
 
 library(lolog)
 library(testthat)
 
-context("C++ tests")
+
 
 test_that("C++", {
   runLologCppTests()

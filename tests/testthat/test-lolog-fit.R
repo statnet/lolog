@@ -1,8 +1,8 @@
+context("LOLOG Fit")
 library(lolog)
 library(testthat)
 library(ergm)
 
-context("LOLOG Fit")
 
 test_that("lolog_fit", {
   data(sampson)
