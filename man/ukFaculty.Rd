@@ -24,6 +24,12 @@ data set, the original authors (Nepusz T., Petroczi A., Negyessy L., Bazso F. 20
 should be cited, along with this \code{R} package.
 }
 
+\section{Copyright}{
+
+Creative Commons Attribution-Share Alike 2.0 UK: England & Wales License, 
+see http://creativecommons.org/licenses/by-sa/2.0/uk/ for details.
+}
+
 \references{
 Nepusz T., Petroczi A., Negyessy L., Bazso F.: Fuzzy communities and the 
 concept of bridgeness in complex networks. Physical Review E 77:016107, 2008.

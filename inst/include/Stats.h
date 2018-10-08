@@ -2761,7 +2761,7 @@ public:
     
     //Calculate the statistic
     virtual void calculate(const BinaryNet<Engine>& net){
-        if(dcov.nrow() != net.size() | dcov.ncol() != net.size()){
+        if((dcov.nrow() != net.size()) || (dcov.ncol() != net.size())){
           ::Rf_error("EdgeCov error: the dyadic covariate matrix should have the same dimensions as the adjacency matrix.");
         }
         std::vector<double> v(1,0);

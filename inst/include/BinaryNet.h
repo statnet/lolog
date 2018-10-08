@@ -16,10 +16,21 @@
 #include "ShallowCopyable.h"
 #include <memory>
 #include <boost/shared_ptr.hpp>
+#include <stdint.h>
 
 namespace lolog {
 
 using namespace Rcpp;
+
+
+#ifdef _WIN32
+typedef unsigned __int64	unsigned64_t;
+#else
+
+typedef uint64_t			unsigned64_t;
+
+#endif
+
 /*!
  * The network. the fundamental structure of this package. Takes Engine as
  * a template parameter, which controls the underlying representation of the network.
@@ -278,7 +289,7 @@ public:
     /*!
      * \returns the maximum number of edges possible
      */
-    long long maxEdges() const{
+    unsigned64_t maxEdges() const{
         return engine.maxEdges();
     }
 
@@ -1710,8 +1721,8 @@ public:
         }
     }
 
-    long long maxEdges() const{
-        long long n = verts.size();
+    unsigned64_t maxEdges() const{
+        unsigned64_t n = verts.size();
         return n*(n-1);
     }
 
@@ -2408,8 +2419,8 @@ public:
         }
     }
 
-    long long maxEdges() const{
-        long long n= verts.size();
+    unsigned64_t maxEdges() const{
+        unsigned64_t n= verts.size();
         return n*(n-1LL)/2LL;
     }
 

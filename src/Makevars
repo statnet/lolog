@@ -1,6 +1,6 @@
 ## Use the R_HOME indirection to support installations of multiple R version
 PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`
-PKG_CPPFLAGS= -I../inst/include 
+PKG_CPPFLAGS= -I../inst/include
 ## PKG_CXXFLAGS= -Wundefined-var-template -UNDEBUG -D_GLIBCXX_DEBUG -D_LIBCPP_DEBUG -O0
 ## -O0 -fno-inline
 ## As an alternative, one can also add this code in a file 'configure'

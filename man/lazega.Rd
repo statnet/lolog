@@ -21,6 +21,12 @@ data set, the original authors (Lazega, 2001)
 should be cited, along with this \code{R} package.
 }
 
+\section{Copyright}{
+
+Creative Commons Attribution-Share Alike 4.0 International License, 
+see https://creativecommons.org/licenses/by/4.0/ for details.
+}
+
 \references{
 Lazega, Emmanuel (2001), The Collegial Phenomenon: The Social Mechanisms of Cooperation 
 among Peers in a Corporate Law Partnership, Oxford: Oxford University Press

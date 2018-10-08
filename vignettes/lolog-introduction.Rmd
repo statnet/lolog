@@ -305,16 +305,9 @@ This currently produces:
 - `preferentialAttachment(k=1)` (undirected)
 - `sharedNbrs(k=1)` (undirected)
 - `nodeLogMaxCov(name)` (order-independent)  (undirected)
+- `twoPath()` (order-independent)  (directed)  (undirected)
 - `boundedDegree(lower,upper)` (order-independent)  (undirected)
-Adds a constraint that the degrees for the network must be between lower and upper.
 
-Key terms still to be added are:
-
-- ctriple
-- ttriple
-- triadcensus
-- geodesic distances
-- ?
 
 ### Coding New Terms
 

@@ -61,6 +61,9 @@ NULL
 #' @source The data set was originally reported by Nepusz et. al. (2008) and was
 #' subsequently processed and included by the igraphdata package. We have simply
 #' converted their network from an igraph to a network object.
+#' @section Copyright:
+#' Creative Commons Attribution-Share Alike 2.0 UK: England & Wales License, 
+#' see http://creativecommons.org/licenses/by-sa/2.0/uk/ for details.
 #' @keywords datasets
 NULL
 
@@ -82,6 +85,9 @@ NULL
 #' among Peers in a Corporate Law Partnership, Oxford: Oxford University Press
 #' @source 
 #' See \url{http://elazega.fr/?page_id=609} and \url{https://www.stats.ox.ac.uk/~snijders/siena/Lazega_lawyers_data.htm}
+#' @section Copyright:
+#' Creative Commons Attribution-Share Alike 4.0 International License, 
+#' see https://creativecommons.org/licenses/by/4.0/ for details.
 #' @keywords datasets
 NULL
 
