@@ -1,5 +1,5 @@
 context("LOLOG Fit")
-library(lolog)
+#library(lolog)
 library(testthat)
 library(ergm)
 

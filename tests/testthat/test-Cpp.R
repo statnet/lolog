@@ -1,7 +1,7 @@
 
 context("C++ tests")
 
-library(lolog)
+#library(lolog)
 library(testthat)
 
 

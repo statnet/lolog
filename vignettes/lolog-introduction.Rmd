@@ -294,6 +294,7 @@ This currently produces:
 - `nodeMatch(name)` (dyad-independent)  (order-independent)  (directed)  (undirected) 
 - `nodeMix(name)` (dyad-independent)  (order-independent)  (directed)  (undirected)
 - `edgeCov(x)` (dyad-independent)  (order-independent)  (directed)  (undirected) 
+- `edgeCovSparse(x)` (dyad-independent)  (order-independent)  (directed)  (undirected) 
 - `degree(d, direction=0L, lessThanOrEqual=FALSE)` (order-independent)  (directed)  (undirected) 
 - `degreeCrossProd()` (order-independent)  (undirected) 
 - `gwdsp(alpha)` (order-independent)  (directed)  (undirected) 

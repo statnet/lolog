@@ -200,7 +200,7 @@ as.BinaryNet.default <- function(x, ...) {
 
 #' indexing
 #' @name [
-#' @aliases [,Rcpp_DirectedNet-method
+#' @aliases [,Rcpp_DirectedNet-method [,Rcpp_DirectedNet,ANY,ANY,ANY-method \S4method{[}{Rcpp_DirectedNet,ANY,ANY,ANY}
 #' @param x object
 #' @param i indices
 #' @param j indices
@@ -242,7 +242,7 @@ setMethod("[", c("Rcpp_DirectedNet"),
 
 #' indexing
 #' @name [
-#' @aliases [,Rcpp_UndirectedNet-method
+#' @aliases [,Rcpp_UndirectedNet-method [,Rcpp_UndirectedNet,ANY,ANY,ANY-method \S4method{[}{Rcpp_UndirectedNet,ANY,ANY,ANY}
 #' @docType methods
 #' @rdname extract-methods
 setMethod("[", c("Rcpp_UndirectedNet"),
@@ -258,7 +258,7 @@ setMethod("[", c("Rcpp_UndirectedNet"),
 
 #' indexing
 #' @name [<-
-#' @aliases [<-,Rcpp_DirectedNet-method
+#' @aliases [<-,Rcpp_DirectedNet-method [<-,Rcpp_DirectedNet,ANY,ANY,ANY-method \S4method{[<-}{Rcpp_DirectedNet,ANY,ANY,ANY}
 #' @param value values to assign
 #' @docType methods
 #' @rdname extract-methods
@@ -279,7 +279,7 @@ setMethod("[<-", c("Rcpp_DirectedNet"),
 
 #' indexing
 #' @name [<-
-#' @aliases [<-,Rcpp_UndirectedNet-method
+#' @aliases [<-,Rcpp_UndirectedNet-method [<-,Rcpp_UndirectedNet,ANY,ANY,ANY-method \S4method{[<-}{Rcpp_UndirectedNet,ANY,ANY,ANY}
 #' @docType methods
 #' @rdname extract-methods
 setMethod("[<-", c("Rcpp_UndirectedNet"),

@@ -9,6 +9,7 @@
 #include <vector>
 #include <utility>
 #include <boost/container/flat_map.hpp>
+#include <boost/unordered_map.hpp>
 namespace lolog{
 
 
@@ -2882,6 +2883,115 @@ public:
 
 typedef Stat<Directed, TwoPath<Directed> > DirectedTwoPath;
 typedef Stat<Undirected, TwoPath<Undirected> > UndirectedTwoPath;
+
+
+
+template<class Engine>
+class EdgeCovSparse : public BaseStat< Engine > {
+protected:
+  boost::unordered::unordered_map<std::pair<int, int>, double> map;
+  std::string termName; /*!< the name of the term variable */
+    
+  void convertMatrix(SEXP x){
+    Rcpp::Language call("getNamespace","Matrix");
+    //call.eval();
+    //Environment Matrix("package:Matrix"); 
+    Environment Matrix = call.eval();
+    Function summary = Matrix["summary"];
+    //Rcpp::Function summary("summary");
+    //SEXP sumry = summary(x);
+    //sumry.attr("class") = "data.frame"
+    Rcpp::DataFrame df = Rcpp::as<Rcpp::DataFrame>(summary(x));
+    Rcpp::IntegerVector ivals = df["i"];
+    Rcpp::IntegerVector jvals = df["j"];
+    Rcpp::NumericVector values = df["x"];
+    for(int i=0; i < df.nrow(); i++){
+      map[std::make_pair(ivals[i] - 1,jvals[i] - 1)] = values[i];
+    }
+  }
+  
+  double dcov(int i, int j, bool directed){
+    std::pair<int,int> p = std::make_pair(i,j);
+    double v = 0.0;
+    //Rcpp::Rcout << "\n\n\n" << map.count(std::make_pair(25,1));
+    if(map.count(p))
+      v = map.at(p);
+    else if(!directed){
+      p = std::make_pair(j,i);
+      if(map.count(p))
+        v = map.at(p);
+    }
+    return v;
+  }
+public:
+  
+  //Constructor
+  EdgeCovSparse(){}
+  
+  //Parse parameters
+  EdgeCovSparse(List params){
+    ParamParser p(name(), params);
+    SEXP x = p.parseNext< SEXP >("x");
+    convertMatrix(x);
+    termName = p.parseNext< std::string >("name","");
+    p.end();
+  }
+  
+  //The name 
+  std::string name(){return "edgeCovSparse";}
+  
+  std::vector<std::string> statNames(){
+    std::vector<std::string> statnames(1,"edgeCovSparse."+termName);
+    return statnames;
+  }
+  
+  //Calculate the statistic
+  virtual void calculate(const BinaryNet<Engine>& net){
+    //if(dcov.n_rows != net.size() | dcov.n_cols != net.size()){
+    //  ::Rf_error("EdgeCov error: the dyadic covariate matrix should have the same dimensions as the adjacency matrix.");
+    //}
+    std::vector<double> v(1,0);
+    this->stats=v;
+    this->lastStats = std::vector<double>(1,0.0);
+    if(this->thetas.size()!=1)
+      this->thetas = v;
+    if(net.isDirected()){
+      for(int i=0;i<net.size();i++){
+        for(int j=0;j<net.size();j++){
+          this->stats[0] += net.hasEdge(i,j)*dcov(i,j, true);
+        }
+      }
+    }else{
+      for(int i=1;i<net.size();i++){
+        for(int j=0;j<i;j++){
+          this->stats[0] += net.hasEdge(i,j)*dcov(i,j, false);
+        }
+      }
+    }
+  }
+  
+  //Update the statistic given a dyad toggle
+  virtual void dyadUpdate(const BinaryNet<Engine>& net,const int &from,const int &to,const std::vector<int> &order,const int &actorIndex){
+    BaseOffset<Engine>::resetLastStats();
+    bool addingEdge = !net.hasEdge(from,to);
+    double change = 2.0 * (!net.hasEdge(from,to) - 0.5);
+    this->stats[0] += change * dcov(from, to, net.isDirected());
+  }
+  
+  //Declare that this statistic is order independent
+  bool isOrderIndependent(){
+    return true;
+  }
+  
+  //Declare that this statistic is dyad independent
+  bool isDyadIndependent(){
+    return true;
+  }
+  
+};
+
+typedef Stat<Undirected, EdgeCovSparse<Undirected> > UndirectedEdgeCovSparse;
+typedef Stat<Directed, EdgeCovSparse<Directed> > DirectedEdgeCovSparse;
 
 
 
