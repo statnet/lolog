@@ -8,6 +8,7 @@ library(testthat)
 
 
 test_that("Inline", {
+  skip_on_cran()
   # This creates a function in C++ to create an empty network of size n
   # and expose it to R.
   src <- "
