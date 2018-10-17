@@ -6,7 +6,7 @@ context("BinaryNet")
 
 library(testthat)
 library(ergm)
-library(lolog)
+#library(lolog)
 library(network)
 library(igraph)
 

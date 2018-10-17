@@ -21,7 +21,8 @@ Imports:
     parallel,
     ggplot2,
     reshape2,
-    intergraph
+    intergraph,
+    Matrix
 Suggests:
     testthat,
     inline,

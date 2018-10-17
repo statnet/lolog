@@ -1,6 +1,6 @@
 context("Model Creation")
 library(testthat)
-library(lolog)
+#library(lolog)
 library(ergm)
 
 

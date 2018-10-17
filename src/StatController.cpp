@@ -43,6 +43,7 @@ void initStats(){
     registerStatistic( DirStatPtr( new DirectedDegree() ) );
     registerStatistic( DirStatPtr( new DirectedStar() ) );
     registerStatistic( DirStatPtr( new DirectedNodeCov() ) );
+    registerStatistic( DirStatPtr( new DirectedEdgeCovSparse() ) );
     registerStatistic( DirStatPtr( new DirectedGwesp() ) );
     registerStatistic( DirStatPtr( new DirectedGeoDist() ) );
     registerStatistic( DirStatPtr( new DirectedGwDegree() ) );
@@ -74,6 +75,7 @@ void initStats(){
     registerStatistic( UndirStatPtr( new UndirectedNodeMatch() ) );
     registerStatistic( UndirStatPtr( new UndirectedStar() ) );
     registerStatistic( UndirStatPtr( new UndirectedNodeCov() ) );
+    registerStatistic( UndirStatPtr( new UndirectedEdgeCovSparse() ) );
     registerStatistic( UndirStatPtr( new UndirectedGwesp() ) );
     registerStatistic( UndirStatPtr( new UndirectedGeoDist() ) );
     registerStatistic( UndirStatPtr( new UndirectedGwDegree() ) );

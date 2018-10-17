@@ -4,23 +4,31 @@
 \name{[}
 \alias{[}
 \alias{[,Rcpp_DirectedNet-method}
+\alias{[,Rcpp_DirectedNet,ANY,ANY,ANY-method}
+\alias{\S4method{[}{Rcpp_DirectedNet,ANY,ANY,ANY}}
 \alias{[}
 \alias{[,Rcpp_UndirectedNet-method}
+\alias{[,Rcpp_UndirectedNet,ANY,ANY,ANY-method}
+\alias{\S4method{[}{Rcpp_UndirectedNet,ANY,ANY,ANY}}
 \alias{[<-}
 \alias{[<-,Rcpp_DirectedNet-method}
+\alias{[<-,Rcpp_DirectedNet,ANY,ANY,ANY-method}
+\alias{\S4method{[<-}{Rcpp_DirectedNet,ANY,ANY,ANY}}
 \alias{[<-}
 \alias{[<-,Rcpp_UndirectedNet-method}
+\alias{[<-,Rcpp_UndirectedNet,ANY,ANY,ANY-method}
+\alias{\S4method{[<-}{Rcpp_UndirectedNet,ANY,ANY,ANY}}
 \title{indexing}
 \usage{
-\S4method{[}{Rcpp_DirectedNet}(x, i, j, ..., maskMissing = TRUE,
+\S4method{[}{Rcpp_DirectedNet,ANY,ANY,ANY}(x, i, j, ..., maskMissing = TRUE,
   drop = TRUE)
 
-\S4method{[}{Rcpp_UndirectedNet}(x, i, j, ..., maskMissing = TRUE,
+\S4method{[}{Rcpp_UndirectedNet,ANY,ANY,ANY}(x, i, j, ..., maskMissing = TRUE,
   drop = TRUE)
 
-\S4method{[}{Rcpp_DirectedNet}(x, i, j, ...) <- value
+\S4method{[}{Rcpp_DirectedNet,ANY,ANY,ANY}(x, i, j, ...) <- value
 
-\S4method{[}{Rcpp_UndirectedNet}(x, i, j, ...) <- value
+\S4method{[}{Rcpp_UndirectedNet,ANY,ANY,ANY}(x, i, j, ...) <- value
 }
 \arguments{
 \item{x}{object}

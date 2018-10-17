@@ -110,6 +110,11 @@ The \code{x} argument is a square matrix of covariates, one for each possible ed
  have the same default name "edgeCov.".
   }
   
+\item{\code{ edgeCovSparse(x, name=NULL) } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
+  Identical to edgeCov, except \code{x} should be a sparse matrix. This is especially useful for larger networks,
+  where passing a dense matrix to \code{edgeCov} is too memory intensive. 
+  }
+  
 \item{\code{gwesp(alpha)}  (order-independent)  (directed)  (undirected)}{ 
 This term is just like \code{gwdsp} except it adds a statistic equal to the
 geometrically weighted \emph{edgewise} (not dyadwise) shared partner
