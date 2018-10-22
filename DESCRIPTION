@@ -1,6 +1,6 @@
 Package: lolog
 Maintainer: Ian E. Fellows <ian@fellstat.com>
-License: MIT + file LICENSE
+License: MIT + file LICENCE
 Title: Latent Order Logistic Graph Models
 LinkingTo: Rcpp, BH
 Type: Package
