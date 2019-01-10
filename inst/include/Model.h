@@ -454,7 +454,7 @@ public:
         return net;
     }
 
-    SEXP getNetworkR() const{
+    Rcpp::RObject getNetworkR() const{
         return wrap(*net);
     }
 

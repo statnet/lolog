@@ -2931,7 +2931,7 @@ public:
   //Parse parameters
   EdgeCovSparse(List params){
     ParamParser p(name(), params);
-    SEXP x = p.parseNext< SEXP >("x");
+    Rcpp::RObject x = p.parseNext< Rcpp::RObject >("x");
     convertMatrix(x);
     termName = p.parseNext< std::string >("name","");
     p.end();

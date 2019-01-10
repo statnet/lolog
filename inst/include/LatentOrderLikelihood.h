@@ -139,7 +139,7 @@ public:
     /*!
      * Get model exposed to R
      */
-    SEXP getModelR(){
+    Rcpp::RObject getModelR(){
         return wrap(*model);
     }
 
@@ -261,7 +261,7 @@ public:
         return result;
     }
 
-    SEXP generateNetwork(){
+    Rcpp::RObject generateNetwork(){
         GetRNGstate();
         long n = model->network()->size();
         std::vector<int> vertices(n);
@@ -279,7 +279,7 @@ public:
 
 
 
-    SEXP generateNetworkWithOrder(std::vector<int> vert_order){
+    Rcpp::RObject generateNetworkWithOrder(std::vector<int> vert_order){
         GetRNGstate();
         long n = model->network()->size();
         long nStats = model->thetas().size();

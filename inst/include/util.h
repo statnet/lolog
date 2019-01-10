@@ -49,7 +49,7 @@ boost::shared_ptr<T> unwrapRobject(const SEXP& s){
  * Object must be of a module exported class
  */
 template<class T>
-SEXP wrapInReferenceClass(const T& obj,std::string className){
+Rcpp::RObject wrapInReferenceClass(const T& obj,std::string className){
     XPtr< T > xp = (&obj)->template vShallowCopyXPtr<T>();
     //XPtr< T > xp(new T(obj));
 #ifndef INSIDE

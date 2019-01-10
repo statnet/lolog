@@ -817,7 +817,7 @@ public:
     /*!
      * A list of character vectors representing the discrete and continuous variables
      */
-    SEXP getVariableNamesR1(bool simplify){
+    Rcpp::RObject getVariableNamesR1(bool simplify){
         Rcpp::List result;
         std::vector<std::string> tmp;
         tmp.push_back("discrete");
@@ -833,21 +833,21 @@ public:
         }
     }
 
-    SEXP getVariableNamesR2(){
+    Rcpp::RObject getVariableNamesR2(){
         return getVariableNamesR1(false);
     }
 
     /*!
      * get a variable by name
      */
-    SEXP getVariableR(std::string name){
+    Rcpp::RObject getVariableR(std::string name){
         return engine.getVariableR(name,true);
     }
 
     /*!
      * get a variable by name
      */
-    SEXP getVariableR1(std::string name,bool maskMissing){
+    Rcpp::RObject getVariableR1(std::string name,bool maskMissing){
         return engine.getVariableR(name,maskMissing);
     }
 
@@ -1587,19 +1587,21 @@ public:
         verts[at]->setDiscreteObserved(which,observed);
     }
 
-    void addDiscreteVariableR(RObject robj,std::string name){
+    void addDiscreteVariableR(SEXP robj,std::string name){
         std::vector<int> vals;
         std::vector<std::string> levels;
         try{
             Language call("as.factor",robj);
-            SEXP facSexp = call.eval();
+            Rcpp::RObject facSexp = call.eval();
             Language call1("as.integer",facSexp);
-            SEXP intSexp = call1.eval();
+            Rcpp::RObject intSexp = call1.eval();
             Language call2("levels",facSexp);
-            SEXP levelsSexp = call2.eval();
+            Rcpp::RObject levelsSexp = call2.eval();
             vals = as< std::vector<int> >(intSexp);
             levels = as< std::vector<std::string> >(levelsSexp);
-        }catch(...){
+        } catch(std::exception &ex) {	
+            forward_exception_to_r(ex);
+        } catch(...){
             ::Rf_error("error, invalid object addDiscreteVariableR");
         }
         if(vals.size() != this->size())
@@ -1621,7 +1623,7 @@ public:
         }
     }
 
-    SEXP getVariableR(std::string name,bool maskMissing){
+    Rcpp::RObject getVariableR(std::string name,bool maskMissing){
         std::vector<std::string> names = discreteVarNames();
         int index = -1;
         for(int i=0;i<names.size();i++)
@@ -1699,10 +1701,10 @@ public:
                 removeDiscreteVariable(index);
             ContinAttrib atr;
             atr.setName(name);
-            SEXP lb = vec.attr("lowerBound");
+            Rcpp::RObject lb = vec.attr("lowerBound");
             if(!Rf_isNull(lb))
                 atr.setLowerBound(as<double>(lb));
-            SEXP ub = vec.attr("upperBound");
+            Rcpp::RObject ub = vec.attr("upperBound");
             if(!Rf_isNull(ub))
                 atr.setUpperBound(as<double>(ub));
             addContinVariable(d,atr);
@@ -2285,11 +2287,11 @@ public:
         std::vector<std::string> levels;
         try{
             Language call("as.factor",robj);
-            SEXP facSexp = call.eval();
+            Rcpp::RObject facSexp = call.eval();
             Language call1("as.integer",facSexp);
-            SEXP intSexp = call1.eval();
+            Rcpp::RObject intSexp = call1.eval();
             Language call2("levels",facSexp);
-            SEXP levelsSexp = call2.eval();
+            Rcpp::RObject levelsSexp = call2.eval();
             vals = as< std::vector<int> >(intSexp);
             levels = as< std::vector<std::string> >(levelsSexp);
         }catch(...){
@@ -2315,7 +2317,7 @@ public:
         }
     }
 
-    SEXP getVariableR(std::string name,bool maskMissing){
+    Rcpp::RObject getVariableR(std::string name,bool maskMissing){
         std::vector<std::string> names = discreteVarNames();
         int index = -1;
         for(int i=0;i<names.size();i++)
@@ -2377,10 +2379,10 @@ public:
             NumericVector vec = as<NumericVector>(var);
             ContinAttrib atr;
             atr.setName(name);
-            SEXP lb = vec.attr("lowerBound");
+            Rcpp::RObject lb = vec.attr("lowerBound");
             if(!Rf_isNull(lb))
                 atr.setLowerBound(as<double>(lb));
-            SEXP ub = vec.attr("upperBound");
+            Rcpp::RObject ub = vec.attr("upperBound");
             if(!Rf_isNull(ub))
                 atr.setUpperBound(as<double>(ub));
             if(vec.size()!=size())
