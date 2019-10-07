@@ -89,6 +89,7 @@ RCPP_MODULE(lolog) {
     .method("setVertexOrder",&Model<Undirected>::setVertexOrderVector)
     .method("getVertexOrder",&Model<Undirected>::getVertexOrderVector)
     .method("isIndependent",&Model<Undirected>::isIndependent)
+    .method("dyadUpdate",&Model<Undirected>::dyadUpdate)
     ;
     class_<Model<Directed> >("DirectedModel")
     .constructor()
@@ -106,6 +107,7 @@ RCPP_MODULE(lolog) {
     .method("setVertexOrder",&Model<Directed>::setVertexOrderVector)
     .method("getVertexOrder",&Model<Directed>::getVertexOrderVector)
     .method("isIndependent",&Model<Directed>::isIndependent)
+    .method("dyadUpdate",&Model<Directed>::dyadUpdate)
     ;
 
     class_<LatentOrderLikelihood<Undirected> >("UndirectedLatentOrderLikelihood")
