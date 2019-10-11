@@ -89,6 +89,7 @@ RCPP_MODULE(lolog) {
     .method("setVertexOrder",&Model<Undirected>::setVertexOrderVector)
     .method("getVertexOrder",&Model<Undirected>::getVertexOrderVector)
     .method("isIndependent",&Model<Undirected>::isIndependent)
+    //added in 
     .method("dyadUpdate",&Model<Undirected>::dyadUpdate)
     ;
     class_<Model<Directed> >("DirectedModel")
@@ -107,6 +108,7 @@ RCPP_MODULE(lolog) {
     .method("setVertexOrder",&Model<Directed>::setVertexOrderVector)
     .method("getVertexOrder",&Model<Directed>::getVertexOrderVector)
     .method("isIndependent",&Model<Directed>::isIndependent)
+    //added in
     .method("dyadUpdate",&Model<Directed>::dyadUpdate)
     ;
 
@@ -118,6 +120,8 @@ RCPP_MODULE(lolog) {
     .method("variationalModelFrame",&LatentOrderLikelihood<Undirected>::variationalModelFrame)
     .method("variationalModelFrameWithFunc",&LatentOrderLikelihood<Undirected>::variationalModelFrameWithFunc)
     .method("generateNetwork",&LatentOrderLikelihood<Undirected>::generateNetwork)
+    //added in
+    .method("calcChangeStats",&LatentOrderLikelihood<Undirected>::calcChangeStats)
     ;
 
     class_<LatentOrderLikelihood<Directed> >("DirectedLatentOrderLikelihood")
@@ -128,6 +132,8 @@ RCPP_MODULE(lolog) {
     .method("variationalModelFrame",&LatentOrderLikelihood<Directed>::variationalModelFrame)
     .method("variationalModelFrameWithFunc",&LatentOrderLikelihood<Directed>::variationalModelFrameWithFunc)
     .method("generateNetwork",&LatentOrderLikelihood<Directed>::generateNetwork)
+    //added in
+    .method("calcChangeStats",&LatentOrderLikelihood<Directed>::calcChangeStats)
     ;
 
     function("initLologStatistics",&initStats);

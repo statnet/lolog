@@ -370,6 +370,65 @@ public:
 
         return result;
     }
+  
+  //Heavily modified from the generate network function
+  Rcpp::List calcChangeStats(std::vector<int> perm_heads,
+                             std::vector<int> perm_tails){
+    
+    long n = model->network()->size();
+    long nStats = model->thetas().size();
+    long e = n*(n-1);
+    if(!model->network()->isDirected()){
+      e = e/2;
+    }
+    
+    //Make fake vert order so don't have to change other functions
+    //Will not effect calculation for order independent stats
+    std::vector<int> vert_order(1,n);
+    
+    //Check if the perm_head and perm_tails vectors have the right number of elements
+    if(perm_heads.size() != e || perm_tails.size() != e){
+      Rcpp::Rcout<< "The perm is the wrong length" ;
+    }
+    
+    //The model used for calculating the change stats
+    ModelPtr runningModel = noTieModel->clone();
+    runningModel->setNetwork(noTieModel->network()->clone());
+    runningModel->calculate();
+    
+    std::vector<double> eStats = std::vector<double>(nStats, 0.0);//runningModel->statistics();
+    std::vector<double> stats = std::vector<double>(nStats, 0.0);
+    std::vector<double> auxStats = std::vector<double>(nStats, 0.0);
+    std::vector<double> terms = runningModel->statistics();
+    std::vector<double>  newTerms = runningModel->statistics();
+    std::vector<double>  emptyStats = runningModel->statistics();
+    Rcpp::List result(e);
+    
+    
+    //bool directedGraph = runningModel->network()->isDirected();
+    // double llik = runningModel->logLik();
+    // double llikChange, probTie;//, ldenom;
+    for(int i=0; i < e; i++){
+      int vertex = perm_tails[i];
+      int alter = perm_heads[i];
+      assert(!runningModel->network()->hasEdge(vertex, alter));
+      //llik = runningModel->logLik();
+      std::vector<double> stat = runningModel->statistics();
+      
+      runningModel->dyadUpdate(vertex, alter, vert_order, vertex);
+      //runningModel->statistics(newTerms);
+      std::vector<double> statNew(nStats);
+      runningModel->statistics(statNew);
+      std::vector<double> changeStat(nStats);
+      std::transform(statNew.begin(), statNew.end(),stat.begin(),changeStat.begin(),std::minus<double>());
+      result[i] = changeStat;
+      if(model->network()->hasEdge(vertex,alter)){
+        runningModel->network()->toggle(vertex,alter);
+      }else{runningModel->rollback();}
+    }
+    return result;
+  }
+  
 };
 
 
