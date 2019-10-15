@@ -372,6 +372,7 @@ public:
   }
   
   //Based on generate model from vertex order - generate network based on edge ordering
+  //Also returns the change stats used to generate the network
   Rcpp::RObject generateNetworkWithEdgeOrder(std::vector<int> perm_heads,
                                              std::vector<int> perm_tails){
     GetRNGstate();
@@ -397,6 +398,9 @@ public:
     ModelPtr runningModel = noTieModel->clone();
     runningModel->setNetwork(noTieModel->network()->clone());
     runningModel->calculate();
+    
+    //Make the change stat list
+    Rcpp::List changeStats;
     
     
     std::vector<double> eStats = std::vector<double>(nStats, 0.0);//runningModel->statistics();
@@ -429,14 +433,18 @@ public:
         runningModel->rollback();
       
       //update the generated network statistics and expected statistics
+      //Initiate change stats
+      std::vector<int> change(terms.size());
       for(int m=0; m<terms.size(); m++){
         double diff = newTerms[m] - terms[m];\
+        change[m] = diff;
         eStats[m] += diff * probTie;
         if(hasEdge){
           stats[m] += diff;
           terms[m] += diff;
         }
       }
+      changeStats.push_back(change);
     }
     std::vector<int> rankOrder = vert_order;
     for(int i=0;i<vert_order.size();i++)
@@ -450,6 +458,7 @@ public:
     result["emptyNetworkStats"] = wrap(emptyStats);
     result["stats"] = wrap(stats);
     result["expectedStats"] = wrap(eStats);
+    result["changeStats"] = wrap(changeStats);
     
     return result;
   }
