@@ -400,7 +400,7 @@ public:
     runningModel->calculate();
     
     //Make the change stat list
-    Rcpp::List changeStats;
+    Rcpp::List changeStats(e);
     
     
     std::vector<double> eStats = std::vector<double>(nStats, 0.0);//runningModel->statistics();
@@ -434,7 +434,7 @@ public:
       
       //update the generated network statistics and expected statistics
       //Initiate change stats
-      std::vector<int> change(terms.size());
+      std::vector<double> change(terms.size());
       for(int m=0; m<terms.size(); m++){
         double diff = newTerms[m] - terms[m];\
         change[m] = diff;
@@ -444,7 +444,7 @@ public:
           terms[m] += diff;
         }
       }
-      changeStats.push_back(change);
+      changeStats[i] = change;
     }
     std::vector<int> rankOrder = vert_order;
     for(int i=0;i<vert_order.size();i++)
