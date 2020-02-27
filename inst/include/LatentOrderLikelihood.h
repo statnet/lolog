@@ -388,11 +388,24 @@ public:
       throw(std::range_error("Wrong length of permutation"));
     }
     
-    //Make vert order that isn't used
-    std::vector<int> vert_order(n);
-    for(int j=0;j<n;j++){
-      vert_order[j] = (j+1);
+    //Check if the max of perm head and perm tail are correct
+    int max_tail = *std::max_element(perm_tails.begin(),perm_tails.end());
+    int max_head = *std::max_element(perm_heads.begin(),perm_heads.end());
+    if( max_tail > (n-1) || max_head > (n-1) ){
+      Rcpp::Rcout<< "The perm has vertices that don't exist, probably forgot to minus 1 in the heads and tails from R to cpp" ;
     }
+    
+    //Make vert order that isn't used
+    std::vector<int> vertices(n);
+    if(model->hasVertexOrder()){
+      this->generateOrder(vertices, model->getVertexOrder());
+    }else{
+      for(int i=0; i<n;i++){
+        vertices[i] = i;
+      }
+      this->shuffle(vertices, n);
+    }
+    std::vector<int> vert_order = vertices;
     
     //The model used for generating the network draw
     ModelPtr runningModel = noTieModel->clone();
@@ -409,6 +422,7 @@ public:
     std::vector<double> terms = runningModel->statistics();
     std::vector<double>  newTerms = runningModel->statistics();
     std::vector<double>  emptyStats = runningModel->statistics();
+    int actorIndex = 1;
     
     //std::vector<int> workingVertOrder = vert_order;
     
@@ -419,9 +433,21 @@ public:
     for(int i=0; i < e; i++){
       int vertex = perm_tails[i];
       int alter = perm_heads[i];
-      assert(!runningModel->network()->hasEdge(vertex, alter));
+      
+      //Don't need to assert this, to speed up
+      //assert(!runningModel->network()->hasEdge(vertex, alter));
+      
       llik = runningModel->logLik();
-      runningModel->dyadUpdate(vertex, alter, vert_order, i);
+      
+      //Find which actor the vertex correponds to
+      for(int k =0; k<n;k++){
+        if(vert_order[k] == vertex){
+          int actorIndex = k;
+          break;
+        }
+      }
+      
+      runningModel->dyadUpdate(vertex, alter, vert_order, actorIndex);
       runningModel->statistics(newTerms);
       llikChange = runningModel->logLik() - llik;
       probTie = 1.0 / (1.0 + exp(-llikChange));
@@ -475,13 +501,28 @@ public:
       e = e/2;
     }
     
-    //Make fake vert order so don't have to change other functions
-    //Will not effect calculation for order independent stats
-    std::vector<int> vert_order(1,n);
+    //Make vert order that isn't used
+    std::vector<int> vertices(n);
+    if(model->hasVertexOrder()){
+      this->generateOrder(vertices, model->getVertexOrder());
+    }else{
+      for(int i=0; i<n;i++){
+        vertices[i] = i;
+      }
+      this->shuffle(vertices, n);
+    }
+    std::vector<int> vert_order = vertices;
     
     //Check if the perm_head and perm_tails vectors have the right number of elements
     if(perm_heads.size() != e || perm_tails.size() != e){
       Rcpp::Rcout<< "The perm is the wrong length" ;
+    }
+    
+    //Check if the max of perm head and perm tail are correct
+    int max_tail = *std::max_element(perm_tails.begin(),perm_tails.end());
+    int max_head = *std::max_element(perm_heads.begin(),perm_heads.end());
+    if( max_tail > (n-1) || max_head > (n-1) ){
+      Rcpp::Rcout<< "The perm has vertices that don't exist, probably forgot to minus 1 in the heads and tails from R to cpp" ;
     }
     
     //The model used for calculating the change stats
@@ -495,6 +536,7 @@ public:
     std::vector<double> terms = runningModel->statistics();
     std::vector<double>  newTerms = runningModel->statistics();
     std::vector<double>  emptyStats = runningModel->statistics();
+    int actorIndex = 1;
     Rcpp::List result(e);
     
     
@@ -508,7 +550,15 @@ public:
       //llik = runningModel->logLik();
       std::vector<double> stat = runningModel->statistics();
       
-      runningModel->dyadUpdate(vertex, alter, vert_order, vertex);
+      //Find which actor the vertex correponds to
+      for(int k =0; k<n;k++){
+        if(vert_order[k] == vertex){
+          actorIndex = k;
+          break;
+        }
+      }
+      
+      runningModel->dyadUpdate(vertex, alter, vert_order, actorIndex);
       //runningModel->statistics(newTerms);
       std::vector<double> statNew(nStats);
       runningModel->statistics(statNew);
