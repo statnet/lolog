@@ -30,23 +30,23 @@ protected:
   typedef boost::shared_ptr< std::vector<int> > VectorPtr;
   
   /**
-  * The likelihood model with the observed graph
-  */
+   * The likelihood model with the observed graph
+   */
   ModelPtr model;
   
   /**
-  * The likelihood model with an empty graph
-  */
+   * The likelihood model with an empty graph
+   */
   ModelPtr noTieModel;
   
   /**
-  * A vector giving the (partial) ordering for vertex inclusion
-  */
+   * A vector giving the (partial) ordering for vertex inclusion
+   */
   //VectorPtr order;
   
   /**
-  * Fisher-Yates shuffle of elements up to offset
-  */
+   * Fisher-Yates shuffle of elements up to offset
+   */
   template<class T>
   void shuffle(std::vector<T>& vec, long offset){
     for( int i=0; i < offset - 1.0; i++){
@@ -59,9 +59,9 @@ protected:
   }
   
   /**
-  * Generates a vertex ordering 'vertexOrder' conditional upon a possibly
-  * partial ordering 'order'.
-  */
+   * Generates a vertex ordering 'vertexOrder' conditional upon a possibly
+   * partial ordering 'order'.
+   */
   void generateOrder(std::vector<int>& vertexOrder,const VectorPtr order){
     vertexOrder.resize(order->size());
     std::vector<int> y(vertexOrder.size());
@@ -94,9 +94,9 @@ public:
   }
   
   /*!
-  * R constructor for RCPP
-  *
-  */
+   * R constructor for RCPP
+   *
+   */
   LatentOrderLikelihood(SEXP sexp){
     boost::shared_ptr<LatentOrderLikelihood> xp = unwrapRobject< LatentOrderLikelihood<Engine> >(sexp);
     model = xp->model;
@@ -105,8 +105,8 @@ public:
   }
   
   /*!
-  * coerce to R object. for RCPP
-  */
+   * coerce to R object. for RCPP
+   */
   operator SEXP() const{
     return wrapInReferenceClass(*this,Engine::engineName() + "LatentOrderLikelihood");
   }
@@ -137,8 +137,8 @@ public:
   
   
   /*!
-  * Get model exposed to R
-  */
+   * Get model exposed to R
+   */
   Rcpp::RObject getModelR(){
     return wrap(*model);
   }
@@ -274,12 +274,28 @@ public:
       this->shuffle(vertices, n);
     }
     PutRNGstate();
-    return this->generateNetworkWithOrder(vertices);
+    return this->generateNetworkWithOrder(vertices,false);
+  }
+  
+  Rcpp::RObject generateNetworkReturnChanges(){
+    GetRNGstate();
+    long n = model->network()->size();
+    std::vector<int> vertices(n);
+    if(model->hasVertexOrder()){
+      this->generateOrder(vertices, model->getVertexOrder());
+    }else{
+      for(int i=0; i<n;i++){
+        vertices[i] = i;
+      }
+      this->shuffle(vertices, n);
+    }
+    PutRNGstate();
+    return this->generateNetworkWithOrder(vertices,true);
   }
   
   
   
-  Rcpp::RObject generateNetworkWithOrder(std::vector<int> vert_order){
+  Rcpp::RObject generateNetworkWithOrder(std::vector<int> vert_order,bool storeChangeStats=false){
     GetRNGstate();
     long n = model->network()->size();
     long nStats = model->thetas().size();
@@ -288,6 +304,18 @@ public:
     ModelPtr runningModel = noTieModel->clone();
     runningModel->setNetwork(noTieModel->network()->clone());
     runningModel->calculate();
+    bool directedGraph = runningModel->network()->isDirected();
+    
+    Rcpp::List changeStats(1);
+    if(storeChangeStats){
+      //Make the change stat list
+      long e = n*(n-1);
+      if(!directedGraph){
+        e = e*0.5;
+      }
+      Rcpp::List tmp(e);
+      changeStats = tmp;
+    }
     
     
     std::vector<double> eStats = std::vector<double>(nStats, 0.0);//runningModel->statistics();
@@ -299,7 +327,7 @@ public:
     
     std::vector<int> workingVertOrder = vert_order;
     
-    bool directedGraph = runningModel->network()->isDirected();
+    
     double llik = runningModel->logLik();
     double llikChange, probTie;//, ldenom;
     bool hasEdge = false;
@@ -322,14 +350,28 @@ public:
           runningModel->rollback();
         
         //update the generated network statistics and expected statistics
+        //Initiate change stats
+        std::vector<double> change(terms.size());
+        
         for(int m=0; m<terms.size(); m++){
           double diff = newTerms[m] - terms[m];\
           eStats[m] += diff * probTie;
+          change[m] = diff;
           if(hasEdge){
             stats[m] += diff;
             terms[m] += diff;
           }
         }
+        if(storeChangeStats){
+          if(directedGraph){
+            changeStats[((i-1)*(i) + (2*j))] = change; //make sure we get the right one if directed
+          }else{
+            changeStats[((i-1)*(i)*0.5 + j)] = change;
+          }
+        }
+        
+        
+        
         if(directedGraph){
           assert(!runningModel->network()->hasEdge(alter, vertex));
           llik = runningModel->logLik();
@@ -344,13 +386,18 @@ public:
           }else
             runningModel->rollback();
           
+          
           for(int m=0; m<terms.size(); m++){
             double diff = newTerms[m] - terms[m];
             eStats[m] += diff * probTie;
+            change[m] = diff;
             if(hasEdge){
               stats[m] += diff;
               terms[m] += diff;
             }
+          }
+          if(storeChangeStats){
+            changeStats[((i-1)*(i) + (2*j +1))] = change; //make sure we get the right one if directed
           }
         }
       }
@@ -367,6 +414,7 @@ public:
     result["emptyNetworkStats"] = wrap(emptyStats);
     result["stats"] = wrap(stats);
     result["expectedStats"] = wrap(eStats);
+    if(storeChangeStats){result["changeStats"] = wrap(changeStats);}
     
     return result;
   }

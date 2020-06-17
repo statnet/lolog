@@ -122,6 +122,7 @@ RCPP_MODULE(lolog) {
     .method("generateNetwork",&LatentOrderLikelihood<Undirected>::generateNetwork)
     //added in
     .method("calcChangeStats",&LatentOrderLikelihood<Undirected>::calcChangeStats)
+    .method("generateNetworkReturnChanges",&LatentOrderLikelihood<Undirected>::generateNetworkReturnChanges)
     .method("generateNetworkWithEdgeOrder",&LatentOrderLikelihood<Undirected>::generateNetworkWithEdgeOrder)
     
     ;
@@ -136,6 +137,7 @@ RCPP_MODULE(lolog) {
     .method("generateNetwork",&LatentOrderLikelihood<Directed>::generateNetwork)
     //added in
     .method("calcChangeStats",&LatentOrderLikelihood<Directed>::calcChangeStats)
+    .method("generateNetworkReturnChanges",&LatentOrderLikelihood<Directed>::generateNetworkReturnChanges)
     .method("generateNetworkWithEdgeOrder",&LatentOrderLikelihood<Directed>::generateNetworkWithEdgeOrder)
     
     ;
