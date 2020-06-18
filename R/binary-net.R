@@ -28,7 +28,7 @@ as.network.Rcpp_UndirectedNet <- function(x, ...) {
   attr(el, "n") <- n <- x$size()
   
   if (nrow(el) > 0)
-    nw <- network(el, directed = FALSE)
+    nw <- network(el,matrix.type = "edgelist", directed = FALSE)
   else
     nw <- network.initialize(n, directed = FALSE)
   
@@ -76,7 +76,7 @@ as.network.Rcpp_DirectedNet <- function(x, ...) {
   attr(el, "n") <- n <- x$size()
   
   if (nrow(el) > 0)
-    nw <- network(el, directed = TRUE)
+    nw <- network(el, directed = TRUE,matrix.type = "edgelist")
   else
     nw <- network.initialize(n, directed = TRUE)
   
