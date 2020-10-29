@@ -2,7 +2,6 @@
 % Please edit documentation in R/inline.R, R/roxygen.R
 \name{inlineLologPlugin}
 \alias{inlineLologPlugin}
-\alias{inlineLologPlugin}
 \title{An lolog plug-in for easy C++ prototyping and access}
 \usage{
 inlineLologPlugin(...)

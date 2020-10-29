@@ -4,7 +4,8 @@
 \alias{plot.lologGmm}
 \title{Conduct Monte Carlo diagnostics on a lolog model fit}
 \usage{
-\method{plot}{lologGmm}(x, type = c("histograms", "target", "model"), ...)
+\method{plot}{lologGmm}(x, type = c("histograms", "target", "model"),
+  ...)
 }
 \arguments{
 \item{x}{A model fit object to be diagnosed.}

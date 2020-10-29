@@ -5,14 +5,16 @@
 \title{Fits a latent ordered network model using Monte Carlo variational inference}
 \usage{
 lologVariational(formula, nReplicates = 5L, dyadInclusionRate = NULL,
-  targetFrameSize = 5e+05)
+  edgeInclusionRate = NULL, targetFrameSize = 5e+05)
 }
 \arguments{
 \item{formula}{A lolog formula. See \code{link{lolog}}}
 
 \item{nReplicates}{An integer controlling how many dyad ordering to perform.}
 
-\item{dyadInclusionRate}{Controls what proportion of dyads in each ordering should be dropped.}
+\item{dyadInclusionRate}{Controls what proportion of non-edges in each ordering should be dropped.}
+
+\item{edgeInclusionRate}{Controls what proportion of edges in each ordering should be dropped.}
 
 \item{targetFrameSize}{Sets dyadInclusionRate so that the model frame for the logistic regression will have on average this amount of observations.}
 }
@@ -24,7 +26,8 @@ items:
 \item{theta}{The fit parameter values}
 \item{vcov}{The asymptotic covariance matrix for the parameter values.}
 \item{nReplicates}{The number of replicates}
-\item{dyadInclusionRate}{The rate at which dyads are included}
+\item{dyadInclusionRate}{The rate at which non-edges are included}
+\item{edgeInclusionRate}{The rate at which edges are included}
 \item{allDyadIndependent}{Logical indicating model dyad independence}
 \item{likelihoodModel}{An object of class *LatentOrderLikelihood at the fit parameters}
 \item{outcome}{The outcome vector for the logistic regression}
@@ -45,7 +48,9 @@ exactly maximum likelihood inference. The objective function is
 This can be approximated by drawing samples from p(s) to approximate the expectation. The
 number of samples is controlled by the nReplicates parameter. The memory required is on the
 order of nReplicates * (# of dyads). For large networks this can be impractical, so
-adjusting dyadInclusionRate allows one to down sample the # of dyads in each replicate.
+adjusting dyadInclusionRate and edgeInclusionRate allows one to down sample the # of 
+dyads in each replicate. By default these are set attempting to achieve as equal a number
+of edges and non-edges as possible while targeting a model frame with targetFrameSize number of rows.
 
 If the model is dyad independent, replicates are redundant, and so nReplicates is set to
 1 with a note.

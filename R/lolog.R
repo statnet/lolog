@@ -158,7 +158,7 @@ lolog <- function(formula,
   #initialize theta via variational inference
   if (is.null(theta)) {
     vcat("Initializing Using Variational Fit\n")
-    varFit <- lologVariational(formula, dyadInclusionRate = 1)
+    varFit <- lologVariational(formula, targetFrameSize = 1000000)
     if (varFit$allDyadIndependent) {
       vcat("Model is dyad independent. Returning maximum likelihood estimate.\n")
       return(varFit)

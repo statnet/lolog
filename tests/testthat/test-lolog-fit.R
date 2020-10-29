@@ -75,7 +75,7 @@ test_that("lolog_fit_parallel", {
     cluster = cluster,
     verbose = FALSE
   )
-  expect_true(all(fit$theta > c(-1.9, 0)) &
+  expect_true(all(fit$theta > c(-1.9, -.1)) &
                 all(fit$theta < c(-1.1, .2)))
   
   
