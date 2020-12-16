@@ -144,6 +144,10 @@ public:
     }
 
     List variationalModelFrame(int nOrders, double downsampleRate){
+        return variationalModelFrameMulti(nOrders, downsampleRate, downsampleRate);
+    }
+    
+    List variationalModelFrameMulti(int nOrders, double downsampleRate, double edgeDownsampleRate){
         List result;
 
         long n = model->network()->size();
@@ -157,24 +161,36 @@ public:
                 }
                 this->shuffle(vertices, n);
             }
-            result.push_back(this->modelFrameGivenOrder(downsampleRate, vertices));
+            result.push_back(this->modelFrameGivenOrder(downsampleRate, edgeDownsampleRate, vertices));
         }
         return result;
     }
 
 
-    List variationalModelFrameWithFunc(int nOrders, double downsampleRate, Function vertexOrderingFunction){
+    List variationalModelFrameWithFunc(int nOrders, double downsampleRate, 
+                                       Function vertexOrderingFunction){
+        return variationalModelFrameWithFuncMulti(nOrders, downsampleRate, 
+                                             downsampleRate, vertexOrderingFunction);
+    }
+    
+    List variationalModelFrameWithFuncMulti(int nOrders, double downsampleRate, 
+                                            double edgeDownsampleRate, Function vertexOrderingFunction){
         List result;
         for( int i=0; i<nOrders; i++){
             GetRNGstate();
             std::vector<int> vertices = as< std::vector<int> >(vertexOrderingFunction());
             PutRNGstate();
-            result.push_back(this->modelFrameGivenOrder(downsampleRate, vertices));
+            result.push_back(this->modelFrameGivenOrder(downsampleRate, edgeDownsampleRate, vertices));
         }
         return result;
     }
-
+    
     List modelFrameGivenOrder(double downsampleRate, std::vector<int> vert_order){
+        return modelFrameGivenOrder(downsampleRate, downsampleRate, vert_order);
+    }
+
+    List modelFrameGivenOrder(double downsampleRate, double edgeDownsampleRate, 
+                              std::vector<int> vert_order){
         GetRNGstate();
         long n = model->network()->size();
         //long nStats = model->thetas().size();
@@ -190,11 +206,13 @@ public:
 
         std::vector<int> outcome;
         std::vector< std::vector<double> > predictors(terms.size());
+        std::vector<double> selectionProb;
         for(int i=0;i<predictors.size();i++){
             predictors.at(i).reserve(floor(downsampleRate * noTieModel->network()->maxEdges()) + 1000);
         }
 
         bool sample;
+        double selProb;
         //bool hasEdge;
         //double lpartition = 0.0;
         for(int i=0; i < n; i++){
@@ -202,10 +220,15 @@ public:
             this->shuffle(workingVertOrder,i);
             for(int j=0; j < i; j++){
                 int alter = workingVertOrder[j];
-                sample = Rf_runif(0.0,1.0) < downsampleRate;
                 assert(!runningModel->network()->hasEdge(vertex, alter));
                 bool hasEdge = model->network()->hasEdge(vertex, alter);
+                if(hasEdge || model->network()->hasEdge(alter, vertex))
+                    selProb = edgeDownsampleRate;
+                else
+                    selProb = downsampleRate;
+                sample = Rf_runif(0.0,1.0) < selProb;
                 if(sample){
+                    selectionProb.push_back(selProb);
                     runningModel->statistics(terms);
                     runningModel->dyadUpdate(vertex, alter, vert_order, i);
                     runningModel->statistics(newTerms);
@@ -229,6 +252,7 @@ public:
                 if(runningModel->network()->isDirected()){
                     hasEdge = model->network()->hasEdge(alter, vertex);
                     if(sample){
+                        selectionProb.push_back(selProb);
                         runningModel->statistics(terms);
                         runningModel->dyadUpdate(alter, vertex, vert_order, i);
                         runningModel->statistics(newTerms);
@@ -258,6 +282,7 @@ public:
         List result;
         result["outcome"] = wrap(outcome);
         result["samples"] = wrap(predictors);
+        result["selectionProb"] = wrap(selectionProb);
         return result;
     }
 

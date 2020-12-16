@@ -6,7 +6,8 @@
 #'
 #' @param formula A lolog formula. See \code{link{lolog}}
 #' @param nReplicates An integer controlling how many dyad ordering to perform.
-#' @param dyadInclusionRate Controls what proportion of dyads in each ordering should be dropped.
+#' @param dyadInclusionRate Controls what proportion of non-edges in each ordering should be dropped.
+#' @param edgeInclusionRate Controls what proportion of edges in each ordering should be dropped.
 #' @param targetFrameSize Sets dyadInclusionRate so that the model frame for the logistic regression will have on average this amount of observations.
 #'
 #'
@@ -22,7 +23,9 @@
 #' This can be approximated by drawing samples from p(s) to approximate the expectation. The
 #' number of samples is controlled by the nReplicates parameter. The memory required is on the
 #' order of nReplicates * (# of dyads). For large networks this can be impractical, so
-#' adjusting dyadInclusionRate allows one to down sample the # of dyads in each replicate.
+#' adjusting dyadInclusionRate and edgeInclusionRate allows one to down sample the # of 
+#' dyads in each replicate. By default these are set attempting to achieve as equal a number
+#' of edges and non-edges as possible while targeting a model frame with targetFrameSize number of rows.
 #'
 #' If the model is dyad independent, replicates are redundant, and so nReplicates is set to
 #' 1 with a note.
@@ -39,7 +42,8 @@
 #' \item{theta}{The fit parameter values}
 #' \item{vcov}{The asymptotic covariance matrix for the parameter values.}
 #' \item{nReplicates}{The number of replicates}
-#' \item{dyadInclusionRate}{The rate at which dyads are included}
+#' \item{dyadInclusionRate}{The rate at which non-edges are included}
+#' \item{edgeInclusionRate}{The rate at which edges are included}
 #' \item{allDyadIndependent}{Logical indicating model dyad independence}
 #' \item{likelihoodModel}{An object of class *LatentOrderLikelihood at the fit parameters}
 #' \item{outcome}{The outcome vector for the logistic regression}
@@ -63,6 +67,7 @@
 lologVariational <- function(formula,
                              nReplicates = 5L,
                              dyadInclusionRate = NULL,
+                             edgeInclusionRate = NULL,
                              targetFrameSize = 500000) {
   lolik <- createLatentOrderLikelihood(formula)
   nReplicates <- as.integer(nReplicates)
@@ -81,22 +86,35 @@ lologVariational <- function(formula,
   network <- lolik$getModel()$getNetwork()
   n <- network$size()
   ndyads <- n * (n - 1)
+  nedges <- lolik$getModel()$getNetwork()$nEdges()
   if (!network$isDirected())
     ndyads <- ndyads / 2
-  if (is.null(dyadInclusionRate)) {
-    dyadInclusionRate <- min(1, targetFrameSize / ndyads)
+
+  if (is.null(edgeInclusionRate)){
+    edgeInclusionRate <- min( floor(targetFrameSize / 2), nedges) / nedges
   }
+  
+  if (is.null(dyadInclusionRate)) {
+    dyadInclusionRate <- min(1, (targetFrameSize - edgeInclusionRate * nedges)  / (ndyads - nedges + 1) )
+  }
+  
   samples <-
-    lolik$variationalModelFrame(nReplicates, dyadInclusionRate)
+    lolik$variationalModelFrameMulti(nReplicates, dyadInclusionRate, edgeInclusionRate)
   predictors <- lapply(samples, function(x)
     as.data.frame(x[[2]],
                   col.names = 1:length(x[[2]])))
   predictors <- do.call(rbind, predictors)
   outcome <- do.call(c, lapply(samples, function (x)
     x[[1]]))
+  selectionProb <- do.call(c, lapply(samples, function (x)
+    x[[3]]))
   
   logFit <-
-    glm(outcome ~ as.matrix(predictors) - 1, family = binomial())
+    glm(
+      outcome ~ as.matrix(predictors) - 1, 
+      family = "binomial",
+      weights = 1 / selectionProb
+      )
   theta <- logFit$coefficients
   lolik$setThetas(theta)
   names(theta) <- names(lolik$getModel()$statistics())
@@ -104,9 +122,10 @@ lologVariational <- function(formula,
     method = "variational",
     formula = formula,
     theta = theta,
-    vcov = vcov(logFit) * nReplicates / dyadInclusionRate,
+    vcov = vcov(logFit) * nReplicates,
     nReplicates = nReplicates,
     dyadInclusionRate = dyadInclusionRate,
+    edgeInclusionRate = edgeInclusionRate,
     allDyadIndependent = allDyadIndependent,
     likelihoodModel = lolik,
     outcome = outcome,

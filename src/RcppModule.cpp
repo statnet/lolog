@@ -115,6 +115,8 @@ RCPP_MODULE(lolog) {
     .method("setThetas",&LatentOrderLikelihood<Undirected>::setThetas)
     .method("variationalModelFrame",&LatentOrderLikelihood<Undirected>::variationalModelFrame)
     .method("variationalModelFrameWithFunc",&LatentOrderLikelihood<Undirected>::variationalModelFrameWithFunc)
+    .method("variationalModelFrameMulti",&LatentOrderLikelihood<Undirected>::variationalModelFrameMulti)
+    .method("variationalModelFrameWithFuncMulti",&LatentOrderLikelihood<Undirected>::variationalModelFrameWithFuncMulti)
     .method("generateNetwork",&LatentOrderLikelihood<Undirected>::generateNetwork)
     ;
 
@@ -125,6 +127,8 @@ RCPP_MODULE(lolog) {
     .method("setThetas",&LatentOrderLikelihood<Directed>::setThetas)
     .method("variationalModelFrame",&LatentOrderLikelihood<Directed>::variationalModelFrame)
     .method("variationalModelFrameWithFunc",&LatentOrderLikelihood<Directed>::variationalModelFrameWithFunc)
+    .method("variationalModelFrameMulti",&LatentOrderLikelihood<Directed>::variationalModelFrameMulti)
+    .method("variationalModelFrameWithFuncMulti",&LatentOrderLikelihood<Directed>::variationalModelFrameWithFuncMulti)
     .method("generateNetwork",&LatentOrderLikelihood<Directed>::generateNetwork)
     ;
 

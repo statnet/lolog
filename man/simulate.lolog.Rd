@@ -4,8 +4,8 @@
 \alias{simulate.lolog}
 \title{Generates BinaryNetworks from a fit lolog object}
 \usage{
-\method{simulate}{lolog}(object, nsim = 1, seed = NULL, convert = FALSE,
-  ...)
+\method{simulate}{lolog}(object, nsim = 1, seed = NULL,
+  convert = FALSE, ...)
 }
 \arguments{
 \item{object}{A `lolog` object.}

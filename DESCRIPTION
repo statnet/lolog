@@ -5,7 +5,7 @@ Title: Latent Order Logistic Graph Models
 LinkingTo: Rcpp, BH
 Type: Package
 LazyLoad: yes
-Author: c(person(c("Ian","E."),"Fellows", role=c("aut","cre"), email="ian@fellstat.com"), person(c("Mark","S."),"Handcock", role="ctb"))
+Authors@R: c(person(c("Ian","E."),"Fellows", role=c("aut","cre"), email="ian@fellstat.com"), person(c("Mark","S."),"Handcock", role="ctb"))
 Description: Estimation of Latent Order Logistic (LOLOG) Models for Networks.
     LOLOGs are a flexible and fully general class of statistical graph models. 
     This package provides functions for performing MOM, GMM and variational 
@@ -33,5 +33,5 @@ Suggests:
     igraph
 URL: https://github.com/statnet/lolog
 RcppModules: lolog
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr

@@ -692,7 +692,7 @@ public:
      * deep copy
      *  \returns an R Reference Class deep copy of the network
      */
-    SEXP cloneR() const{
+    Rcpp::RObject cloneR() const{
         return wrap(BinaryNet(*this,true));
     }
 
