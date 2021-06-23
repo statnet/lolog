@@ -4,8 +4,13 @@
 \alias{lologVariational}
 \title{Fits a latent ordered network model using Monte Carlo variational inference}
 \usage{
-lologVariational(formula, nReplicates = 5L, dyadInclusionRate = NULL,
-  edgeInclusionRate = NULL, targetFrameSize = 5e+05)
+lologVariational(
+  formula,
+  nReplicates = 5L,
+  dyadInclusionRate = NULL,
+  edgeInclusionRate = NULL,
+  targetFrameSize = 5e+05
+)
 }
 \arguments{
 \item{formula}{A lolog formula. See \code{link{lolog}}}

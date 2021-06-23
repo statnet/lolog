@@ -18,11 +18,9 @@
 \alias{\S4method{[<-}{Rcpp_UndirectedNet,ANY,ANY,ANY}}
 \title{indexing}
 \usage{
-\S4method{[}{Rcpp_DirectedNet,ANY,ANY,ANY}(x, i, j, ...,
-  maskMissing = TRUE, drop = TRUE)
+\S4method{[}{Rcpp_DirectedNet,ANY,ANY,ANY}(x, i, j, ..., maskMissing = TRUE, drop = TRUE)
 
-\S4method{[}{Rcpp_UndirectedNet,ANY,ANY,ANY}(x, i, j, ...,
-  maskMissing = TRUE, drop = TRUE)
+\S4method{[}{Rcpp_UndirectedNet,ANY,ANY,ANY}(x, i, j, ..., maskMissing = TRUE, drop = TRUE)
 
 \S4method{[}{Rcpp_DirectedNet,ANY,ANY,ANY}(x, i, j, ...) <- value
 

@@ -1,7 +1,3 @@
-# TODO: Add comment
-#
-# Author: ianfellows
-###############################################################################
 context("BinaryNet")
 
 library(testthat)

@@ -4,11 +4,23 @@
 \alias{lolog}
 \title{Fits a LOLOG model via Monte Carlo Generalized Method of Moments}
 \usage{
-lolog(formula, auxFormula = NULL, theta = NULL, nsamp = 1000,
-  includeOrderIndependent = TRUE, targetStats = NULL,
-  weights = "full", tol = 0.1, nHalfSteps = 10, maxIter = 100,
-  minIter = 2, startingStepSize = 0.1, maxStepSize = 0.5,
-  cluster = NULL, verbose = TRUE)
+lolog(
+  formula,
+  auxFormula = NULL,
+  theta = NULL,
+  nsamp = 1000,
+  includeOrderIndependent = TRUE,
+  targetStats = NULL,
+  weights = "full",
+  tol = 0.1,
+  nHalfSteps = 10,
+  maxIter = 100,
+  minIter = 2,
+  startingStepSize = 0.1,
+  maxStepSize = 0.5,
+  cluster = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{formula}{A lolog formula for the sufficient statistics (see details).}

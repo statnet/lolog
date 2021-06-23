@@ -4,8 +4,15 @@
 \alias{plot.gofit}
 \title{Plots a gofit object}
 \usage{
-\method{plot}{gofit}(x, y, type = c("line", "box"), scaling = c("none",
-  "std", "sqrt"), lineAlpha = 0.06, lineSize = 1, ...)
+\method{plot}{gofit}(
+  x,
+  y,
+  type = c("line", "box"),
+  scaling = c("none", "std", "sqrt"),
+  lineAlpha = 0.06,
+  lineSize = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{the gofit object}

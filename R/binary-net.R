@@ -4,9 +4,13 @@
 #' Network conversion
 #' @param x The object
 #' @param ... Additional parameters
-as.network <- function(x, ...) {
-  UseMethod("as.network")
-}
+#' @name as.network
+NULL
+#as.network
+
+#as.network <- as.network#function(x, ...) {
+#  UseMethod("as.network")
+#}
 
 #' Convert a UndirectedNet to a network object
 #' @param x the object
@@ -28,7 +32,7 @@ as.network.Rcpp_UndirectedNet <- function(x, ...) {
   attr(el, "n") <- n <- x$size()
   
   if (nrow(el) > 0)
-    nw <- network(el, directed = FALSE)
+    nw <- network(el, directed = FALSE, matrix.type = "edgelist")
   else
     nw <- network.initialize(n, directed = FALSE)
   

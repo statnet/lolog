@@ -3,9 +3,6 @@
 \name{as.network}
 \alias{as.network}
 \title{Network conversion}
-\usage{
-as.network(x, ...)
-}
 \arguments{
 \item{x}{The object}
 
