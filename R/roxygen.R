@@ -102,7 +102,7 @@ NULL
 #' @name lolog-terms
 #' @docType methods
 #' @section Statistic Descriptions:
-#' \itemize{
+#' \describe{
 #' \item{\code{edges}  (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
 #' \emph{Edges:} This term adds one network statistic equal to the number of edges 
 #' (i.e. nonzero values) in the network. }
@@ -133,8 +133,7 @@ NULL
 #' 
 #' \item{\code{transitivity()}  (order-independent) (undirected)}{ 
 #' The Soffer-Vazquez   transitivity. This is clustering metric that adjusts for large degree
-#' differences and is described by C in Equation 6 of 
-#' \url{https://pdfs.semanticscholar.org/7af5/f8c871d99b868cd0ed70c5fd09f59b399769.pdf}. Note 
+#' differences and is described by C in Equation 6 of #' \url{https://pubmed.ncbi.nlm.nih.gov/16089694/}. Note 
 #' The approximation of the number of possible shared neighbors between node i and j of min(d_i,d_j) - 1
 #' in this implementation.
 #'  }
@@ -332,7 +331,7 @@ NULL
 #'  }
 #'  
 #' @section Constraint Descriptions:
-#' \itemize{
+#' \describe{
 #' \item{\code{boundedDegree(lower,upper)}  (order-independent)  (undirected)}{ 
 #' Adds a constraint that the degrees for the network must be between lower and upper.
 #'   }
