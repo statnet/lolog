@@ -43,7 +43,7 @@ protected:
         int s = params.size();
         if(s <= nUnnamedParsed){
             if(!allowDefault)
-                ::Rf_error(("Error in " + name + ": To few parameters.").c_str());
+                ::Rf_error("%s",("Error in " + name + ": To few parameters.").c_str());
             return ret;
         }
         std::string pName;
@@ -58,7 +58,7 @@ protected:
                 ret = Rcpp::as<T>(params.at(nUnnamedParsed));
                 totalParsed++;
             }catch(...){
-                ::Rf_error(("Error in " + name + ": Invalid type for parameter " + paramName).c_str());
+                ::Rf_error("%s",("Error in " + name + ": Invalid type for parameter " + paramName).c_str());
             }
             nUnnamedParsed++;
         }else{
@@ -71,13 +71,13 @@ protected:
                         ret = Rcpp::as<T>(params.at(i));
                         totalParsed++;
                     }catch(...){
-                        ::Rf_error(("Error in " + name + ": Invalid type for parameter " + paramName).c_str());
+                        ::Rf_error("%s",("Error in " + name + ": Invalid type for parameter " + paramName).c_str());
                     }
                     continue;
                 }
             }
             if(!found && !allowDefault){
-                ::Rf_error(("Error in " + name + ":  Required parameter " + paramName + " missing").c_str());
+                ::Rf_error("%s",("Error in " + name + ":  Required parameter " + paramName + " missing").c_str());
             }
         }
         return ret;
@@ -113,7 +113,7 @@ public:
         if(par == "undirected")
             return UNDIRECTED;
 
-        ::Rf_error(("Error in " + name + ":  Required parameter " + paramName + " must be 'in', 'out', or 'undirected'").c_str());
+        ::Rf_error("%s",("Error in " + name + ":  Required parameter " + paramName + " must be 'in', 'out', or 'undirected'").c_str());
         return UNDIRECTED;
     }
 
@@ -127,13 +127,13 @@ public:
         if(par == "undirected")
             return UNDIRECTED;
 
-        ::Rf_error(("Error in " + name + ":  Required parameter " + paramName + " must be 'in', 'out', or 'undirected'").c_str());
+        ::Rf_error("%s",("Error in " + name + ":  Required parameter " + paramName + " must be 'in', 'out', or 'undirected'").c_str());
         return UNDIRECTED;
     }
 
     void end(){
         if(totalParsed != params.size()){
-            Rf_error(("Either unknown or duplicate parameters passed to " + name).c_str());
+            Rf_error("%s",("Either unknown or duplicate parameters passed to " + name).c_str());
         }
     }
 };

@@ -11,7 +11,7 @@ Description: Estimation of Latent Order Logistic (LOLOG) Models for Networks.
     This package provides functions for performing MOM, GMM and variational 
     inference. Visual diagnostics and goodness of fit metrics are provided. 
     See Fellows (2018) <arXiv:1804.04583> for a detailed description of the methods.
-Version: 1.3
+Version: 1.3.1
 Depends:
     R (>= 4.0.0),
     methods,
@@ -33,5 +33,5 @@ Suggests:
     igraph
 URL: https://github.com/statnet/lolog
 RcppModules: lolog
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.2
 VignetteBuilder: knitr

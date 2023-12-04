@@ -63,7 +63,13 @@ variable equal to the count of edges between those levels.
 The \code{d} argument is a vector of distinct integers. This term adds one
 network statistic to the model for each element in \code{d}; the \eqn{i}th
 such statistic equals the number of nodes in the network of degree
-\code{d[i]}, i.e. with exactly \code{d[i]} edges. 
+\code{d[i]}, i.e. with exactly \code{d[i]} edges.
+For directed networks if direction="undirected"
+degree is counted as the sum of the in and out degrees of a node. If direction="in" then in-degrees are
+used and direction="out" indicates out-degrees.
+
+If lessThanOrEqual=TRUE, then the count is the number of nodes with degree less than or equal to d.
+  }
 
 \item{\code{twoPath} (order-independent) (directed)  (undirected)}{
  This term adds one statistic to the model, equal to the number of 2-paths in
@@ -76,12 +82,6 @@ such statistic equals the number of nodes in the network of degree
  \eqn{\{i,j\}, \{j,k\}}. That is, it is an undirected path of length 2 from
  \eqn{i} to \eqn{k} via \eqn{j}, also known as a 2-star.}
 
-For directed networks if direction="undirected"
-degree is counted as the sum of the in and out degrees of a node. If direction="in" then in-degrees are
-used and direction="out" indicates out-degrees.
-
-If lessThanOrEqual=TRUE, then the count is the number of nodes with degree less than or equal to d.
-  }
   
   
 \item{\code{ degreeCrossProd() (order-independent)  (undirected) }}{ 

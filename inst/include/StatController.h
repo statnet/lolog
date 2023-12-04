@@ -58,11 +58,11 @@ public:
             pS = statMapPtr->at(name);
 
         }catch(...){
-            Rf_error((std::string("Unknown statistic: ") + name).c_str());
+            Rf_error("%s",(std::string("Unknown statistic: ") + name).c_str());
             return NULL;
         }
         if(pS==NULL){
-            Rf_error((std::string("Unknown statistic: ") + name).c_str());
+            Rf_error("%s",(std::string("Unknown statistic: ") + name).c_str());
             return NULL;
         }
         return pS->vCreateUnsafe(params);
@@ -74,11 +74,11 @@ public:
             pS = offsetMapPtr->at(name);
 
         }catch(...){
-            Rf_error((std::string("Unknown offset: ") + name).c_str());
+            Rf_error("%s",(std::string("Unknown offset: ") + name).c_str());
             return NULL;
         }
         if(pS==NULL){
-            Rf_error((std::string("Unknown offset: ") + name).c_str());
+            Rf_error("%s",(std::string("Unknown offset: ") + name).c_str());
             return NULL;
         }
         return pS->vCreateUnsafe(params);
