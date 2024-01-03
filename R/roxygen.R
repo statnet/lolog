@@ -181,12 +181,14 @@ NULL
 #'     of the degrees of all pairs of nodes in the network which are tied.
 #'   }
 #'   
-#' \item{\code{ nodeCov(name) } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
+#' \item{\code{ nodeCov(name, direction="undirected") } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 
 #' The \code{name} argument is a character string giving the name of a
 #' numeric attribute in the network's vertex attribute list.
 #' This term adds a single network statistic to the model equaling the sum of
 #' \code{name(i)} and \code{name(j)} for all edges \eqn{(i,j)} in the
-#' network. For categorical variables, levels are coded as 1,..,nlevels`.
+#' network. For categorical variables, levels are coded as 1,..,nlevels`. 
+#' If direction="in", only in-edges are counted. If direction="out" only 
+#' out-edges are counted.
 #'   }
 #'   
 #' \item{\code{ edgeCov(x, name=NULL) } (dyad-independent)  (order-independent)  (directed)  (undirected)}{ 

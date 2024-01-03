@@ -40,6 +40,7 @@ void initStats(){
     registerStatistic( DirStatPtr( new DirectedTriangles() ) );
     registerStatistic( DirStatPtr( new DirectedMutual() ) );
     registerStatistic( DirStatPtr( new DirectedNodeMatch() ) );
+    registerStatistic( DirStatPtr( new DirectedNodeMix() ) );
     registerStatistic( DirStatPtr( new DirectedDegree() ) );
     registerStatistic( DirStatPtr( new DirectedStar() ) );
     registerStatistic( DirStatPtr( new DirectedNodeCov() ) );

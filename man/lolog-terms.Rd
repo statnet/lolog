@@ -240,7 +240,7 @@ in the network.
 
 \section{Constraint Descriptions}{
 
-\itemize{
+\describe{
 \item{\code{boundedDegree(lower,upper)}  (order-independent)  (undirected)}{ 
 Adds a constraint that the degrees for the network must be between lower and upper.
   }

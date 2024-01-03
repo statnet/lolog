@@ -69,5 +69,12 @@ test_that("Stats", {
   f1 <- calculateStatistics(lazega ~ edges() + edgeCov(as.matrix(A)))
   f2 <- calculateStatistics(lazega ~ edges() + edgeCovSparse(A))
   expect_equivalent(f1,f2)
+  
+  data(sampson)
+  f <- calculateStatistics(samplike ~ nodeMix("group"))
+  expect_equivalent(f, c(nodemix.Loyal.Loyal = 23, nodemix.Loyal.Outcasts = 2, nodemix.Loyal.Turks = 9, 
+                         nodemix.Outcasts.Loyal = 1, nodemix.Outcasts.Outcasts = 10, nodemix.Outcasts.Turks = 7, 
+                         nodemix.Turks.Loyal = 5, nodemix.Turks.Outcasts = 1, nodemix.Turks.Turks = 30
+  ))
 })
   

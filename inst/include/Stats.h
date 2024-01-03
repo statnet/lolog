@@ -857,20 +857,24 @@ protected:
     int varIndex; /*!< the index of the variable in the network */
     int nstats; /*!< the number of stats generated (i.e. the number of levels squared) */
     int nlevels; /*!< the number of levels of the variable */
+    bool directed;
     std::vector<std::string> levels;
 public:
     NodeMix(){
         variableName="";
         nstats=nlevels=varIndex = -1;
+        directed = false;
     }
 
     NodeMix(std::string name){
         variableName=name;
         nstats=nlevels=varIndex = -1;
+        directed = false;
     }
 
     NodeMix(List params){
         nstats=nlevels=varIndex = -1;
+        directed = false;
         ParamParser p(name(), params);
         variableName = p.parseNext< std::string >("name");
         p.end();
@@ -882,6 +886,9 @@ public:
     }
 
     int getIndex(int i,int j){
+        if(directed){
+            return i * nlevels + j;
+        }
         int c;
         if(i>j){
             c=i;
@@ -898,8 +905,11 @@ public:
     std::vector<std::string> statNames(){
         std::vector<std::string> statnames(nstats,"");
         for(int i=0;i<levels.size();i++){
-            for(int j=i;j<levels.size();j++){
-                std::string name = "nodemix." + levels.at(j) + "." + levels.at(i);
+            int c = i;
+            if(directed)
+                c = 0;
+            for(int j=c;j<levels.size();j++){
+                std::string name = "nodemix." + levels.at(i) + "." + levels.at(j);
                 statnames.at(getIndex(i,j)) = name;
             }
         }
@@ -907,6 +917,7 @@ public:
     }
 
     void calculate(const BinaryNet<Engine>& net){
+        directed = net.isDirected();
         int from,to;
         int value1, value2;
         std::vector<std::string> vars = net.discreteVarNames();
@@ -917,11 +928,14 @@ public:
             }
         }
         if(variableIndex<0)
-            ::Rf_error("NodeMatch::calculate nodal attribute not found in network");
+            ::Rf_error("NodeMix::calculate nodal attribute not found in network");
         varIndex = variableIndex;
         levels = net.discreteVariableAttributes(varIndex).labels();
         nlevels = levels.size();
-        nstats = nlevels * (nlevels + 1) / 2;
+        if(directed)
+            nstats = nlevels * nlevels;
+        else
+            nstats = nlevels * (nlevels + 1) / 2;
         this->init(nstats);
         boost::shared_ptr< std::vector< std::pair<int,int> > > edges = net.edgelist();
         for(int i=0;i<edges->size();i++){
