@@ -13,4 +13,4 @@ loadModule("lolog", TRUE)
 
 
 #library(roxygen2)
-#roxygenize('lolog',roclets='rd')
+#roxygen2::roxygenize('lolog',roclets='rd')

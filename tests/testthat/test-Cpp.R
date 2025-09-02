@@ -1,6 +1,3 @@
-
-context("C++ tests")
-
 #library(lolog)
 library(testthat)
 

@@ -113,7 +113,7 @@ as.network.Rcpp_DirectedNet <- function(x, ...) {
 #' @param x the Rcpp_DirectedNet object
 #' @param ... additional parameters for plot.network
 #' @details
-#' This is a thin wrapper around \code{\link{plot.network}}.
+#' This is a thin wrapper around \code{\link[network]{plot.network}}.
 #' @examples
 #' data(ukFaculty)
 #' net <- as.BinaryNet(ukFaculty)
@@ -128,7 +128,7 @@ plot.Rcpp_DirectedNet <- function(x, ...) {
 #' @param x the object
 #' @param ... additional parameters for plot.network
 #' @details
-#' This is a thin wrapper around \code{\link{plot.network}}.
+#' This is a thin wrapper around \code{\link[network]{plot.network}}.
 #' @examples
 #' el <- matrix(c(1,2),ncol=2)
 #' net <- new(UndirectedNet, el, 5L)

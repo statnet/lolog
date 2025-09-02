@@ -1,5 +1,3 @@
-context("Latent Order Likeihood")
-
 #library(lolog)
 library(testthat)
 library(ergm)

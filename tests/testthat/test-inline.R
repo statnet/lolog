@@ -1,6 +1,3 @@
-context("inline tests")
-
-
 #library(lolog)
 library(BH)
 library(testthat)

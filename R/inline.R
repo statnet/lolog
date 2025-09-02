@@ -6,8 +6,8 @@
 #' @param ... plug-in arguments
 #' @details
 #' The lolog Rcpp plugin allows for the rapid prototyping of compiled code.
-#' new functions can be registered and exposed using \code{\link{cppFunction}}
-#' and new statistics can be compiled and registered using \code{\link{sourceCpp}}.
+#' new functions can be registered and exposed using \code{\link[Rcpp]{cppFunction}}
+#' and new statistics can be compiled and registered using \code{\link[Rcpp]{sourceCpp}}.
 #' @examples
 #' \dontrun{
 #' # This creates a function in C++ to create an empty network of size n
@@ -25,7 +25,7 @@
 #' net[1:10,1:10]
 #' 
 #' }
-#' @seealso \code{\link{cppFunction}}, \code{\link{sourceCpp}}, \code{\link{cppFunction}}
+#' @seealso \code{\link[Rcpp]{cppFunction}}, \code{\link[Rcpp]{sourceCpp}}
 inlineLologPlugin <- Rcpp::Rcpp.plugin.maker(
   include.after = "#include <lolog.h>",
   LinkingTo = unique(c("lolog", "BH", "Rcpp")),
@@ -33,3 +33,6 @@ inlineLologPlugin <- Rcpp::Rcpp.plugin.maker(
   Imports = unique(c("lolog", "BH", "Rcpp")),
   package        = "lolog"
 )
+
+
+

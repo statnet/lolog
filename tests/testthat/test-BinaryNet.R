@@ -1,5 +1,3 @@
-context("BinaryNet")
-
 library(testthat)
 library(ergm)
 #library(lolog)

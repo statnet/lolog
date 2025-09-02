@@ -10,7 +10,7 @@ Description: Estimation of Latent Order Logistic (LOLOG) Models for Networks.
     LOLOGs are a flexible and fully general class of statistical graph models. 
     This package provides functions for performing MOM, GMM and variational 
     inference. Visual diagnostics and goodness of fit metrics are provided. 
-    See Fellows (2018) <arXiv:1804.04583> for a detailed description of the methods.
+    See Fellows (2018) <doi:10.48550/arXiv.1804.04583> for a detailed description of the methods.
 Version: 1.3.2
 Depends:
     R (>= 4.0.0),
@@ -24,7 +24,7 @@ Imports:
     intergraph,
     Matrix
 Suggests:
-    testthat,
+    testthat (>= 3.0.0),
     inline,
     knitr,
     rmarkdown,
@@ -33,5 +33,7 @@ Suggests:
     igraph
 URL: https://github.com/statnet/lolog
 RcppModules: lolog
-RoxygenNote: 7.2.2
+RoxygenNote: 7.3.2
+Encoding: UTF-8
 VignetteBuilder: knitr
+Config/testthat/edition: 3

@@ -1,5 +1,3 @@
-context("stat tests")
-
 #library(lolog)
 library(testthat)
 library(ergm)

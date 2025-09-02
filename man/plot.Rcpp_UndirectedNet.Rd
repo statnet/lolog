@@ -15,7 +15,7 @@
 Plot an UndirectedNet object
 }
 \details{
-This is a thin wrapper around \code{\link{plot.network}}.
+This is a thin wrapper around \code{\link[network]{plot.network}}.
 }
 \examples{
 el <- matrix(c(1,2),ncol=2)

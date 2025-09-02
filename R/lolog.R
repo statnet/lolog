@@ -294,13 +294,13 @@ lolog <- function(formula,
       }
       results <-
         parallel::parLapply(cluster, 1:nsamp, worker, theta = theta)
-      stats <- t(sapply(results, function(x)
+      stats <- do.call(rbind,lapply(results, function(x)
         x$stats))
-      estats <- t(sapply(results, function(x)
+      estats <- do.call(rbind,lapply(results, function(x)
         x$estats))
       colnames(stats) <- colnames(estats) <- statNames
       if (!is.null(auxFormula))
-        auxStats <- t(sapply(results, function(x)
+        auxStats <- do.call(rbind,lapply(results, function(x)
           x$auxStats))
       else
         auxStats <- NULL
@@ -349,9 +349,14 @@ lolog <- function(formula,
     if (verbose >= 3){
       ns <- nrow(stats)
       os <- obsModelStats
-      pairs(rbind(stats, os), pch='.', cex=c(rep(1, ns), 10),
-	    col=c(rep("black", ns), "red"), diag.panel = .panelHist,
-            main=paste("Iteration",iter),cex.main=0.9)
+      if(length(os) == 1){
+        hist(stats, xlim = c(min(c(stats,os)),max(c(stats,os))))
+        points(os,0, col="red",cex=2, pch=16)
+      }else{
+        pairs(rbind(stats, os), pch='.', cex=c(rep(1, ns), 10),
+	        col=c(rep("black", ns), "red"), diag.panel = .panelHist,
+	        main=paste("Iteration",iter),cex.main=0.9)
+      }
     }
     vcat("Statistic GM Skewness Coef :", apply(stats,2, .gmSkewness),"\n", vl=2)
     
@@ -461,7 +466,6 @@ print.lolog <- function(x, ...) {
 #' Summary of a `lolog` object
 #' @param object the object
 #' @param ... additional parameters (unused)
-#' @method summary lolog
 #' @examples
 #' data(lazega)
 #' fit <- lologVariational(lazega ~ edges() + nodeMatch("office") + triangles, 
@@ -557,7 +561,7 @@ coef.lolog <- function(object, ...){
 #' target output statistic values with the pairs of observed target statistics represented by red squares.
 #' output statistic values with the observed statistics represented by vertical lines. "model" produces a pairs plot of the 
 #' sampled output statistic values with the pairs of observed statistics represented by red squares.
-#' @param ... Additional parameters. Passed to \link{geom_histogram} if type="histogram" 
+#' @param ... Additional parameters. Passed to \link[ggplot2]{geom_histogram} if type="histogram" 
 #' and \link{pairs} otherwise.
 #' 
 #' @examples 

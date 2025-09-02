@@ -15,7 +15,7 @@ target output statistic values with the pairs of observed target statistics repr
 output statistic values with the observed statistics represented by vertical lines. "model" produces a pairs plot of the 
 sampled output statistic values with the pairs of observed statistics represented by red squares.}
 
-\item{...}{Additional parameters. Passed to \link{geom_histogram} if type="histogram" 
+\item{...}{Additional parameters. Passed to \link[ggplot2]{geom_histogram} if type="histogram" 
 and \link{pairs} otherwise.}
 }
 \description{

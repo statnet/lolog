@@ -15,7 +15,7 @@
 plot an DirectedNet object
 }
 \details{
-This is a thin wrapper around \code{\link{plot.network}}.
+This is a thin wrapper around \code{\link[network]{plot.network}}.
 }
 \examples{
 data(ukFaculty)

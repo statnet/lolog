@@ -18,8 +18,8 @@ The inline plug-in for lolog
 }
 \details{
 The lolog Rcpp plugin allows for the rapid prototyping of compiled code.
-new functions can be registered and exposed using \code{\link{cppFunction}}
-and new statistics can be compiled and registered using \code{\link{sourceCpp}}.
+new functions can be registered and exposed using \code{\link[Rcpp]{cppFunction}}
+and new statistics can be compiled and registered using \code{\link[Rcpp]{sourceCpp}}.
 }
 \examples{
 \dontrun{
@@ -40,5 +40,5 @@ net[1:10,1:10]
 }
 }
 \seealso{
-\code{\link{cppFunction}}, \code{\link{sourceCpp}}, \code{\link{cppFunction}}
+\code{\link[Rcpp]{cppFunction}}, \code{\link[Rcpp]{sourceCpp}}
 }

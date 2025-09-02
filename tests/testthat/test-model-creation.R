@@ -1,4 +1,3 @@
-context("Model Creation")
 library(testthat)
 #library(lolog)
 library(ergm)
